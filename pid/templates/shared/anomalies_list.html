@@ -1,0 +1,36 @@
+{% macro anomalies_list(parent_object) %}
+
+<label class="pri-table-header">Anomalies</label>
+<table class="table table-condensed table-hover pri-table">
+    <tbody class="pri-list rowlink" data-link="row">
+        {% if parent_object.anomalies %}
+        {% for anomaly in parent_object.anomalies %}
+        <tr>
+            <td width="150px"><a href="{{ anomaly.get_url() }}">{{anomaly.key}}</a></td>
+            <td>{{anomaly.name|sn}}</td>
+            <td width="100px">{{anomaly.state|sn}}</td>
+            <td width="100px" data-toggle="tooltip" title="Created At">{{ moment(anomaly.created_at).format('YYYY-MM-DD') }}</td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr class="no-anomalies-added">
+            <td colspan="4"><i>No anomalies for this {{ parent_object.descriptor|lower }}.</i></td>
+        </tr>
+        {% endif %}
+    </tbody>
+    <tfoot>
+        <tr onclick="addAnomalyModal('{{ parent_object.get_class_name() }}', {{parent_object.id}});">
+            <td colspan="4">
+                <span><i class="pri-app-icon sm pri-icons-discrepancy"></i>Create Anomaly</span>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        flask_moment_render_all();  // For rendering timestamp
+    });
+</script>
+
+{% endmacro %}

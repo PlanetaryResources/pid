@@ -1,0 +1,58 @@
+
+{% from "shared/ajax_input_float_field.html" import render_ajax_input_float_field %}
+
+<div class="row">
+    <div class="col-xs-2">
+        <label class="control-label pri-field-label">Measured Mass</label><label class="control-label pri-field-label normal">&nbsp;(g)</label><br/>
+        {{ render_ajax_input_float_field(field=product.measured_mass, parent_object=product,
+                 api_url="/product/update", field_name='measured_mass',
+                 label='Measured Mass', display_label=False) }}
+    </div>
+    {% if product.part.components %}
+    <div class="col-xs-10"></div>
+    {% else %}
+    <div class="col-xs-2">
+        <label class="control-label pri-field-label">Material</label><br/>
+        <div class="small" style="padding-top: 5px;">{{ product.part.material|default('<i>Nothing selected</i>', True)|safe }}</div>
+    </div>
+    <div class="col-xs-2">
+        <label class="control-label pri-field-label">Material Specification</label><br/>
+        <div class="small" style="padding-top: 5px;">{{ product.part.material_specification|default('<i>Nothing selected</i>', True)|safe }}</div>
+    </div>
+    <div class="col-xs-6"></div>
+    {% endif %}
+</div>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        <label class="pri-table-header">INSTALLED IN</label><br>
+        {% if installed_ins %}
+        <table class="table table-condensed table-hover pri-table">
+            <thead>
+                <tr>
+                    <th width="20%">Part Number</th>
+                    <th width="20%">S/N / LOT</th>
+                    <th width="60%">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, values in installed_ins.items() %}
+                {% set pc = values[0] %}
+                <tr>
+                    <td><a href="{{pc.parent.part.design.get_url()}}">{{ pc.parent.part.part_number }}</a></td>
+                    <td>
+                        <a href="{{pc.parent.get_url()}}">{{ pc.parent.serial_number}}</a>
+                        <span class="pull-right">({{values|length}})</span>
+                    </td>
+                    <td>{{ pc.parent.part.get_name()|sn }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <i class="small">This product is not installed anywhere.</i>
+        {% endif %}
+    </div>
+</div>
+<div id="product_components">
+    {% include "product/as-built/component_list.html" %}  {# col-xs-12 in include #}
+</div>

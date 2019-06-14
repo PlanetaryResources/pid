@@ -1,0 +1,76 @@
+<div class="row">
+    <div class="col-xs-3">
+        <span class="pri-field-label">Create:</span>
+        <button type="button" class="btn pri-btn-primary center-block" style="display:inline-block;" onclick="createTaskModal();">Create Task</button>
+    </div>
+</div>
+<div class="row" style="margin-top: 10px;line-height:20px;">
+    <div class="col-xs-8">
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-xs-1 pri-field-label">View:</label>
+                <div class="col-xs-11">
+                    <label class="radio-inline">
+                        <input type="radio" name="taskType" value="requested">Requested By:
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="taskType" checked value="assigned">Assigned To:
+                    </label>
+                    <button class="btn pri-btn-secondary" id="user-me-btn" style="margin-right:18px;">Me</button>
+                    <button class="btn pri-btn-secondary" id="user-efab-btn" style="margin-right:18px;">EFAB</button>
+                    <button class="btn pri-btn-secondary" id="user-mfab-btn" style="margin-right:18px;">MFAB</button>
+                    <button class="btn pri-btn-secondary" id="user-admin-btn">PLAID Admin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-3">
+        <div class="pri-select-wrapper" style="margin-top:-5px;margin-left: -15px;">
+            <select class="form-control dashboard-user-select input-sm">
+                {% for user in users %}
+                <option value="{{user.username}}" {% if current_user.id == user.id %} selected {% endif %}>
+                {{user.get_name()}}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top: 10px;">
+    <div class="col-xs-offset-1 col-xs-11">
+        <button class="btn pri-btn-secondary">RECORDS FOR YOUR APPROVAL</button>
+    </div>
+</div>
+<div class="row" style="margin-top:10px">
+    <div class="col-xs-offset-1 col-xs-11">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="hide-complete-tasks"/> Hide Completed
+            </label>
+            <br>
+            <label>
+                <input type="checkbox" id="hide-rejected-tasks"/> Hide Rejected
+            </label>
+        </div>
+    </div>
+</div>
+<hr/>
+<div class="row">
+    <div class="col-xs-12">
+      <table class="table table-condensed table-striped table-hover" id="tasks-table">
+          <thead>
+              <tr>
+                  <th>Task Number</th>
+                  <th>Name</th>
+                  <th>Need Date</th>
+                  <th>Requested By</th>
+                  <th>Assigned To</th>
+                  <th>Criticality</th>
+                  <th>Status</th>
+              </tr>
+          </thead>
+          <tbody data-link="row" class="pri-list rowlink">
+          </tbody>
+      </table>
+    </div>
+  </div>

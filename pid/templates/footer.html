@@ -1,0 +1,8 @@
+<footer class="footer pri-footer">
+	<span>© {{ get_text('footer.company') }} {{ moment().format('YYYY') }}</span>
+    <span style="margin-left: 30px;" data-toggle="tooltip" title="{{ online_users|join('<br>') }}">Active Users: {{ online_users|length }}</span>
+    <span style="margin-left: 100px;"><a href="https://confluence.prioffice.net/display/ET/PLAID+-+Overview" target="new">About PLAID</a></span>
+    <span style="margin-left: 30px;"><a href="https://jira.prioffice.net/secure/CreateIssue.jspa?pid=11500&issuetype=1" target="new">Report Bug</a></span>
+    <span style="margin-left: 30px;"><a href="https://jira.prioffice.net/secure/CreateIssue.jspa?pid=11500&issuetype=2" target="new">Request Feature</a></span>
+	<span class="pull-right">{{ get_text('footer.version') }} {{ VERSION }}</span>
+</footer>

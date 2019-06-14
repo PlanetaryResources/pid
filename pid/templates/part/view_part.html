@@ -1,0 +1,116 @@
+{% from "shared/view_changelog_button.html" import view_changelog_button %}
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+
+{% if not part.inseparable_component %}
+<div class="row">
+    <div class="col-xs-2">
+        <span class="pri-secondary-header">{{ part.get_unique_identifier() }}</span>
+    </div>
+    <div class="col-xs-6">
+            {{ render_xeditable_text_field(field=part.get_name(), parent_object=part, api_url="/part/update",
+            field_name='name', input_class="pri-secondary-subheader", display_label=False, label='Name') }}
+    </div>
+    <div class="col-xs-3 text-right">
+        {% if part.get_nlas_for_part() %}
+        <i class="pri-app-icon edit pri-icons-reports-view-list-up xs-margin" data-toggle="tooltip" title="View Next Level Assemblies" onclick="viewPartNLAModal({{part.id}}, this);"></i>
+        {% else %}
+        <i class="pri-app-icon edit pri-icons-reports-view-list-up xs-margin disabled" data-toggle="tooltip" title="No NLAs to view"></i>
+        {% endif %}
+        <a href="{{ url_for('part.get_design_list', id=part.id) }}" target="_blank">
+            <i class="pri-app-icon edit pri-icons-reports-view-list-down xs-margin" data-toggle="tooltip" title="View Full Design List"></i>
+        </a>
+        {% if part.get_builds_for_design_number_and_part_identifier() %}
+        <i class="pri-app-icon edit pri-icons-reports-view-build xs-margin" data-toggle="tooltip" title="View Builds" onclick="viewPartBuildsModal({{part.id}}, this);"></i>
+        {% else %}
+        <i class="pri-app-icon edit pri-icons-reports-view-build xs-margin disabled" data-toggle="tooltip" title="No builds to view"></i>
+        {% endif %}
+        {{ view_changelog_button(parent_object=part) }}
+    </div>
+    <div class="col-xs-1 text-right">
+        {% if part.can_user_edit('builds') %}
+        <i class="pri-app-icon create pri-icons-reports-add-build no-margin" data-toggle="tooltip" title="Create Build" onclick="createPartBuildModal({{part.id}}, null);"></i>
+        {% else %}
+        <i class="pri-app-icon create pri-icons-reports-add-build no-margin disabled" data-toggle="tooltip" title="Can only create build after design is released"></i>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div id="mass_fields_{{part.id}}">
+        {# Total of col-xs-5 in include below #}
+        {% include "part/mass_fields.html" %}
+    </div> {# end mass_fields #}
+    <div class="col-xs-1"></div>
+    <div id="material_fields_{{part.id}}">
+        {# Total of col-xs-6 in include below #}
+        {% include "part/material_fields.html" %}
+    </div>
+</div>
+{% if part.components %}
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        <table class="table table-condensed table-hover pri-table">
+            <thead>
+                <tr>
+                    <th width="70px">QTY</th>
+                    <th width="150px">P/N</th>
+                    <th>NAME / DESCRIPTION</th>
+                    <th width="70px">CBE (g)</th>
+                    <th width="70px">UNC (%)</th>
+                    <th width="70px">PBE (g)</th>
+                    <th width="100px">STATE</th>
+                    <th width="70px"></th>
+                </tr>
+            </thead>
+            <tbody id="part_components_for_part_{{part.id}}">
+                {% include "part/view_part_components.html" %}
+            </tbody>
+            {% if part.can_user_edit('components') %}
+            <tfoot>
+                <tr onclick="addPartComponentModal({{part.id}});">
+                    <td colspan="8">
+                        <span><i class="pri-app-icon sm pri-icons-add"></i>ADD COMPONENT</span>
+                    </td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        <table class="table table-condensed table-hover pri-table">
+            <tbody id="part_components_for_part_{{part.id}}"></tbody>
+            {% if part.can_user_edit('components') %}
+            <tfoot>
+                <td colspan="8" onclick="addPartComponentModal({{part.id}});"><span style="cursor: pointer;"><i class="pri-app-icon sm pri-icons-add"></i>ADD COMPONENT</span></td>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+{% endif %} {# end if part.components #}
+{% else %} {# else if not part.inseparable_component #}
+<div class="row">
+    <div class="col-xs-2">
+        <span class="pri-secondary-header">{{ part.get_unique_identifier() }}</span>
+    </div>
+    <div class="col-xs-6">
+            {{ render_xeditable_text_field(field=part.get_name(), parent_object=part, api_url="/part/update",
+                         field_name='name', input_class="pri-secondary-subheader", display_label=False, label='Name') }}
+    </div>
+    <div class="col-xs-4"></div>
+</div>
+<div class="row">
+    <div id="mass_fields_{{part.id}}">
+        {# Total of col-xs-5 in include below #}
+        {% include "part/mass_fields.html" %}
+    </div> {# end mass_fields #}
+    <div class="col-xs-1"></div>
+    <div id="material_fields_{{part.id}}">
+        {# Total of col-xs-6 in include below #}
+        {% include "part/material_fields.html" %}
+    </div>
+</div>
+{% endif %} {# end if not part.inseparable_component #}
+<hr>

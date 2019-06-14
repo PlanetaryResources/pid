@@ -1,0 +1,13 @@
+
+These are the designs you just created:
+<br><br>
+<table class="table table-condensed table-hover pri-table">
+    <tbody>
+        {% for design in designs %}
+        <tr>
+            <td><a href="{{ design.get_url() }}">{{ design.get_unique_identifier() }}</a></td>
+            <td>{{ design.name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

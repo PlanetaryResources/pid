@@ -1,0 +1,11 @@
+The following record has been assigned to you for approval:
+
+Record:          {{ record.get_unique_identifier() }} - {{ record.get_name() }}
+Owner:           {{ record.owner.get_name() }}
+Your Capacity:   {{ approver.capacity }}
+{% if comment %}
+Comment:         {{ comment }}
+{% endif %}
+
+Record URL:
+{{ record.get_url(external=True) }}

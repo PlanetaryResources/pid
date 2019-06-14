@@ -1,0 +1,35 @@
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+
+{% if product_component.part %}
+<tr>
+    <td>
+        <a href="{{product_component.part.design.get_latest_revision_url()}}">{{ product_component.part.part_number }}</a>
+        <span class="pull-right">({{components|length}})</span>
+    </td>
+    <td>
+        {{ render_ajax_select_field(field=product_component.product, parent_object=product_component, api_url="/product/component/update",
+                                    field_name='product_all', display_label=False, input_size='input-sm',
+                                    options=product_component.get_products_for_product_component(), option_name='serial_number',
+                                    option_id='id', allow_blank=True, blank_text='---',
+                                    populate_id='product_components') }}
+    </td>
+    <td>{{ product_component.part.get_name()|sn }}</td>
+    <td>---</td>
+</tr>
+{% elif product_component.vendor_part %}
+<tr>
+    <td>
+        <a href="{{product_component.vendor_part.get_url()}}">{{ product_component.vendor_part.part_number }}</a>
+        <span class="pull-right">({{components|length}})</span>
+    </td>
+    <td>
+        {{ render_ajax_select_field(field=product_component.vendor_product, parent_object=product_component, api_url="/product/component/update",
+                                    field_name='vendor_product_all', display_label=False, input_size='input-sm',
+                                    options=product_component.get_vendor_products_for_product_component(), option_name='serial_number',
+                                    option_id='id', allow_blank=True, blank_text='---',
+                                    populate_id='product_components') }}
+    </td>
+    <td>{{ product_component.vendor_part.get_name()|sn }}</td>
+    <td>---</td>
+</tr>
+{% endif %}

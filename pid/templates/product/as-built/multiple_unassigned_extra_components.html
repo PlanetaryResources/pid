@@ -1,0 +1,69 @@
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+
+{% if product_component.part %}
+<tr class="action-icons-row" id="product_component_{{product_component.id}}">
+    <td>
+        <a href="{{product_component.part.design.get_latest_revision_url()}}">{{ product_component.part.part_number }}</a>
+        <span class="pull-right">({{components|length}})</span>
+    </td>
+    <td>
+        {{ render_ajax_select_field(field=product_component.product, parent_object=product_component, api_url="/product/extra_component/update",
+                                    field_name='product_all', display_label=False, input_size='input-sm',
+                                    options=product_component.get_products_for_extra_product_component(), option_name='serial_number',
+                                    option_id='id', allow_blank=True, blank_text='---',
+                                    populate_id='product_components') }}
+    </td>
+    <td>{{ product_component.part.get_name()|sn }}</td>
+    <td>---</td>
+    <td>
+        <div class="action-icons text-right">
+            <span class="cursor-pointer" id="delete_product_component_{{product_component.id}}"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></span>
+        </div>
+    </td>
+</tr>
+{% elif product_component.vendor_part %}
+<tr class="action-icons-row" id="product_component_{{product_component.id}}">
+    <td>
+        <a href="{{product_component.vendor_part.get_url()}}">{{ product_component.vendor_part.part_number }}</a>
+        <span class="pull-right">({{components|length}})</span>
+    </td>
+    <td>
+        {{ render_ajax_select_field(field=product_component.vendor_product, parent_object=product_component, api_url="/product/extra_component/update",
+                                    field_name='vendor_product_all', display_label=False, input_size='input-sm',
+                                    options=product_component.get_vendor_products_for_extra_product_component(), option_name='serial_number',
+                                    option_id='id', allow_blank=True, blank_text='---',
+                                    populate_id='product_components') }}
+    </td>
+    <td>{{ product_component.vendor_part.get_name()|sn }}</td>
+    <td>---</td>
+    <td>
+        <div class="action-icons text-right">
+            <span class="cursor-pointer" id="delete_product_component_{{product_component.id}}"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></span>
+        </div>
+    </td>
+</tr>
+{% endif %}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#delete_product_component_{{product_component.id}}').click(function(e) {
+            $.ajax({
+                url: '/product/delete_product_component',
+                type: 'POST',
+                data: {
+                    pk: '{{product_component.id}}',
+                    amount: 'all_unassigned'
+                },
+                success: function(data) {
+                    // Remove row visually
+                    var $parent = $('#product_component_{{product_component.id}}').parent();
+                    $('#product_component_{{product_component.id}}').remove();
+                    if ($parent.find('tr').length == 0) {
+                        $parent.parent().find('thead').remove();
+                        $parent.append('<tr class="no-extra-components"><td colspan="5"><i>There are no extra components for this product.</i></td></tr>');
+                    }
+                }
+            });
+        });
+    });
+</script>

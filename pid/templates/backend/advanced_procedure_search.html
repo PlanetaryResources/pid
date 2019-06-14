@@ -1,0 +1,198 @@
+<form id="procedure-search-form" class="form-horizontal advanced-search-form {% if record_type != 'procedure' %} hidden {% endif %}">
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="proc-number">Procedure Number</label>
+        <div class="col-xs-10" id="proc-number">
+            <div class="row">
+                <div class="col-xs-2">
+                    <select class="form-control input-sm" name="proc_number_query_type">
+                        <option value="includes" selected>
+                            Includes
+                        </option>
+                        <option value="starts-with">
+                            Starts w/
+                        </option>
+                        <option value="ends-with">
+                            Ends w/
+                        </option>
+                    </select>
+                </div>
+                <div class="col-xs-3">
+                    <input type="text" class="form-control" name="proc_number_query"/>
+                </div>
+                <label class="col-xs-2 control-label" for="proc-part-number">Part #</label>
+                <div class="col-xs-2" id="proc-part-number">
+                    <select class="form-control input-sm" name="part_number_query_type">
+                        <option value="includes" selected>
+                            Includes
+                        </option>
+                        <option value="starts-with">
+                            Starts w/
+                        </option>
+                        <option value="ends-with">
+                            Ends w/
+                        </option>
+                    </select>
+                </div>
+                <div class="col-xs-3">
+                    <input type="text" class="form-control" name="part_number_query"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="proc-title">Text Fields</label>
+        <div class="col-xs-10" id="proc-title">
+            <input type="text" class="form-control" name="text_fields_query" placeholder="Searches name, description, summary, and notes" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="proc-state">State</label>
+        <div class="col-xs-10" id="proc-state">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="row">
+                        <div class="col-xs-9">
+                            <select class="form-control input-sm" name="state">
+                                <option value="">-- any --</option>
+                                {% for state in Procedure.workflow.states %}
+                                    <option value="{{state}}">{{state}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="true" name="in_open_state" />
+                                    Open
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="row">
+                        <label class="col-xs-3 control-label" for="proc-project">Project</label>
+                        <div class="col-xs-9" id="proc-project">
+                            <select class="form-control input-sm" name="project_id">
+                                <option value="">-- any --</option>
+                                {% for project in projects %}
+                                <option value="{{ project.id }}">
+                                    {{ project.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="proc-owner">Owner</label>
+        <div class="col-xs-10" id="proc-owner">
+            <div class="row">
+                <div class="col-xs-6">
+                    <select class="form-control input-sm" name="created_by_id">
+                        <option value="">-- any --</option>
+                        {% for owner in users %}
+                        <option value="{{ owner.id }}">
+                            {{ owner.get_name() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-xs-6">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="proc-created-by">Created By/On</label>
+        <div class="col-xs-10" id="proc-created-by">
+            <div class="row">
+                <div class="col-xs-4">
+                    <select class="form-control input-sm" name="created_by_id">
+                        <option value="">-- any --</option>
+                        {% for owner in users %}
+                        <option value="{{ owner.id }}">
+                            {{ owner.get_name() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-xs-8">
+                    <div class="input-group input-daterange">
+                        <input type="text" class="form-control input-sm" name="created_on_start" id="procedure_created_on_start">
+                            <div class="input-group-addon" style="color: black;">to</div>
+                        <input type="text" class="form-control input-sm" name="created_on_end" id="procedure_created_on_end">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-4">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" value="true" name="exclude_obsolete" checked/>
+                    Exclude Obsolete
+                </label>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <a href="#" class="clear-selections pull-right">Clear Selections</a>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-12">
+            <button class="btn btn-default pri-btn-primary" id="search-procedure-btn">Search</button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var procedureSearchResultTable = $('#procedure-search-results').DataTable({
+            dom: '<"pull-left"r<"#procedure-action-btns">><"pull-right"B>t<"pull-left"i><"pull-right"p>',
+            columnDefs: [
+                {targets: [0], render: renderUrlColumn, width: '15%'},
+                {targets: [1], width: '10%'},
+                {targets: [3], render: renderStateIcon},
+                {targets: [8], render: renderDateColumn}
+            ],
+            columns: [
+                {data: 'procedure_number', name: 'procedure_number', defaultContent: ''},
+                {data: 'revision', name: 'revision', defaultContent: ''},
+                {data: 'name', name: 'name', defaultContent: ''},
+                {data: 'state', name: 'state', defaultContent: ''},
+                {data: 'summary', name: 'summary', defaultContent: '', visible: false},
+                {data: 'project', name: 'project', defaultContent: '', visible: false},
+                {data: 'owner', name: 'owner', defaultContent: '', visible: false},
+                {data: 'created_by', name: 'created_by', defaultContent: '', visible: false},
+                {data: 'created_at', name: 'created_at', defaultContent: '', visible: false}
+            ],
+            buttons: [
+                {extend: 'colvis', text: 'Show Columns', columns: ':gt(0)', className: 'pri-btn-secondary'}
+            ]
+        });
+
+        // Catch submission of forms and load data through datatables
+        $('#search-procedure-btn').on('click', function (e) {
+            start_search();
+            e.preventDefault();
+            var queryParams = $('#procedure-search-form').formSerialize();
+            procedureSearchResultTable.ajax.url('/procedure/advanced_search?' + queryParams).load(search_complete, true);
+        });
+
+        addSaveAndCopyToDataTable(procedureSearchResultTable, '#procedure-action-btns');
+
+        $('#procedure_created_on_start').datepicker().on('changeDate', function(e) {
+            $('#procedure_created_on_end').datepicker('show');
+        });
+        $('#procedure_created_on_end').datepicker();
+
+        if ('{{record_type}}' === 'procedure') {
+            refreshSearchParams('{{record_type}}', procedureSearchResultTable);
+        }
+    });
+</script>

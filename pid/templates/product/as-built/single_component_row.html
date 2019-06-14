@@ -1,0 +1,77 @@
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+
+<tr>
+    {% if product_component.part %}
+    <td><a href="{{product_component.part.design.get_latest_revision_url()}}">{{ product_component.part.part_number }}</a></td>
+    <td>
+        {% if product_component.product %}
+        <a href="{{product_component.product.get_url()}}">{{ product_component.product.serial_number }}</a>
+        {% if product_component.can_user_edit('components') %}
+        <i id="clear_pc_{{product_component.id}}" class="fa fa-times-circle fa-lg pull-right cursor-pointer" aria-hidden="true" data-toggle="tooltip" title="Clear"></i>
+        {% endif %}
+        {% else %}
+        {{ render_ajax_select_field(field=product_component.product, parent_object=product_component, api_url="/product/component/update",
+                                    field_name='product', display_label=False, input_size='input-sm',
+                                    options=product_component.get_products_for_product_component(), option_name='serial_number',
+                                    option_id='id', allow_blank=True, blank_text='---',
+                                    populate_id='product_components') }}
+        {% endif %}
+    </td>
+    <td>{{ product_component.part.get_name()|sn }}</td>
+    <td>{% if product_component.product %}{{ product_component.product.state|sn }}{% else %}---{% endif %}</td>
+    {% else %}
+    <td><a href="{{product_component.vendor_part.get_url()}}">{{ product_component.vendor_part.part_number }}</a></td>
+    <td>
+        {% if product_component.vendor_product %}
+        <a href="{{product_component.vendor_product.get_url()}}">{{ product_component.vendor_product.serial_number }}</a>
+        {% if product_component.can_user_edit('components') %}
+        <i id="clear_vpc_{{product_component.id}}" class="fa fa-times-circle fa-lg pull-right cursor-pointer" aria-hidden="true" data-toggle="tooltip" title="Clear"></i>
+        {% endif %}
+        {% else %}
+        {{ render_ajax_select_field(field=product_component.vendor_product, parent_object=product_component, api_url="/product/component/update",
+                                    field_name='vendor_product', display_label=False, input_size='input-sm',
+                                    options=product_component.get_vendor_products_for_product_component(), option_name='serial_number',
+                                    option_id='id', allow_blank=True, blank_text='---',
+                                    populate_id='product_components') }}
+        {% endif %}
+    </td>
+    <td>{{ product_component.vendor_part.get_name()|sn }}</td>
+    <td>{% if product_component.vendor_product %}{{ product_component.vendor_product.state|sn }}{% else %}---{% endif %}</td>
+    {% endif %}
+</tr>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        {% if product_component.product %}
+        $('#clear_pc_{{product_component.id}}').click(function(e) {
+            $.ajax({
+                url: '/product/component/update',
+                type: 'POST',
+                data: {
+                    pk: '{{product_component.id}}',
+                    name: 'product',
+                    value: 'None'
+                },
+                success: function(data) {
+                    $('#product_components').html(data);
+                }
+            });
+        });
+        {% elif product_component.vendor_product %}
+        $('#clear_vpc_{{product_component.id}}').click(function(e) {
+            $.ajax({
+                url: '/product/component/update',
+                type: 'POST',
+                data: {
+                    pk: '{{product_component.id}}',
+                    name: 'vendor_product',
+                    value: 'None'
+                },
+                success: function(data) {
+                    $('#product_components').html(data);
+                }
+            });
+        });
+        {% endif %}
+    });
+</script>

@@ -1,0 +1,113 @@
+
+<div id="search_part_components_{{part.id}}">
+    <div style="width: 600px;">
+        <var id="result-container-part_components_{{part.id}}" class="result-container">Start typing to search</var>
+        <form id="form-part_components_{{part.id}}" name="form-part_components">
+            <div class="typeahead__container pri-typeahead part-components-typeahead">
+                <div class="typeahead__field">
+                    <span class="typeahead__query">
+                        <input id="search_parts_{{part.id}}" class="js-typeahead-components" name="components[query]" type="search" placeholder="Search" autocomplete="off">
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        setTimeout(function() { $('#search_parts_{{part.id}}').focus() }, 0);  // Focus on search field when open
+        $.typeahead({
+            input: '#search_parts_{{part.id}}',
+            minLength: 3,
+            maxItem: 15,
+            order: 'asc',
+            hint: true,  // Shows a hint while user is typing
+            dynamic: true,  // Queries backend for each input rather than just once
+            searchOnFocus: true,
+            display: ['number', 'name'],
+            correlativeTemplate: ['number', 'name'],
+            template: function (query, item) {
+                var template = '<span class="typeahead-group">{[icon]}</span>';
+                template += '<span class="typeahead-number" title="{[number|raw]}">{[number]}</span>';
+                template += '<span class="typeahead-name" title="{[name|raw]}">{[name]}</span>';
+                if (typeof item.thumb_url != 'undefined' && item.thumb_url != null) {
+                    template += '<span class="typeahead-logo"><img class="img-rounded" src="{[thumb_url]}"></span>';
+                }
+                return template;
+            }, // end template
+            source: {
+                'Part': {
+                    ajax: {
+                        url: '/part/typeahead_search_parts',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}",
+                            part_id: {{part.id}},
+                            search_type: 'part_component'
+                        },
+                        path: 'parts'
+                    }
+                },
+                'Vendor Part': {
+                    ajax: {
+                        url: '/vendorpart/typeahead_search_vendor_parts',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}",
+                            part_id: {{part.id}}
+                        },
+                        path: 'vendor_parts'
+                    }
+                }
+            },
+            callback: {
+                onNavigateAfter: function (node, lis, a, item, query, event) {
+                    if (~[38,40].indexOf(event.keyCode)) {
+                        var resultList = node.closest("form").find("ul.typeahead__list"),
+                            activeLi = lis.filter("li.active"),
+                            offsetTop = activeLi[0] && activeLi[0].offsetTop - (resultList.height() / 2) || 0;
+                        resultList.scrollTop(offsetTop);
+                    }
+                },
+                onClickAfter: function (node, a, item, event) {
+                    event.preventDefault();
+                    $.ajax({
+                        url: '/part/add_component',
+                        type: 'POST',
+                        data: {
+                            part_id: {{part.id}},
+                            record_id: item.id,
+                            record_class: item.class
+                        },
+                        success: function(data) {
+                            // Check if we need to add header, add if needed
+                            if ($('#part_components_for_part_{{part.id}}').find('tr').length == 0) {
+                                $('#part_components_for_part_{{part.id}}').parent().prepend('<thead><tr><th width="70px">QTY</th><th width="150px">P/N</th><th>NAME / DESCRIPTION</th><th width="70px">CBE (g)</th><th width="70px">UNC (%)</th><th width="70px">PBE (g)</th><th width="100px">STATE</th><th width="70px"></th></tr></thead>');
+                            }
+                            // Append new PC to table
+                            $('#part_components_for_part_{{part.id}}').append(data);
+                            update_mass('#mass_fields_{{part.id}}', {{part.id}});
+                            $.notify('Component successfully added');
+                            // Remove material fields if present
+                            $('#material_fields_{{part.id}}').html('<div class="col-xs-6"></div>');
+                        }
+                    });
+                    add_part_component_modal.destroy();  // Close modal
+                },
+                onResult: function (node, query, result, resultCount) {
+                    if (query === "") return;
+                    var text = "";
+                    if (result.length > 0 && result.length < resultCount) {
+                        text = "Showing <strong>" + result.length + "</strong> of <strong>" + resultCount + '</strong> elements matching "' + query + '"';
+                    } else if (result.length > 0) {
+                        text = 'Showing <strong>' + result.length + '</strong> elements matching "' + query + '"';
+                    } else {
+                        text = 'No results matching "' + query + '"';
+                    }
+                    $('#result-container-part_components_{{part.id}}').html(text);
+                }
+            } // end typeahead callback
+        }); // end typeahead
+    });
+</script>

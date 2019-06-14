@@ -1,0 +1,47 @@
+version: '2'
+
+services:
+
+  nginx_staging:
+    image: nginx:latest
+    hostname: plaid_staging_nginx
+    container_name: nginx_staging
+    restart: "no"
+    depends_on:
+      - plaid_staging
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./conf/nginx:/etc/nginx/conf.d
+      - ./logs:/var/log/nginx
+
+  rabbitmq_staging:
+    image: rabbitmq:3.6.10
+    container_name: rabbitmq_staging
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=plaid_staging_rabbit
+      - RABBITMQ_DEFAULT_PASS=CHANGE_THIS_PASSWORD
+      - RABBITMQ_DEFAULT_VHOST=plaid_staging_amqp
+      - RABBITMQ_ERLANG_COOKIE=CHANGE_THIS_COOKIE
+      - RABBITMQ_LOGS=/var/log/rabbitmq/rabbitmq/rabbitmq.log
+      - RABBITMQ_SASL_LOGS=/var/log/rabbitmq/rabbitmq/rabbitmq_sasl.log
+      - RABBITMQ_HIPE_COMPILE=1
+    volumes:
+      - ./logs:/var/log/rabbitmq
+    ports:
+      - "5673:5673"
+
+  plaid_staging:
+    build: .
+    container_name: plaid_staging
+    restart: always
+    depends_on:
+      - rabbitmq_staging
+    environment:
+      - PLAID_LOG_FILE=/var/log/plaid/plaid/plaid.log
+    volumes:
+      - ./logs:/var/log/plaid
+      - ./uploads:/app/uploads
+    ports:
+      - "5001:5000"

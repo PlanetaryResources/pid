@@ -1,0 +1,26 @@
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+
+{% set url = api_url + '/' + document.id|string %}
+
+<tr class="action-icons-row list-row" id="document-row-{{document.id}}">
+    <td width="250px"><a href="{{ document.get_url() }}">{{document.title}}</a></td>
+    <td>
+        <input type="text" class="inline-document-input form-control input-sm" style="display: none;" id="description-document-{{document.id}}" value="{{document.description|sn}}">
+        <span class="inline-document-display">{{document.description|sn}}</span>
+        <input type="hidden" id="current-document-description-{{document.id}}" value="{{document.description|sn}}">
+    </td>
+    <td width="100px">
+        {% if parent_object.can_user_edit('documents') %}
+        <div class="save-icon text-right" style="display: none;">
+            <div class="editable-buttons">
+                <button type="submit" class="btn btn-primary btn-sm editable-submit" onclick="saveDocument({{document.id}}, '{{url}}');"><i class="glyphicon glyphicon-ok"></i></button>
+                <button type="button" class="btn btn-default btn-sm editable-cancel" onclick="cancelDocument({{document.id}});"><i class="glyphicon glyphicon-remove"></i></button>
+            </div>
+        </div>
+        <div class="action-icons text-right">
+            <span class="cursor-pointer" onclick="editDocument({{document.id}}, '{{url}}');"><i class="fa fa-lg fa-pencil" aria-hidden="true" style="padding-right:5px;"></i></span>
+            <span class="cursor-pointer" onclick="deleteDocument(event, '{{url}}')" data-doc-id="{{document.id}}"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></span>
+        </div>
+        {% endif %}
+    </td>
+</tr>

@@ -1,0 +1,65 @@
+{% macro approver_list(parent_object) %}
+
+<label class="pri-table-header">Approvers</label>
+<div>
+    {% if current_user == parent_object.owner %}
+    {% if current_user.padawan %}
+    Your supervisor is included as an Approver.<br><br>
+    {% else %}
+    {% if parent_object.can_user_edit('self_approved') %}
+    <div class="checkbox" style="margin-left: 20px;">
+        <label>
+            <input type="checkbox" onclick="selfApprove(this, {{ parent_object.id }}, '{{ parent_object.get_class_name() }}')"{% if parent_object.self_approved %} checked{% endif %}/>
+            Me, Myself and I take full responsibiliy for the content and accuracy of this company record.
+        </label>
+    </div>
+    {% else %}
+    <div class="checkbox" style="margin-left: 20px; color: lightgrey;">
+        <label>
+            <input type="checkbox" disabled{% if parent_object.self_approved %} checked{% endif %}/>
+            Me, Myself and I take full responsibiliy for the content and accuracy of this company record.
+        </label>
+    </div>
+    {% endif %} {# end if user can edit #}
+    {% endif %} {# end if user padawan #}
+    {% endif %} {# end if user is owner #}
+</div>
+
+<table class="table table-condensed table-hover pri-table" id="approver_list" {% if parent_object.self_approved %}style="display: none;"{% endif %}>
+    {% if parent_object.approvers %}
+    <thead>
+    {% else %}
+    <thead style="display:none;">
+    {% endif %}
+        <tr>
+            <th width="40%">APPROVER</th>
+            <th width="40%">CAPACITY</th>
+            <th width="10%"></th>
+            <th width="10%"></th>
+        </tr>
+    </thead>
+    {% if parent_object.approvers %}
+    <tbody class="pri-list">
+        {% for approver in parent_object.approvers %}
+        {% include "shared/approver_row.html" %}
+        {% endfor %}
+    </tbody>
+    {% else %}
+    <tbody class="pri-list">
+        <tr class="no-approvers-added">
+            <td colspan="6"><i>No approvers added yet.</i></td>
+        </tr>
+    </tbody>
+    {% endif %}
+    {% if parent_object.can_user_edit('approvers') %}
+    <tfoot>
+        <tr class="add-approver" onclick="addApprover(this, {{ parent_object.id }}, '{{ parent_object.get_class_name() }}')">
+            <td colspan="6">
+                <span><i class="pri-app-icon sm pri-icons-add"></i>Add Approver</span>
+            </td>
+        </tr>
+    </tfoot>
+    {% endif %}
+</table>
+
+{% endmacro %}

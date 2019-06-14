@@ -1,0 +1,45 @@
+{% macro design_list_component(component, PartComponent, parentId) %}
+{% if component.part %}
+    {% set reference = component.part %}
+    {% set reference_url = '/design/' + reference.design.design_number + '-' + reference.design.revision %}
+    {% set display_part_number = reference.part_number %}
+    {% set display_name = reference.name %}
+    {% set revision_state = reference.design.revision + ' - ' + reference.design.state %}
+    {# Ensures components load references to part, design, and vendor_part #}
+    {% set children = PartComponent.get_components_by_part_id(reference.id) %}
+    {% set owner = reference.design.owner.get_name() %}
+{% elif component.vendor_part %}
+    {% set reference =component.vendor_part %}
+    {% set reference_url = '/vendorpart/' + reference.part_number %}
+    {% set display_part_number = reference.part_number %}
+    {% set display_name = reference.name %}
+    {% set revision_state = reference.state %}
+    {% set children = [] %}
+    {% set owner = reference.owner.get_name() %}
+{% endif %}
+
+
+    <tr data-tt-id="component-{{component.id}}" data-tt-parent-id="{{parentId}}" data-tt-branch="{{children|length > 0}}">
+        <td>{{display_name}}</td>
+        <td class="center-text">
+            <a href="{{reference_url}}">
+                {{display_part_number}}
+            </a>
+        </td>
+        <td class="center-text">{{component.quantity}}</td>
+        <td class="center-text">{{'%0.2f'| format(reference.current_best_estimate|float)}}</td>
+        <td class="center-text">{{'%0.1f'| format(reference.uncertainty|float)}}</td>
+        <td class="center-text">{{'%0.2f'| format(reference.predicted_best_estimate|float)}}</td>
+        <td class="center-text">{{revision_state}}</td>
+        <td class="center-text">{{reference.material.name}}</td>
+        <td class="center-text">{{reference.material_specification.name}}</td>
+        <td class="center-text">{{owner}}</td>
+    </tr>
+
+    {% if children | length > 0 %}
+        {% for child in children %}
+            {{design_list_component(child, PartComponent, 'component-' + component.id|string)}}
+        {% endfor %}
+    {% endif %}
+
+{% endmacro %}

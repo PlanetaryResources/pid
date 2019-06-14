@@ -1,0 +1,39 @@
+<div id="save_search_modal">
+<form method="POST" class="form-horizontal" action="/common/add_advanced_search" id="add-advanced-search">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <input type="hidden" name="searchParams" value="{{search_params}}"/>
+    <div class="form-group">
+        <label class="col-xs-3 control-label" for="saved-search-name">Name</label>
+        <div class="col-xs-9" id="saved-search-name">
+            <input type="text" class="form-control" name="name" />
+        </div>
+    </div>
+    <hr />
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-offset-1 col-xs-10">
+                <button type="submit" class="btn pri-btn-primary">Save Search</button>
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#add-advanced-search').ajaxForm({
+            beforeSubmit: function (formData, jqForm, options) {
+                disableModal('#save_search_modal', saveSearchModal);
+                return true;
+            },
+            error: function (response, statusText, xhr, $form) {
+                enableModal('#save_search_modal', saveSearchModal);
+                //TODO: Handle errors
+            },
+            success: function (response, statusText, xhr, $form) {
+                enableModal('#save_search_modal', saveSearchModal);
+                saveSearchModal.close();
+                $.notify('Saved Search');
+            }
+        });
+    });
+</script>

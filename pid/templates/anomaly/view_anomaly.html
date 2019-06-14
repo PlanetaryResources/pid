@@ -1,0 +1,195 @@
+{% extends "layout.html" %}
+
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+{% from "shared/bookmark.html" import bookmark %}
+{% from "shared/creation_fields.html" import creation_fields %}
+{% from 'shared/thumbnail.html' import thumbnail %}
+{% from "shared/view_changelog_button.html" import view_changelog_button %}
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+{% from 'shared/workflow.html' import workflow with context %}
+
+{% block page_title %}{{ anomaly.key }} - {{ anomaly.name }}{% endblock %}
+
+{% block content %}
+<div id="view_anomaly">
+    <div class="row sticky-header-row">
+        <div class="col-xs-1">
+            <div class="pri-record-icon-wrapper">
+                <i class="pri-record-icon pri-icons-record-anomaly" aria-hidden="true"></i>
+            </div>
+        </div>
+        <div class="col-xs-11">
+            <div class="row">
+                <div class="col-xs-4">
+                    <span class="pri-header">{{ anomaly.key }}</span>
+                </div>
+                <div class="col-xs-6">
+                    {{ render_xeditable_text_field(field=anomaly.name, parent_object=anomaly, api_url="/anomaly/update",
+                    field_name='name', display_label=False, input_class="pri-subheader", non_edit_additional_css="margin-top: 20px;") }}
+                </div>
+                <div class="col-xs-2">
+                    <div id="workflow_container">
+                        {{ workflow(record=anomaly) }}
+                    </div>
+                    {{ bookmark(parent_object=anomaly, current_user=current_user) }}
+                </div>
+            </div>
+        </div>
+    </div> <!-- end div row sticky-header-row -->
+    <div class="row header-info">
+        <div class="col-xs-2" id="thumbnail_parent">
+            {{ thumbnail(record=anomaly) }}
+        </div>
+        <div class="col-xs-10">
+            <div class="row top-pad-10">
+                <div class="col-xs-6">
+                    {{ render_ajax_select_field(field=anomaly.owner, parent_object=anomaly, api_url="/anomaly/update",
+                    field_name='owner', label='OWNER', options=users, horizontal_labels=True, input_size='input-sm',
+                    option_id='id', option_name='get_name()', non_edit_additional_css='margin-top: 6px; margin-left: -7px;') }}
+                </div>
+                <div class="col-xs-6 minus-one-column">
+                    {{ render_ajax_select_field(field=anomaly.project, parent_object=anomaly, api_url="/anomaly/update",
+                    field_name='project', label='PROJECT', options=projects, horizontal_labels=True, input_size='input-sm',
+                    option_id='id', option_name='name', non_edit_additional_css='margin-top: 6px; margin-left: -7px;',
+                    allow_blank=True, blank_text='--- Select Project ---') }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <i style="left: 100px; top: 8px; position: absolute; font-size: 20px;" class="pri-icons-critical-{{ anomaly.criticality.name|lower }}" aria-hidden="true" id="anomaly-criticality-icon"></i>
+                    {{ render_ajax_select_field(field=anomaly.criticality, parent_object=anomaly, api_url="/anomaly/update",
+                    field_name='criticality', label='CRITICALITY', options=criticality_options, horizontal_labels=True, input_size='input-sm',
+                    option_id='id', option_name='name', non_edit_additional_css='margin-top: 6px; margin-left: -7px;') }}
+                    <i style="right: 50px;" class="pri-app-icon pri-icons-question-circle tooltip-icon" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="bottom"></i>
+                </div>
+                <div class="col-xs-6 minus-one-column">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <label class="control-label pri-field-label ">VIEW</label>
+                        </div>
+                        <div class="col-xs-8">
+                            {{ view_changelog_button(parent_object=anomaly) }}
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- end row -->
+            <div class="row top-pad-15">
+                <div class="col-xs-12">
+                    {% if anomaly.anomaly_type == 'design' or anomaly.anomaly_type == 'vendor_part' %}
+                    <label class="pri-table-header">Against Designs</label>
+                    <table class="table table-condensed table-hover pri-table">
+                        <thead>
+                            <tr>
+                                <th width="25%">Design Number</th>
+                                <th width="10%">REV</th>
+                                <th width="60%">NAME / DESCRIPTION</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="anomaly_designs">
+                            {% set designs = anomaly.designs + anomaly.vendor_parts %}
+                            {% for design in designs %}
+                            {% include 'anomaly/anomaly_design_row.html' %}
+                            {% endfor %}
+                        </tbody>
+                        {% if anomaly.can_user_edit('designs') %}
+                        <tfoot>
+                            <tr onclick="addDesignToAnomalyModal({{anomaly.id}});">
+                                <td colspan="6">
+                                    <span><i class="pri-app-icon sm pri-icons-add"></i>Add Design</span>
+                                </td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                    {% elif anomaly.anomaly_type == 'asrun' %}
+                    <label class="pri-table-header">Against As Run</label>
+                    <table class="table table-condensed table-hover pri-table">
+                        <thead>
+                            <tr>
+                                <th width="10%">Instance</th>
+                                <th width="10%">Doc Rev</th>
+                                <th width="50%">Products</th>
+                                <th width="20%">As-Run Description</th>
+                                <th width="20%">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for as_run in anomaly.as_runs %}
+                            <tr>
+                                <td><a href="{{ as_run.get_url() }}">{{pad_with_zeros(as_run.as_run_number|string, 3)}}</a></td>
+                                <td><a href="{{ as_run.procedure.get_url() }}">{{as_run.procedure.revision}}</a></td>
+                                <td>
+                                    {% for product in as_run.products + as_run.vendor_products%}
+                                    <a href="{{ product.get_url() }}">{{product.product_number}}</a>
+                                    {% endfor %}
+                                </td>
+                                <td>{{as_run.name|sn}}</td>
+                                <td>{{as_run.state}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endif %} {# end if designs or as-runs #}
+                </div> <!-- end div col-xs-12 -->
+            </div> <!-- end div row -->
+        </div> <!-- end div col-xs-10 -->
+    </div> <!-- end div row header-info -->
+    <div class="row top-pad-15">
+        <div class="panel">
+            <ul class="nav nav-tabs nav-justified">
+                <li class="active"><a data-toggle="tab" href="#info">INFO</a></li>
+                <li><a data-toggle="tab" href="#links">LINKS</a></li>
+                <li><a data-toggle="tab" href="#approvals">APPROVALS</a></li>
+                <li><a data-toggle="tab" href="#images">IMAGES</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="info" class="tab-pane active">
+                    {% include "anomaly/tab_info.html" %}
+                </div>
+                <div id="links" class="tab-pane">
+                    {% include "anomaly/tab_links.html" %}
+                </div>
+                <div id="approvals" class="tab-pane">
+                    {% include "anomaly/tab_approvals.html" %}
+                </div>
+                <div id="images" class="tab-pane">
+                    {% include "anomaly/tab_images.html" %}
+                </div>
+            </div>
+        </div>
+    </div> <!-- end div row -->
+    <div class="row">
+        <div class="col-xs-12">
+            {{ creation_fields(parent_object=anomaly, moment=moment) }}
+        </div>
+    </div>
+</div>
+<div data-jbox-content="view-anomaly" style="display:none;">
+    <p><b>ODD</b></p>
+    <p>Something mildly strange happened</p>
+    <p><b>WORRISOME</b></p>
+    <p>Something strange happened that is going to bug you until you figure out what it was</p>
+    <p><b>SERIOUS</b></p>
+    <p>Something bad happened that needs to be addressed ASAP</p>
+    <p><b>SoF</b></p>
+    <p>S*#@'s on Fire. Stop whatever else is happening and fix this now.</p>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        let tooltip_settings = { content: $('[data-jbox-content="view-anomaly"]') };
+        new jBox('Tooltip', $.extend({}, global_jbox_tooltip_options, tooltip_settings));
+        $('.sticky-header-row').sticky({topSpacing: $('.navbar').height(), zIndex: 4, getWidthFrom: '#view_anomaly .panel'});
+        $('#criticality-anomaly-{{ anomaly.id }}-ajax').change(function() {
+            // For updating criticality icon when dropdown is changed
+            let criticality = $('#criticality-anomaly-{{ anomaly.id }}-ajax option:selected').text().trim().toLowerCase();
+            let cricticalityIconElement = $('#anomaly-criticality-icon');
+            cricticalityIconElement.removeClass();
+            cricticalityIconElement.addClass('pri-icons-critical-'+criticality);
+        });
+    });
+</script>
+{% endblock %}

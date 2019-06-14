@@ -1,0 +1,85 @@
+<div id="approvals_modal">
+    <form class="form-horizontal" method="POST" action="/common/approve" id="approvals_modal_form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="parent_id" value="{{ parent_object.id }}"/>
+        <input type="hidden" name="parent_class" value="{{ parent_object.get_class_name() }}"/>
+        {% for approval in approvals %}
+        <input type="hidden" name="approver_id" value="{{ approval.id }}"/>
+        <h5>{{ approval.capacity }}</h5>
+        <div class="form-group">
+            <div class="col-xs-7">
+                <label class="radio-inline">
+                    <input type="radio" name="approval_{{ approval.id }}" value="approve">Approve
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="approval_{{ approval.id }}" value="edit">Edit Required
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="approval_{{ approval.id }}" value="reassign">Reassign:
+                </label>
+            </div>
+            <div class="col-xs-5">
+                <select class="form-control" name="approval_reassign_{{ approval.id }}" disabled>
+                    <option value="None">---</option>
+                    {% for user in users %}
+                    {% if user != current_user %}
+                    <option value="{{ user.id }}">{{ user.get_name() }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="comment" class="col-xs-2 control-label">Comment</label>
+            <div class="col-xs-10">
+                <textarea class="form-control" name="approval_comment_{{ approval.id }}"></textarea>
+            </div>
+        </div>
+        <hr>
+        {% endfor %}
+        <div class="form-group">
+            <div class="col-xs-12">
+                <button type="submit" class="btn pri-btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        {% for approval in approvals %}
+        $("input[name='approval_{{ approval.id }}']").change(radioValueChanged_{{ approval.id }});
+        function radioValueChanged_{{ approval.id }}() {
+            let radioValue = $(this).val();
+            if (radioValue === 'reassign') {
+                $("select[name='approval_reassign_{{ approval.id }}']").removeAttr('disabled');
+            }
+            else {
+                $("select[name='approval_reassign_{{ approval.id }}']").attr('disabled', 'disabled');
+            }
+        }
+        {% endfor %}
+        $('#approvals_modal_form').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#approvals_modal', approvals_modal);
+                for (let i = 0; i < formData.length; i++) {
+                    if (~formData[i].name.indexOf("approval_reassign")) {
+                        if (formData[i].value === 'None') {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            },
+            error: function(responseText, statusText, xhr, $form) {
+                enableModal('#approvals_modal', approvals_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#approvals_modal').replaceWith(responseText.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                // Open page for new revision
+                location.reload();
+            }
+        });
+    });
+</script>

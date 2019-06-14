@@ -1,0 +1,8 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+	<ul>
+		<li><a href="{{ url_for('public.home') }}">Back to public home</a></li>
+		<li><a href="{{ url_for('backend.dashboard') }}">Back to dashboard</a></li>
+	</ul>
+{% endblock %}

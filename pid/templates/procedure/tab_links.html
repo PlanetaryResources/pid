@@ -1,0 +1,10 @@
+
+{% from 'common/reference_to_list.html' import references_to with context %}
+{% from 'common/reference_by_list.html' import references_by with context %}
+
+<div class="row">
+    <div class="col-xs-12">
+        {{ references_to(referencing_object=proc) }}
+        {{ references_by(referencing_object=proc) }}
+    </div>
+</div>

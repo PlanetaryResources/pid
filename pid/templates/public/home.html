@@ -1,0 +1,14 @@
+ {% extends "layout.html" %} {% block content %}
+ {% set plaid = url_for('static', filename = 'images/spaceballs_plaid.jpg') %}
+<div class="row">
+    <div class="col-xs-12" style="min-height: 500px; background-image: url('{{plaid}}'); border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);">
+        <div class="jumbotron">
+        	<div class="jumbotron-contents">
+        	    <h2>{{ get_text('public.home.title') }}</h2>
+        	    <p style="font-weight: normal">{{ get_text('public.home.text') }}</p>
+        	    <p><a href="https://confluence.prioffice.net/display/ET/PLAID+-+Overview" class="btn btn-primary btn-large" target="new">Learn more &raquo;</a></p>
+        	</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

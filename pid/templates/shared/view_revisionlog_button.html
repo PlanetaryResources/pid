@@ -1,0 +1,3 @@
+{% macro view_revisionlog_button(parent_object) %}
+<i class="pri-app-icon edit pri-icons-reports-view-log" data-revision-log-class="{{parent_object.get_class_name()}}" data-revision-log-id="{{parent_object.id}}" onclick="viewRevisionLogModal(this);" data-toggle="tooltip" title="View Revision Log"></i>
+{% endmacro %}

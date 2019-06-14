@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+{% from "shared/bookmark.html" import bookmark %}
+{% from "shared/creation_fields.html" import creation_fields %}
+{% from 'shared/thumbnail.html' import thumbnail %}
+{% from "shared/view_changelog_button.html" import view_changelog_button %}
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+{% from 'shared/workflow.html' import workflow with context %}
+
+{% block page_title %}{{ eco.key }} - {{ eco.name }}{% endblock %}
+
+{% block content %}
+<div id="view_eco">
+    <div class="row sticky-header-row">
+        <div class="col-xs-1">
+            <div class="pri-record-icon-wrapper">
+                <i class="pri-record-icon pri-icons-record-eco" aria-hidden="true"></i>
+            </div>
+        </div>
+        <div class="col-xs-11">
+            <div class="row">
+                <div class="col-xs-4">
+                    <span class="pri-header">{{ eco.key }}</span>
+                </div>
+                <div class="col-xs-6">
+                    {{ render_xeditable_text_field(field=eco.name, parent_object=eco, api_url="/eco/update", field_name='name',
+                    display_label=False, input_class="pri-subheader", non_edit_additional_css="margin-top: 20px;") }}
+                </div>
+                <div class="col-xs-2">
+                    <div id="workflow_container">
+                        {{ workflow(record=eco) }}
+                    </div>
+                    {{ bookmark(parent_object=eco, current_user=current_user) }}
+                </div>
+            </div> <!-- end div row -->
+        </div> <!-- end div col-xs-11 -->
+    </div> <!-- end div row -->
+    <div class="row header-info">
+        <div class="col-xs-2" id="thumbnail_parent">
+            {{ thumbnail(record=eco) }}
+        </div>
+        <div class="col-xs-10">
+            <div class="row">
+                <div class="col-xs-6">
+                    {{ render_ajax_select_field(field=eco.owner, parent_object=eco, api_url="/eco/update", field_name='owner', label='OWNER',
+                    options=users, horizontal_labels=True, option_id='id', option_name='get_name()',
+                    input_size='input-sm', non_edit_additional_css='margin-top: 6px; margin-left: -7px;') }}
+                </div>
+                <div class="col-xs-6 minus-one-column">
+                    {{ render_ajax_select_field(field=eco.project, parent_object=eco, api_url="/eco/update", field_name='project', label='PROJECT',
+                    options=projects, horizontal_labels=True, option_id='id', option_name='name',
+                    input_size='input-sm', non_edit_additional_css='margin-top: 6px; margin-left: -7px;') }}
+                </div>
+            </div> <!-- end div row -->
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <label class="control-label pri-field-label ">VIEW</label>
+                        </div>
+                        <div class="col-xs-6">
+                            {{ view_changelog_button(parent_object=eco) }}
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- end div row -->
+            <div class="row top-pad-15">
+                <div class="col-xs-12">
+                    <label class="pri-table-header">For Designs</label>
+                    <table class="table table-condensed table-hover pri-table">
+                        <thead>
+                            <tr>
+                                <th width="25%">Design Number</th>
+                                <th width="10%">REV</th>
+                                <th width="60%">NAME / DESCRIPTION</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="eco_designs">
+                            {% for design in eco.designs %}
+                            {% include 'eco/eco_design_row.html' %}
+                            {% endfor %}
+                        </tbody>
+                        {% if eco.can_user_edit('designs') %}
+                        <tfoot>
+                            <tr onclick="addDesignToECOModal({{eco.id}});">
+                                <td colspan="6">
+                                    <span><i class="pri-app-icon sm pri-icons-add"></i>Add Design</span>
+                                </td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div> <!-- end div col-cs-12 -->
+            </div> <!-- end div row -->
+        </div> <!-- end col-xs-10 -->
+    </div> <!-- end div row header-info -->
+    <div class="row" style="padding-top: 15px;">
+        <div class="panel">
+            <ul class="nav nav-tabs nav-justified">
+                <li class="active"><a data-toggle="tab" href="#info">INFO</a></li>
+                <li><a data-toggle="tab" href="#links">LINKS</a></li>
+                <li><a data-toggle="tab" href="#approvals">APPROVALS</a></li>
+                <li><a data-toggle="tab" href="#images">IMAGES</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="info" class="tab-pane active">
+                    {% include "eco/tab_info.html" %}
+                </div>
+                <div id="links" class="tab-pane">
+                    {% include "eco/tab_links.html" %}
+                </div>
+                <div id="approvals" class="tab-pane">
+                    {% include "eco/tab_approvals.html" %}
+                </div>
+                <div id="images" class="tab-pane">
+                    {% include "eco/tab_images.html" %}
+                </div>
+            </div> <!-- end div tab-content -->
+        </div> <!-- end div panel -->
+    </div> <!-- end div row -->
+    <div class="row">
+        <div class="col-xs-12">
+            {{ creation_fields(parent_object=eco, moment=moment) }}
+        </div>
+    </div>
+</div> <!-- end div eco -->
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.sticky-header-row').sticky({
+            topSpacing: $('.navbar').height(),
+            zIndex: 4,
+            getWidthFrom: '#view_eco .panel'
+        });
+    });
+</script>
+{% endblock %}

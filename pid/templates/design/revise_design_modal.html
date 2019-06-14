@@ -1,0 +1,90 @@
+<div id="revise_design_modal">
+    <form class="form-horizontal" method="POST" action="/design/revise" id="revise_design_modal_form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {{ form.hidden_tag() }}
+        <div class="form-group{% if form.revision.errors %} has-error{% endif %}">
+            <label for="revision" class="col-xs-4 control-label">{{ form.revision.label }}</label>
+            <div class="col-xs-8">
+                {{ form.revision(class_="form-control") }}
+                {% if form.revision.errors %}
+                <span class="help-block">{{ form.revision.errors|join('<br>')|safe }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group{% if form.revision_reason.errors %} has-error{% endif %}">
+            <label for="revision_reason" class="col-xs-4 control-label">{{ form.revision_reason.label }}</label>
+            <div class="col-xs-8">
+                {{ form.revision_reason(class_="form-control", placeholder="Short description of why revising") }}
+                {% if form.revision_reason.errors %}
+                <span class="help-block">{{ form.revision_reason.errors|join('<br>')|safe }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="include_parts" class="col-xs-4 control-label">Include Parts</label>
+            <div class="col-xs-8">
+                <label class="radio-inline">
+                    <input type="radio" name="include_parts" id="include_parts_all" value="all" checked>All
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="include_parts" id="include_parts_selected" value="selected">Selected
+                </label>
+            </div>
+        </div>
+        <div class="form-group" id="parts_to_include" style="display: none;">
+            <label for="include_parts" class="col-sm-6 control-label">Include Following Parts</label>
+            <div class="col-xs-offset-1 col-xs-5">
+                {% for part in design.parts %}
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="include_selected_parts" id="include_parts_{{part.id}}" value="{{part.id}}">
+                        {{ part.part_number }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="owner" class="col-xs-4 control-label">{{ form.owner.label }}</label>
+            <div class="col-xs-8">
+                {{ form.owner(class_="form-control") }}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-12">
+                <button type="submit" class="btn pri-btn-primary">Revise Design</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        initial_focus('#revision_reason');
+        $("input[name='include_parts']").change(radioValueChanged);
+        function radioValueChanged() {
+            radioValue = $(this).val();
+            if (radioValue === 'selected') {
+                $('#parts_to_include').show();
+            }
+            else {
+                $('#parts_to_include').hide();
+            }
+        }
+        $('#revise_design_modal_form').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#revise_design_modal', revise_design_modal);
+                return true;
+            },
+            error: function(responseText, statusText, xhr, $form) {
+                enableModal('#revise_design_modal', revise_design_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#revise_design_modal').replaceWith(responseText.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                // Open page for new revision
+                window.location = response.url;
+            }
+        });
+    });
+</script>

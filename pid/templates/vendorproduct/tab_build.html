@@ -1,0 +1,50 @@
+
+{% from 'product/discrepancy_list.html' import discrepancy_list with context %}
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+{% from 'shared/document_list.html' import document_list with context %}
+{% from "shared/trumbowyg.html" import trumbowyg %}
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+
+<div class="row">
+    <div class="col-xs-1">
+        <label class="control-label pri-field-label">BUILD</label><br/>
+        <span class="input-sm"><a href="#" onclick="viewVendorBuildModal({{ vendor_product.vendor_build.id }}, this);">{{ vendor_product.vendor_build.build_identifier }}</a></span>
+    </div>
+    <div class="col-xs-2">
+        {{ render_xeditable_text_field(field=vendor_product.vendor_build.purchase_order, parent_object=vendor_product.vendor_build, api_url="/vendorproduct/build/update",
+                                       field_name='purchase_order', label='PO #') }}
+    </div>
+    <div class="col-xs-3">
+        <label class="control-label pri-field-label">VENDOR</label><br/>
+        <div class="input-sm" style="margin-left: -10px;">{{ vendor_product.vendor_build.vendor.name }}</div>
+    </div>
+    <div class="col-xs-3">
+        {{ render_ajax_select_field(field=vendor_product.vendor_build.manufacturer, parent_object=vendor_product.vendor_build, api_url="/vendorproduct/build/update",
+                                    field_name='manufacturer', label='Distributor', options=companies, company_field=True, non_edit_additional_css="margin-left: -10px;",
+                                    option_id='id', option_name='name', input_size='input-sm') }}
+    </div>
+    <div class="col-xs-2">
+        {{ render_ajax_select_field(field=vendor_product.vendor_build.owner, parent_object=vendor_product.vendor_build, api_url="/vendorproduct/build/update",
+                                    field_name='owner', label='OWNER', options=users, non_edit_additional_css="margin-left: -10px;",
+                                    option_id='id', option_name='get_name()', input_size='input-sm') }}
+    </div>
+    <div class="col-xs-1" style="padding-top: 10px">
+        {{ view_changelog_button(parent_object=vendor_product.vendor_build) }}
+    </div>
+</div>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        {{ trumbowyg(field=vendor_product.vendor_build.notes, parent=vendor_product.vendor_build, api_url="/vendorproduct/build/update",
+                                       field_name='notes', label='NOTES', placeholder='Additional information relevant to all Products in this Build; "This vendor rocked! | new manufacturing method') }}
+    </div>
+</div>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        {{ discrepancy_list(parent_object=vendor_product.vendor_build) }}
+    </div>
+</div>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        {{ document_list(parent_object=vendor_product.vendor_build) }}
+    </div>
+</div>

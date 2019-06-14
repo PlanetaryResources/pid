@@ -1,0 +1,68 @@
+
+{% extends "layout.html" %}
+
+{% set active_page = "settings" %}
+{% set active_sub_page = "settings_plaid" %}
+
+{% block content %}
+<div class="row" style="margin-top: 15px;">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading text-center">
+                <span class="panel-title"><strong>{{ get_text('backend.settings.title') }}</strong></span>
+            </div>
+            <div class="panel-body">
+                <form class="form-horizontal" method="POST" action="/settings/update" role="form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="form-group{% if form.efab_user.errors %} has-error{% endif %}">
+                        <label class="col-xs-4 control-label">{{ form.efab_user.label }}</label>
+                        <div class="col-xs-4">
+                            {{ form.efab_user(class_="form-control") }}
+                            {% if form.efab_user.errors %}
+                            <span class="help-block">{{ form.efab_user.errors|join('<br>')|safe }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-xs-4"></div>
+                    </div>
+                    <div class="form-group{% if form.mfab_user.errors %} has-error{% endif %}">
+                        <label class="col-xs-4 control-label">{{ form.mfab_user.label }}</label>
+                        <div class="col-xs-4">
+                            {{ form.mfab_user(class_="form-control") }}
+                            {% if form.mfab_user.errors %}
+                            <span class="help-block">{{ form.mfab_user.errors|join('<br>')|safe }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-xs-4"></div>
+                    </div>
+                    <div class="form-group{% if form.plaid_admin.errors %} has-error{% endif %}">
+                        <label class="col-xs-4 control-label">{{ form.plaid_admin.label }}</label>
+                        <div class="col-xs-4">
+                            {{ form.plaid_admin(class_="form-control") }}
+                            {% if form.plaid_admin.errors %}
+                            <span class="help-block">{{ form.plaid_admin.errors|join('<br>')|safe }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-xs-4"></div>
+                    </div>
+                    <div class="form-group{% if form.name_order.errors %} has-error{% endif %}">
+                        <label class="col-xs-4 control-label">{{ form.name_order.label }}</label>
+                        <div class="col-xs-4">
+                            {{ form.name_order(class_="form-control") }}
+                            {% if form.name_order.errors %}
+                            <span class="help-block">{{ form.name_order.errors|join('<br>')|safe }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-xs-4"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <button type="submit" class="btn pri-btn-primary">Save Settings</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,126 @@
+<div id="create_as_run_modal">
+
+<form id="createAsRunForm" class="form-horizontal" method="POST" action="/asrun/create" role="form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <input type="hidden" name="products" value=""/>
+    <input type="hidden" name="vendor_products" value=""/>
+    <input type="hidden" name="procedure_id" value="{{proc.id}}"/>
+    <div class="row" style="margin-bottom:10px;">
+        <div class="col-xs-12">
+            <table class="table table-condensed table-hover pri-table">
+                <thead>
+                    <tr>
+                        <th>PROCEDURE #</th>
+                        <th>REV</th>
+                        <th>PROCEDURE TITLE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td width="20%">{{proc.identifier}}</td>
+                        <td width="10%">{{proc.revision}}</td>
+                        <td width="70%">{{proc.name}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="form-group {% if form.owner.errors %} has-error{% endif %}">
+        <label class="col-xs-3 control-label" for="owner_id">Owner</label>
+        <div class="col-xs-9">
+            {{ form.owner(class_="form-control") }}
+            {% if form.owner.errors %}
+            <span class="help-block">{{ form.owner.errors|join(', ') }}</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-3 control-label" for="products">Associated Products</label>
+        <div class="col-xs-9">
+            {% for part in proc.parts + proc.vendor_parts %}
+            {% include 'asrun/as_run_part.html' %}
+            {% endfor %}
+        </div>
+    </div>
+    <hr>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-offset-1 col-xs-10">
+                <button type="submit" class="btn pri-btn-primary">Create As-Run</button>
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        var $productListField = $("#createAsRunForm [name='products']");
+        var $vendorProductListField = $("#createAsRunForm [name='vendor_products']");
+        $('#createAsRunForm').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#create_as_run_modal', create_as_run_modal);
+                return true;
+            },
+            error: function(response, statusText, xhr, $form) {
+                enableModal('#create_as_run_modal', create_as_run_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#create_as_run_modal').replaceWith(response.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                window.location = response.url;
+            }
+        });
+        addProductToAsRun = function (domId, productId, serialNumber, partType) {
+            var currentVendorPartList = null;
+            var currentPartList = null;
+            var deleteIcon = '<i class="fa fa-trash-o fa-lg action-icon delete-product" onclick="createAsRunRemoveProduct(event)" aria-hidden="true"></i>';
+            var serialNumberEl = '<span style="display:inline-block;">' + serialNumber + '</span>';
+            if (partType == 'vendor') {
+                currentVendorPartList = $vendorProductListField.val() == "" ? [] : $vendorProductListField.val().split(",");
+                if (currentVendorPartList.indexOf(productId.toString()) > -1) {
+                    $.notify('Product already added.', {
+                        type: 'danger',
+                        element: domId,
+                        delay: 100
+                    });
+                } else {
+                    currentVendorPartList.push(productId);
+                    $vendorProductListField.val(currentVendorPartList.join(","));
+                    $(domId).append('<div data-product-id="' + productId + '" data-part-type="' + partType +'" class="as-run-product">' + deleteIcon + serialNumberEl + '</div>');
+                }
+            } else {
+                currentPartList = $productListField.val() == "" ? [] : $productListField.val().split(",");
+                if (currentPartList.indexOf(productId.toString()) > -1) {
+                    $.notify('Product already added.', {
+                        type: 'danger',
+                        delay: 100,
+                        element: domId
+                    });
+                } else {
+                    currentPartList.push(productId);
+                    $productListField.val(currentPartList.join(","));
+                    $(domId).append('<div data-product-id="' + productId + '" data-part-type="' + partType +'" class="as-run-product">' + deleteIcon + serialNumberEl + '</div>');
+                }
+            }
+        };
+        createAsRunRemoveProduct = function (event) {
+            var $productElement = $(event.currentTarget).parents('.as-run-product');
+            var productData = $productElement.data();
+            var currentProductList = [];
+            if (productData.partType === 'designs') {
+                currentProductList = $productListField.val().split(",");
+                currentProductList = currentProductList.filter(function (value) {
+                    return value != productData.productId;
+                });
+                $productListField.val(currentProductList.join(","));
+            } else {
+                currentProductList = $vendorProductListField.val().split(",");
+                currentProductList = currentProductList.filter(function (value) {
+                    return value != productData.productId;
+                });
+                $vendorProductListField.val(currentProductList.join(","));
+            }
+            $productElement.remove();
+        };
+    });
+</script>

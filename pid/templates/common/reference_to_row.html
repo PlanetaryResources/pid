@@ -1,0 +1,13 @@
+
+<tr id="reference_{{ref.id}}" class="action-icons-row">
+    <td width="150px"><a href="{{ref.get_url_to()}}">{{ref.get_unique_identifier_to()}}</a></td>
+    <td>{{ref.get_name_to()|sn}}</td>
+    <td width="100px">{{ref.get_state_to()|sn}}</td>
+    <td width="70px" class="rowlink-skip">
+        {% if ref.can_user_edit('references') %}
+        <div class="action-icons text-right">
+            <span class="cursor-pointer" onclick="deleteReference({{ref.id}});"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></span>
+        </div>
+        {% endif %}
+    </td>
+</tr>

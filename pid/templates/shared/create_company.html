@@ -1,0 +1,63 @@
+
+<div id="create_company_modal">
+    <div class="row">
+        <form id="createCompanyForm" class="form-horizontal" method="POST" action="/common/company/create" role="form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group {% if form.name.errors %} has-error{% endif %}">
+                <label class="col-xs-4 control-label" for="name">Name</label>
+                <div class="col-xs-7">
+                    {{ form.name(placeholder="", class_="form-control") }}
+                    {% if form.name.errors %}
+                    <span class="help-block">{{ form.name.errors|join(', ') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-4 control-label" for="website">Website</label>
+                <div class="col-xs-7">
+                    {{ form.website(placeholder="", class_="form-control") }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-4 control-label" for="address">Address</label>
+                <div class="col-xs-7">
+                    {{ form.address(class_="form-control") }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-4 control-label" for="notes">Notes</label>
+                <div class="col-xs-7">
+                    {{ form.notes(class_="form-control") }}
+                </div>
+            </div>
+            <hr>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <button type="submit" class="btn pri-btn-primary">Create Company</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#createCompanyForm').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#create_company_modal', create_company_modal);
+                return true;
+            },
+            error: function(response, statusText, xhr, $form) {
+                enableModal('#create_company_modal', create_company_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#create_company_modal').replaceWith(response.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                enableModal('#create_company_modal', create_company_modal);
+                let companyId = xhr.responseJSON.companyId;
+                let companyName = xhr.responseJSON.companyName;
+                addNewCompanyToSelects(companyId, companyName);
+                create_company_modal.close();
+            }
+        });
+    });
+</script>

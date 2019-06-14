@@ -1,0 +1,34 @@
+{% macro link_list(parent_object) %}
+
+{% set links = parent_object.links %}
+{% set parent_object_id = parent_object.id %}
+{% set api_url = url_for("api.generic_links", id=parent_object_id, parent_class=parent_object.get_class_name()) %}
+{% set uid = parent_object.get_class_name() + '_' + parent_object_id|string + '_urls' %}
+
+<div class="link-list">
+    <label class="pri-table-header">URLS</label>
+    <table class="table table-condensed table-hover pri-table">
+        <tbody class="pri-list">
+            {% if links %}
+            {% for link in links %}
+            {% include "shared/link_row.html" %}
+            {% endfor %}
+            {% else %}
+            <tr class="no-urls-added">
+                <td colspan="3"><i>No URLs added yet.</i></td>
+            </tr>
+            {% endif %}
+        </tbody>
+        {% if parent_object.can_user_edit('urls') %}
+        <tfoot>
+            <tr onclick="addURL(this, '{{api_url}}');">
+                <td colspan="3">
+                    <span><i class="pri-app-icon sm fa fa-link" aria-hidden="true"></i>Add URL</span>
+                </td>
+            </tr>
+        </tfoot>
+        {% endif %}
+    </table>
+</div>
+
+{% endmacro %}

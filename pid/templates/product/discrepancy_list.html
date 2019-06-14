@@ -1,0 +1,41 @@
+{% macro discrepancy_list(parent_object) %}
+<label class="pri-table-header">Discrepancies</label>
+<table class="table table-condensed table-hover pri-table">
+    {% if parent_object.discrepancies %}
+    <thead>
+    {% else %}
+    <thead style="display:none;">
+    {% endif %}
+        <tr>
+            <th width="30px">ID</th>
+            <th width="335px">DESCRIPTION</th>
+            <th width="100px">DISPOSITION</th>
+            <th width="335px">JUSTIFICATION</th>
+            <th width="100px">STATE</th>
+            <th width="100px"></th>
+        </tr>
+    </thead>
+    {% if parent_object.discrepancies %}
+    <tbody class="pri-list">
+        {% for discrepancy in parent_object.discrepancies %}
+        {% include "product/discrepancy_row.html" %}
+        {% endfor %}
+    </tbody>
+    {% else %}
+    <tbody class="pri-list">
+        <tr class="no-discrepancies-added">
+            <td colspan="6"><i>No discrepancies for this product.</i></td>
+        </tr>
+    </tbody>
+    {% endif %}
+    {% if parent_object.can_user_edit('discrepancies') %}
+    <tfoot>
+        <tr class="add-discrepancy" onclick="addDiscrepancy(this, {{ parent_object.id }}, '{{ parent_object.get_class_name() }}')">
+            <td colspan="6">
+                <span><i class="pri-app-icon sm pri-icons-simple-discrepancy"></i>Add Discrepancy</span>
+            </td>
+        </tr>
+    </tfoot>
+    {% endif %}
+</table>
+{% endmacro %}

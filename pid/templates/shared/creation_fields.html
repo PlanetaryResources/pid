@@ -1,0 +1,8 @@
+{% macro creation_fields(parent_object, moment) %}
+<div>
+    <span class='pri-field-label'>CREATED ON</span>
+    <span class='text-muted small' style="padding-left: 10px;">{{ moment(parent_object.created_at).format('YYYY.MM.DD') }}</span>
+    <span class='pri-field-label' style="padding-left: 40px;">CREATED BY</span>
+    <span class='text-muted small' style="padding-left: 10px;">{{ parent_object.created_by.get_name() }}</span>
+</div>
+{% endmacro %}

@@ -1,0 +1,30 @@
+<p>One of your pending approvals has been reassigned:</p>
+<table cellspacing="5">
+    <tr>
+        <td><b>Record:</b></td>
+        <td>{{ record.get_unique_identifier() }} - {{ record.get_name() }}</td>
+    </tr>
+    <tr>
+        <td><b>New Approver:</b></td>
+        <td>{{ approver.approver.get_name() }}</td>
+    </tr>
+    {% if comment %}
+    <tr>
+        <td><b>Comment:</b></td>
+        <td>{{ comment }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <td colspan="2" align="center" style="padding-top: 20px;">
+            <div>
+                <!--[if mso]>
+                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ record.get_url(external=True) }}" style="height:40px;v-text-anchor:middle;width:200px;" arcsize="10%" strokecolor="#1e3650" fillcolor="#A8BACD">
+                <w:anchorlock/>
+                <center style="color:#000000;font-family:sans-serif;font-size:13px;font-weight:bold;">View Record</center>
+                </v:roundrect>
+                <![endif]-->
+                <a href="{{ record.get_url(external=True) }}" style="background-color:#A8BACD;border:1px solid #1e3650;border-radius:4px;color:#000000;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:40px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all;">View Record</a>
+            </div>
+        </td>
+    </tr>
+</table>

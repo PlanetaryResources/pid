@@ -1,0 +1,71 @@
+{% from "part/design_list_component.html" import design_list_component %}
+{% extends "layout.html" %}
+{% block page_title %}{{ part.part_number }} - {{ part.get_name() }}{% endblock %}
+
+{% block content %}
+<div class="row" style="margin-top: 20px;">
+    <div class="col-xs-2">
+        <label class="control-label">Part Number</label><br/>
+        <span>{{part.design.design_number}}-{{part.part_identifier}}</span>
+    </div>
+    <div class="col-xs-1">
+        <label class="control-label">REV</label><br/>
+        <span>{{part.design.revision}}</span>
+    </div>
+    <div class="col-xs-6">
+        <label class="control-label">NAME / DESCRIPTION</label><br/>
+        {{part.design.name}}
+    </div>
+</div>
+<table class="table table-condensed table-hover table-striped" id="design-list-table-{{part.id}}">
+    <thead>
+        <tr>
+            <th>Name/Description</th>
+            <th>Part Number</th>
+            <th>Qty</th>
+            <th>CBE(g)</th>
+            <th>% UNC</th>
+            <th>PBE (g)</th>
+            <th>Latest Rev Design State</th>
+            <th>Material</th>
+            <th>Material Spec</th>
+            <th>Owner</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr data-tt-id="part-{{part.id}}">
+        <td>{{part.get_name()}}</td>
+        <td class="center-text">{{part.design.design_number}}-{{part.part_identifier}}</td>
+        <td class="center-text">1</td>
+        <td class="center-text">{{'%0.2f'| format(part.current_best_estimate|float)}}</td>
+        <td class="center-text">{{'%0.1f'| format(part.uncertainty|float)}}</td>
+        <td class="center-text">{{'%0.2f'| format(part.predicted_best_estimate|float)}}</td>
+        <td class="center-text">{{part.design.revision + ' - ' + part.design.state}}</td>
+        <td class="center-text">{{part.material.name}}</td>
+        <td class="center-text">{{part.material_specification.name}}</td>
+        <td class="center-text">{{part.design.owner.get_name()}}</td>
+    </tr>
+    {% for component in components %}
+        {{design_list_component(component, PartComponent, 'part-' + part.id|string)}}
+    {% endfor %}
+    </tbody>
+</table>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#design-list-table-{{part.id}}").treetable({
+            expandable: true,
+            initialState: 'expanded'
+        }).DataTable({
+            dom: '<"pull-right"B>',
+            paging: false,
+            ordering: false,
+            searching: false,
+            buttons: [
+                {extend: 'colvis', text: 'Show Columns', columns: ':gt(0)', className: 'pri-btn-secondary'},
+                {extend: 'csv', className: 'pri-btn-secondary'},
+                {extend: 'pdf', className: 'pri-btn-secondary'}
+            ]
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends "layout.html" %}
+
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+{% from "shared/bookmark.html" import bookmark %}
+{% from "shared/creation_fields.html" import creation_fields %}
+{% from 'shared/thumbnail.html' import thumbnail %}
+{% from "shared/view_changelog_button.html" import view_changelog_button %}
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+{% from 'shared/workflow.html' import workflow with context %}
+
+{% block page_title %}{{ product.product_number }} - {{ product.part.design.name }}{% endblock %}
+
+{% block content %}
+<div id="view_product">
+    <div class="row sticky-header-row">
+        <div class="col-xs-1">
+            <div class="pri-record-icon-wrapper">
+              <i class="pri-record-icon pri-icons-record-product" aria-hidden="true"></i>
+            </div>
+        </div>
+        <div class="col-xs-11">
+            <div class="row">
+                <div class="col-xs-3">
+                    <a href="{{product.part.design.get_url()}}" class="pri-header">{{ product.part.part_number }}</a>
+                    <div class="pri-header-select instance-lot-number">
+                        <select class="form-control" onchange="window.location.href='/product/{{product.part.part_number}}-'+this.value+window.location.hash">
+                            {% for sn in serial_numbers %}
+                            <option value="{{ sn }}"{% if sn == product.serial_number %} selected{% endif %}>
+                                {{ sn }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xs-7">
+                    <span class="pri-subheader">{{ product.part.get_name() }}</span>
+                </div>
+                <div class="col-xs-2">
+                    <div id="workflow_container">
+                        {{ workflow(record=product) }}
+                    </div>
+                    {{ bookmark(parent_object=product, current_user=current_user) }}
+                </div>
+            </div>
+        </div>
+
+    </div>  {# End row, sticky-header #}
+    <div class="row header-info">
+        <div class="col-xs-2" id="thumbnail_parent">
+            {{ thumbnail(record=product) }}
+        </div>
+        <div class="col-xs-10">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="row">
+                        <div class="col-xs-1">
+                            <label class="control-label pri-field-label">SUMMARY</label>
+                        </div>
+                        <div class="col-xs-11">
+                            {{ render_xeditable_text_field(field=product.summary, parent_object=product, api_url="/product/update", non_edit_additional_css="margin-top: 10px; margin-left: 12px;",
+                            field_name='summary', display_label=False, horizontal_labels=True, label_container_class="col-xs-3",input_container_class="col-xs-9", label='SUMMARY', placeholder="This unit intended for FM1 | life testing | show'n'tell | GSE, etc.") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="row">
+                      <div class="col-xs-3">
+                        <label class="control-label pri-field-label ">H/W REV</label>
+                      </div>
+                      <div class="col-xs-3">
+                        <a href="{{ product.part.design.get_url() }}">{{ product.revision }}</a>
+                      </div>
+                      <div class="col-xs-5">
+                        {% if product.revision != product.part.design.find_latest_revision() %}
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true" data-toggle="tooltip" title="!! NOT LATEST REVISION !!" style="padding-top:10px; color: #F73400;"></i>
+                        {% if product.can_user_edit('revision') %}
+                        <button type="button" class="btn pri-btn-secondary" onclick="updateProductToRevisionModal({{product.id}});" style="margin-left:10px;">UPDATE</button>
+                        {% endif %}
+                        {% endif %}
+                      </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 minus-one-column">
+                  {{ render_ajax_select_field(field=product.project, parent_object=product, api_url="/product/update",
+                                              field_name='project', label='PROJECT', options=projects, non_edit_additional_css="margin-top: 6px; margin-left: -15px;",
+                                              option_id='id', horizontal_labels=True, option_name='name', input_size='input-sm') }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="row">
+                        <div class="col-xs-3">
+                          <label class="control-label pri-field-label">DESIGN STATE</label>
+                        </div>
+                        <div class="col-xs-3 small" style="padding-top:10px">
+                            {{product.part.design.state}}
+                        </div>
+                        <div class="col-xs-5">
+                            {% if product.part.design.state != 'Released' %}
+                            <i class="fa fa-exclamation-triangle" aria-hidden="true" data-toggle="tooltip" title="!! DESIGN IS NOT RELEASED !!" style="padding-top:10px; color: #F73400;"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 minus-one-column">
+                      {{ render_ajax_select_field(field=product.owner, parent_object=product, api_url="/product/update",
+                                                  field_name='owner', label='OWNER', options=users, input_size='input-sm', non_edit_additional_css="margin-top: 6px; margin-left: -15px;",
+                                                  option_id='id', horizontal_labels=True, option_name='get_name()') }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    {{ render_ajax_select_field(field=product.hardware_type, parent_object=product, api_url="/product/update",
+                                                field_name='hardware_type', label='H/W TYPE', options=hardware_types, non_edit_additional_css="margin-top: 6px; margin-left: -8px;",
+                                                option_id='id', horizontal_labels=True, option_name='name', input_size='input-sm') }}
+                    <i style="right: 50px; top: 8px;" class="pri-app-icon pri-icons-question-circle tooltip-icon" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="bottom"></i>
+                </div>
+                <div class="col-xs-6 minus-one-column">
+                  <div class="row">
+                    <div class="col-xs-3">
+                      <label class="control-label pri-field-label ">VIEW</label>
+                    </div>
+                    <div class="col-xs-8">
+                       <a href="{{product.get_url() + '/as-built-list'}}" target="_blank"><i class="pri-app-icon edit pri-icons-reports-view-list-down" data-toggle="tooltip" title="View Full As-Built List"></i></a>
+                        {{ view_changelog_button(parent_object=product) }}
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>  {# End col-xs-10 #}
+    </div>  {# End row header-info #}
+    <div class="row" style="padding-top: 15px;">
+        <div class="panel">
+            <ul class="nav nav-tabs nav-justified">
+                <li class="active"><a data-toggle="tab" href="#product">PRODUCT</a></li>
+                <li><a data-toggle="tab" href="#as-built">AS-BUILT</a></li>
+                <li><a data-toggle="tab" href="#links">LINKS</a></li>
+                <li><a data-toggle="tab" href="#approvals">APPROVALS</a></li>
+                <li><a data-toggle="tab" href="#build">BUILD</a></li>
+                <li><a data-toggle="tab" href="#images">IMAGES</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="product" class="tab-pane active">
+                    {% include "product/tab_product.html" %}
+                </div>
+                <div id="as-built" class="tab-pane">
+                    {% include "product/tab_as-built.html" %}
+                </div>
+                <div id="links" class="tab-pane">
+                    {% include "product/tab_links.html" %}
+                </div>
+                <div id="approvals" class="tab-pane">
+                    {% include "product/tab_approvals.html" %}
+                </div>
+                <div id="build" class="tab-pane">
+                    {% include "product/tab_build.html" %}
+                </div>
+                <div id="images" class="tab-pane">
+                    {% include "product/tab_images.html" %}
+                </div>
+            </div>  {# End tab-content #}
+        </div>  {# End panel #}
+    </div>  {# End row #}
+    <div class="row">
+        <div class="col-xs-12">
+            {{ creation_fields(parent_object=product, moment=moment) }}
+        </div>
+    </div>  {# End row, creation information #}
+</div>  {# End container #}
+<div data-jbox-content="view-product" style="display:none;">
+    <p><b>FLIGHT</b></p>
+    <p>Hardware that represents Planetary Resources - built and tracked with the care and pedigree required for flight and/or delivery as a PRI product.</p>
+    <p><b>EM / QUAL</b></p>
+    <p>Engineering / Qualification : Identical to Flight hardware but specifically intended for ground-based use/testing only</p>
+    <p><b>DEVELOPMENTAL</b></p>
+    <p>Not intended to be or represent Flight hardware but is inteneded to inform the development/design of Flight hardware</p>
+    <p><b>GSE</b></p>
+    <p>Fixturing or other tooling designed to interact with and support the manufacture / build / test / transportation / etc. of Flight hardware</p>
+    <p><b>EQUIPMENT</b></p>
+    <p>Infrastructure, tools, test equipment, etc. used at PRI for product development (oscilloscopes, thermal chambers, CNC mills, etc.)</p>
+    <p><b>MISC</b></p>
+    <p>Truly random stuff - tap handles and JIRA horse rear-end awards.</p>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        var tooltip_settings = { content: $('[data-jbox-content="view-product"]') };
+        new jBox('Tooltip', $.extend({}, global_jbox_tooltip_options, tooltip_settings));
+        // TODO: Remove need for this JS library in the future
+        $('.sticky-header-row').sticky({topSpacing: $('.navbar').height(), zIndex: 4, getWidthFrom: '#view_product .panel'});
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+server {
+    listen       80;
+    server_name  plaid.planetaryresources.com;
+    access_log  off;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen       80;
+    server_name  plaid;
+    access_log  off;
+    return 301 https://$server_name.planetaryresources.com$request_uri;
+}
+
+server {
+    listen       443 ssl;
+
+    server_name  plaid.planetaryresources.com;
+
+    access_log  off;
+    ssl on;
+    ssl_certificate /etc/ssl/cert.pem;
+    ssl_certificate_key /etc/ssl/server.key;
+
+    gzip on;
+    gzip_disable "msie6";
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_buffers 16 8k;
+    gzip_http_version 1.1;
+    gzip_min_length 256;
+    gzip_types text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript application/vnd.ms-fontobject application/x-font-ttf font/opentype image/svg+xml image/x-icon;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/opt/pr/pid/pid.sock;
+    }
+
+    location /static/ {
+        alias /opt/pr/pid/pid/static/;
+    }
+}

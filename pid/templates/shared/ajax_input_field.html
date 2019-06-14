@@ -1,0 +1,56 @@
+
+{% macro render_ajax_input_field(field, parent_object) %}
+
+{% set field_name = kwargs.pop('field_name', '')            %}  {# Name of field, sent to server for update #}
+{% set label = kwargs.pop('label', '')|title                %}  {# Label to display                         #}
+{% set display_label = kwargs.pop('display_label', True)    %}  {# Whether we should display label or not   #}
+{% set api_url = kwargs.pop('api_url', '')                  %}  {# URL to call for update                   #}
+{% set populate_id = kwargs.pop('populate_id', '')          %}  {# HTML field ID to update after AJAX call  #}
+{% set input_size = kwargs.pop('input_size', '')            %}  {# Set size of input                        #}
+{% set text_size = kwargs.pop('text_size', '')              %}  {# Set size of text                         #}
+{% set update_mass_id = kwargs.pop('update_mass_id', '')    %}  {# Specific for part compoents, mass update #}
+
+{% set primary_key = parent_object.id %}
+{% set parent_class = parent_object.get_class_name() %}
+
+{# Create a unique id which is unique on entire page for easier reference #}
+{% set uid = field_name + '-' + parent_class + '-' + primary_key|string + '-ajax' %}
+
+{% if display_label == True %}
+<label class="control-label {{text_size}}">{{label}}</label><br/>
+{% endif %}
+{% if parent_object.can_user_edit(field_name) %}
+<input type="input" class="form-control {{input_size}}" value="{{field}}" id="{{uid}}"/>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#{{uid}}").change(function() {
+            $.ajax({
+                url: '{{api_url}}',
+                type: 'POST',
+                data: {
+                    pk: '{{ primary_key }}',
+                    name: '{{field_name}}',
+                    value: $(this).val()
+                },
+                success: function(data) {
+                    highlight($("#{{uid}}"));
+                    $.notify('<strong>{{label}}</strong> updated');
+                    {% if populate_id != '' %}
+                    $('#{{populate_id}}').html(data);
+                    {% endif %}
+                    {% if update_mass_id != '' %}
+                    update_mass('#mass_fields_{{update_mass_id}}', {{update_mass_id}});
+                    {% endif %}
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $.notify('<strong>{{label}}</strong> could not be updated: ' + jqXHR.responseText, { type: 'danger' });
+                }
+            });
+        });
+    });
+</script>
+{% else %}
+{{field}}
+{% endif %}
+
+{% endmacro %}

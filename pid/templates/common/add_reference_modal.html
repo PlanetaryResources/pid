@@ -1,0 +1,192 @@
+<div id="add_reference_modal">
+    <div style="width: 600px;">
+        <var id="result-container-references" class="result-container">Start typing to search</var>
+        <form id="form-references" name="form-references">
+            <div class="typeahead__container pri-typeahead references-typeahead">
+                <div class="typeahead__field">
+                    <span class="typeahead__query">
+                        <input id="search_references" class="js-typeahead-components" name="components[query]" type="search" placeholder="Search" autocomplete="off">
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        setTimeout(function() { $('#search_references').focus() }, 0);  // Focus on search field when open
+        $.typeahead({
+            input: '#search_references',
+            minLength: 3,
+            maxItem: 15,
+            order: 'asc',
+            hint: true,  // Shows a hint while user is typing
+            dynamic: true,  // Queries backend for each input rather than just once
+            searchOnFocus: true,
+            display: ['number', 'name'],
+            correlativeTemplate: ['number', 'name'],
+            dropdownFilter: [{
+                key: 'object_type',
+                value: 'Anomaly',
+                template: 'Anomaly'
+            }, {
+                key: 'object_type',
+                value: 'As Run',
+                template: 'As Run'
+            }, {
+                key: 'object_type',
+                value: 'Design',
+                template: 'Design'
+            }, {
+                key: 'object_type',
+                value: 'ECO',
+                template: 'ECO'
+            }, {
+                key: 'object_type',
+                value: 'Procedure',
+                template: 'Procedure'
+            }, {
+                key: 'object_type',
+                value: 'Product',
+                template: 'Product'
+            }, {
+                key: 'object_type',
+                value: 'Specification',
+                template: 'Specification'
+            }, {
+                key: 'object_type',
+                value: 'Vendor Part',
+                template: 'Vendor Part'
+            }, {
+                key: 'object_type',
+                value: 'Vendor Product',
+                template: 'Vendor Product'
+            }],  // end dropdownfilter
+            template: function (query, item) {
+                let template = '<span class="typeahead-group">{[icon]}</span>';
+                template += '<span class="typeahead-number" title="{[number|raw]}">{[number]}</span>';
+                template += '<span class="typeahead-name" title="{[name|raw]}">{[name]}</span>';
+                if (typeof item.thumb_url !== 'undefined' && item.thumb_url !== null) {
+                    template += '<span class="typeahead-logo"><img class="img-rounded" src="{[thumb_url]}"></span>';
+                }
+                return template;
+            }, // end template
+            source: {
+                'Anomaly': {
+                    ajax: {
+                        url: '/anomaly/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'As Run': {
+                    ajax: {
+                        url: '/asrun/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'Design': {
+                    ajax: {
+                        url: '/design/typeahead_search_designs',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'ECO': {
+                    ajax: {
+                        url: '/eco/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'Procedure': {
+                    ajax: {
+                        url: '/procedure/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'Product': {
+                    ajax: {
+                        url: '/product/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'Specification': {
+                    ajax: {
+                        url: '/specification/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'Vendor Part': {
+                    ajax: {
+                        url: '/vendorpart/typeahead_search_vendor_parts',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'vendor_parts'
+                    }
+                },
+                'Vendor Product': {
+                    ajax: {
+                        url: '/vendorproduct/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+            },  // end source
+            callback: {
+                onNavigateAfter: function (node, lis, a, item, query, event) {
+                    if (~[38,40].indexOf(event.keyCode)) {
+                        let resultList = node.closest("form").find("ul.typeahead__list"),
+                            activeLi = lis.filter("li.active"),
+                            offsetTop = activeLi[0] && activeLi[0].offsetTop - (resultList.height() / 2) || 0;
+                        resultList.scrollTop(offsetTop);
+                    }
+                },
+                onClickAfter: function (node, a, item, event) {
+                    event.preventDefault();
+                    $.ajax({
+                        url: '/common/add_reference',
+                        type: 'POST',
+                        data: {
+                            by_class: '{{referencing_object_class}}',
+                            by_id: {{referencing_object_id}},
+                            to_class: item.class,
+                            to_id: item.id
+                        },
+                        success: function(data) {
+                            let $refToList = $("#ref-to-list");
+                            $refToList.find(".no-references-to").remove();
+                            $refToList.append(data);  // Append to references table
+                            $.notify('Reference added');
+                        }
+                    });
+                    add_reference_modal.destroy();  // Close modal
+                },
+                onResult: function (node, query, result, resultCount) {
+                    if (query === "") return;
+                    let text = "";
+                    if (result.length > 0 && result.length < resultCount) {
+                        text = "Showing <strong>" + result.length + "</strong> of <strong>" + resultCount + '</strong> elements matching "' + query + '"';
+                    } else if (result.length > 0) {
+                        text = 'Showing <strong>' + result.length + '</strong> elements matching "' + query + '"';
+                    } else {
+                        text = 'No results matching "' + query + '"';
+                    }
+                    $('#result-container-references').html(text);
+                }
+            }  // end typeahead callback
+        });  // end typeahead
+    });
+</script>

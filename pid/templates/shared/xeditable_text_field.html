@@ -1,0 +1,120 @@
+
+{% macro render_xeditable_text_field(field, parent_object) %}
+
+{% set field_name = kwargs.pop('field_name', '')                                %}  {# Name of field, sent to server for update                     #}
+{% set primary_key = kwargs.pop('primary_key', '')                              %}  {# ID of object to update                                       #}
+{% set label = kwargs.pop('label', field_name)|title                            %}  {# Label to display                                             #}
+{% set display_label = kwargs.pop('display_label', True)                        %}  {# Whether we should display label or not                       #}
+{% set api_url = kwargs.pop('api_url', '')                                      %}  {# URL to call for update                                       #}
+{% set populate_id = kwargs.pop('populate_id', '')                              %}  {# HTML field ID to update after AJAX call                      #}
+{% set replace_id = kwargs.pop('replace_id', '')                                %}  {# HTML field ID to replace after AJAX call                     #}
+{% set input_class = kwargs.pop('input_class', 'pri-text')                      %}  {# CSS class to add to text input                               #}
+{% set placeholder = kwargs.pop('placeholder', '--')                            %}  {# Placeholder text for the input                               #}
+{% set horizontal_labels = kwargs.pop('horizontal_labels', False)               %}  {# Whether this macro instance has labels above or on the side  #}
+{% set label_container_class = kwargs.pop('label_container_class', 'col-xs-1')  %}  {# CSS class to add to label, usually a Bootstrap col size      #}
+{% set input_container_class = kwargs.pop('input_container_class', None)        %}  {# CSS class to add to label, usually a Bootstrap col size      #}
+{% set non_edit_additional_css = kwargs.pop('non_edit_additional_css', None)    %}  {# Additional CSS to apply when user can't edit                 #}
+
+{% set primary_key = parent_object.id %}
+{% set parent_class = parent_object.get_class_name() %}
+
+{# Create a unique id which is unique on entire page for easier reference #}
+{% set uid = field_name + '-' + parent_class + '-' + primary_key|string + '-xeditable'%}
+
+{% if horizontal_labels %}
+<div class="row">
+    {% if display_label %}
+    <div class="{{label_container_class}}">
+        <label class="control-label pri-field-label">{{ label }}</label>
+    </div>
+    {% endif %}  {# end if display_label #}
+    {% if parent_object.can_user_edit(field_name) %}
+    <div class="{% if input_container_class %} {{input_container_class}} {% elif display_label %} col-xs-8 {% else %} col-xs-12 {% endif %}">
+        <span style="display:none;" id="{{uid}}_span">
+            <a href="#" id="{{uid}}_editable" data-type="text" data-pk="{{primary_key}}" data-url="{{api_url}}">{{field|default('', True)}}</a>
+        </span>
+        <div class="xeditable-inline xeditable-text" id="{{uid}}_input">
+            <div class="pull-left {{input_class}}" id="{{uid}}_editor">{{field|default('<span class="placeholder">' + placeholder + '</span>', True)|safe}}</div>
+            <div class="xeditable-inline-indicator" id="{{uid}}_indicator"><i class="fa fa-pencil" aria-hidden="true"></i></div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    {% else %}  {# else if parent_object.can_user_edit #}
+    <div class="{% if input_container_class %} {{input_container_class}} {% elif display_label %} col-xs-8 {% else %} col-xs-12 {% endif %}">
+        <div class="{{input_class}}" {% if non_edit_additional_css %}style="{{non_edit_additional_css}}"{% endif %}>{{field|default('<span class="placeholder">' + placeholder + '</span>', True)|safe}}</div>
+    </div>
+    {% endif %}  {# end if parent_object.can_user_edit #}
+</div>
+{% else %}  {# else if horizontal_labels #}
+{% if display_label %}
+<label class="control-label pri-field-label">{{ label }}</label><br/>
+{% endif %}  {# end if display_label #}
+{% if parent_object.can_user_edit(field_name) %}
+<span style="display:none;" id="{{uid}}_span">
+    <a href="#" id="{{uid}}_editable" data-type="text" data-pk="{{primary_key}}" data-url="{{api_url}}">{{field|default('', True)}}</a>
+</span>
+
+<div class="xeditable-inline xeditable-text {{wysi_class}}" id="{{uid}}_input">
+    <div class="pull-left {{input_class}}" id="{{uid}}_editor">{{field|default('<span class="placeholder">' + placeholder + '</span>', True)|safe}}</div>
+    <div class="xeditable-inline-indicator" id="{{uid}}_indicator"><i class="fa fa-pencil" aria-hidden="true"></i></div>
+    <div class="clearfix"></div>
+</div>
+{% else %}  {# else if parent_object.can_user_edit #}
+<div class="{{input_class}}" {% if non_edit_additional_css %}style="{{non_edit_additional_css}}"{% endif %}>{{field|default('<span class="placeholder">' + placeholder + '</span>', True)|safe}}</div>
+{% endif %}  {# end if parent_object.can_user_edit #}
+{% endif %}  {# end if horizontal_labels #}
+
+{% if parent_object.can_user_edit(field_name) %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        var xeditable_input_width = $('#{{uid}}_input').width() - 75; // Dynamically calculate inbox size. -75 because button sizes
+        $('#{{uid}}_editable').editable({
+            toggle: 'manual',
+            tpl: "<input type='text' id='' class='{{input_class}}' style='width: "+xeditable_input_width+"px'>",
+            inputclass: '',
+            success: function(response, newValue) {
+                {% if populate_id != '' %}
+                    // Populate field with template coming in response
+                    $('#{{populate_id}}').html(response);
+                {% endif %}
+                {% if replace_id != '' %}
+                    // Replace field with template coming in response
+                    $('#{{replace_id}}').replaceWith(response);
+                {% endif %}
+                // Update value to show, display it and flash
+                if (newValue == '') {
+                    $('#{{uid}}_editor').html('<span class="placeholder">{{placeholder}}</span>');
+                }
+                else {
+                    $('#{{uid}}_editor').html(newValue);
+                }
+                $('#{{uid}}_input').show();
+                highlight($('#{{uid}}_input'));
+                highlight($('#{{uid}}_editor'));
+                // Hide the xeditable form
+                $('#{{uid}}_span').hide();
+                $('#{{uid}}_editable').editable('hide');
+                $('.editableform-loading').remove();
+                // Show user a notification
+                $.notify('<strong>{{label}}</strong> updated');
+            },
+        }).on('hidden', function(e, reason) {
+            // Hide xeditable if focus is lost
+            if (reason == "cancel" || reason == "nochange" || reason == "onblur" || reason == "manual") {
+                $('#{{uid}}_input').show();
+                $('#{{uid}}_editable').editable('hide');
+                $('#{{uid}}_span').hide();
+            }
+        });
+        $('#{{uid}}_input').click(function(e) {
+            // Show xeditable when user clicks on element
+            e.stopPropagation();
+            $('#{{uid}}_editable').editable('show');
+            $('#{{uid}}_span').show();
+            $('#{{uid}}_input').hide();
+        });
+    });
+</script>
+{% endif %}  {# end if parent_object.can_user_edit #}
+
+{% endmacro %}

@@ -1,0 +1,47 @@
+<div id="revise_procedure_modal">
+  <form id="reviseProcedureForm" class="form-horizontal" method="POST" action="/procedure/revise" role="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="procedure_id" value="{{ proc.id }}"/>
+
+        <div class="form-group">
+            <label for="new_revision" class="col-xs-4 control-label">New Revision</label>
+            <div class="col-xs-2">
+                <input class="form-control" name="revision" type="text" id="revision" value="{{proc.find_next_revision()}}" disabled>
+            </div>
+        </div>
+      <div class="form-group {% if form.revision_reason.errors %} has-error{% endif %}">
+          <label class="col-xs-4 control-label" for="revision_reason">Reason for Revision</label>
+          <div class="col-xs-8">
+              {{ form.revision_reason(placeholder="", class_="form-control") }}
+              {% if form.revision_reason.errors %}
+              <span class="help-block">{{ form.revision_reason.errors|join(', ') }}</span>
+              {% endif %}
+          </div>
+      </div>
+        <hr/>
+        <div class="form-group">
+            <div class="col-xs-12">
+                <button type="submit" class="btn pri-btn-primary">Revise Procedure</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        initial_focus('#revision_reason');
+        $('#reviseProcedureForm').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#revise_procedure_modal', revise_procedure_modal);
+                return true;
+            },
+            error: function(response, statusText, xhr, $form) {
+                enableModal('#revise_procedure_modal', revise_procedure_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#revise_procedure_modal').replaceWith(response.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                window.location = response.url;
+            }
+        });
+    });
+</script>

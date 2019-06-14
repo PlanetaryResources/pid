@@ -1,0 +1,16 @@
+{% macro references_by(referencing_object) %}
+<label class="pri-table-header">Referenced by</label>
+<table class="table table-condensed table-hover pri-table">
+    <tbody class="pri-list rowlink" data-link="row">
+        {% if referencing_object.references_by %}
+        {% for ref in referencing_object.references_by %}
+        {% include "common/reference_by_row.html" %}
+        {% endfor %}
+        {% else %}
+        <tr class="no-references-by">
+            <td colspan="3"><i>Not referenced by anything.</i></td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endmacro %}

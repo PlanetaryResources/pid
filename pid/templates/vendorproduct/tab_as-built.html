@@ -1,0 +1,46 @@
+
+<div class="row">
+    <div class="col-xs-3" id="vendor_product_mass_fields">
+        {% include 'vendorproduct/mass_field.html' %}
+    </div>
+    <div class="col-xs-2">
+        <label class="control-label pri-field-label">Material</label><br/>
+        <div class="small" style="padding-top: 5px;">{{ vendor_product.vendor_part.material|default('<i>Nothing selected</i>', True)|safe }}</div>
+    </div>
+    <div class="col-xs-2">
+        <label class="control-label pri-field-label">Material Specification</label><br/>
+        <div class="small" style="padding-top: 5px;">{{ vendor_product.vendor_part.material_specification|default('<i>Nothing selected</i>', True)|safe }}</div>
+    </div>
+    <div class="col-xs-6"></div>
+</div>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        <label class="pri-table-header">INSTALLED IN</label><br>
+        {% if installed_ins %}
+        <table class="table table-condensed table-hover pri-table">
+            <thead>
+                <tr>
+                    <th width="20%">Part Number</th>
+                    <th width="20%">S/N / LOT</th>
+                    <th width="60%">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, values in installed_ins.items() %}
+                {% set pc = values[0] %}
+                <tr>
+                    <td><a href="{{pc.parent.part.design.get_url()}}">{{ pc.parent.part.part_number }}</a></td>
+                    <td>
+                        <a href="{{pc.parent.get_url()}}">{{ pc.parent.serial_number}}</a>
+                        <span class="pull-right">({{values|length}})</span>
+                    </td>
+                    <td>{{ pc.parent.part.design.name|sn }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <i class="small">This product is not installed anywhere.</i>
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,284 @@
+@font-face {
+    font-family: 'pri-icons';
+    src:
+        url('../fonts/pri-icons.ttf?8khzti') format('truetype'),
+        url('../fonts/pri-icons.woff?8khzti') format('woff'),
+        url('../fonts/pri-icons.svg?8khzti#pri-icons') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+[class^="pri-icons-"], [class*=" pri-icons-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'pri-icons' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.pri-icons-add:before {
+    content: "\e901";
+}
+.pri-icons-add-circle:before {
+    content: "\e900";
+}
+.pri-icons-approval:before {
+    content: "\e902";
+}
+.pri-icons-arrow-left:before {
+    content: "\e903";
+}
+.pri-icons-arrow-right:before {
+    content: "\e904";
+}
+.pri-icons-change-workflow:before {
+    content: "\e905";
+}
+.pri-icons-checklist-board:before {
+    content: "\e906";
+}
+.pri-icons-checklist-box:before {
+    content: "\e907";
+}
+.pri-icons-checklist-list:before {
+    content: "\e908";
+}
+.pri-icons-checklist-panel:before {
+    content: "\e909";
+}
+.pri-icons-close:before {
+    content: "\e90b";
+}
+.pri-icons-close-circle:before {
+    content: "\e90a";
+}
+.pri-icons-corrective:before {
+    content: "\e90c";
+}
+.pri-icons-create-asrun:before {
+    content: "\e90d";
+}
+.pri-icons-create-discrepancy:before {
+    content: "\e90e";
+}
+.pri-icons-create-eco:before {
+    content: "\e90f";
+}
+.pri-icons-create-new:before {
+    content: "\e911";
+}
+.pri-icons-create-new-circle:before {
+    content: "\e910";
+}
+.pri-icons-create-part:before {
+    content: "\e912";
+}
+.pri-icons-create-procedure:before {
+    content: "\e913";
+}
+.pri-icons-critical-major:before {
+    content: "\e914";
+}
+.pri-icons-critical-sof:before {
+    content: "\e914";
+}
+.pri-icons-critical-odd:before {
+    content: "\e915";
+}
+.pri-icons-critical-serious:before {
+    content: "\e916";
+}
+.pri-icons-critical-worrisome:before {
+    content: "\e917";
+}
+.pri-icons-discrepancy:before {
+    content: "\e918";
+}
+.pri-icons-edit:before {
+    content: "\e91a";
+}
+.pri-icons-edit-circle:before {
+    content: "\e919";
+}
+.pri-icons-flame:before {
+    content: "\e91b";
+}
+.pri-icons-gear:before {
+    content: "\e91c";
+}
+.pri-icons-hazard:before {
+    content: "\e91d";
+}
+.pri-icons-in-work:before {
+    content: "\e91e";
+}
+.pri-icons-inspection:before {
+    content: "\e950";
+}
+.pri-icons-magnify:before {
+    content: "\e91f";
+}
+.pri-icons-minus:before {
+    content: "\e921";
+}
+.pri-icons-minus-circle:before {
+    content: "\e920";
+}
+.pri-icons-obsolete:before {
+    content: "\e922";
+}
+.pri-icons-open:before {
+    content: "\e923";
+}
+.pri-icons-photo-thick:before {
+    content: "\e924";
+}
+.pri-icons-photo-thin:before {
+    content: "\e926";
+}
+.pri-icons-photo-thin-circle:before {
+    content: "\e925";
+}
+.pri-icons-planned:before {
+    content: "\e927";
+}
+.pri-icons-pr-logo:before {
+    content: "\e928";
+}
+.pri-icons-profile:before {
+    content: "\e929";
+}
+.pri-icons-question:before {
+    content: "\e92b";
+}
+.pri-icons-question-circle:before {
+    content: "\e92a";
+}
+.pri-icons-record-anomaly:before {
+    content: "\e92c";
+}
+.pri-icons-record-as-run:before {
+    content: "\e92d";
+}
+.pri-icons-record-asrun:before {
+    content: "\e92d";
+}
+.pri-icons-record-design:before {
+    content: "\e92e";
+}
+.pri-icons-record-eco:before {
+    content: "\e92f";
+}
+.pri-icons-record-procedure:before {
+    content: "\e930";
+}
+.pri-icons-record-product:before {
+    content: "\e931";
+}
+.pri-icons-record-specification:before {
+    content: "\e932";
+}
+.pri-icons-record-vendor-part:before {
+    content: "\e933";
+}
+.pri-icons-record-vendorpart:before {
+    content: "\e933";
+}
+/* TODO: Can this below be deleted? And at least one of the above? */
+.pri-icons-record-vendordesign:before {
+    content: "\e933";
+}
+.pri-icons-record-vendor-product:before {
+    content: "\e934";
+}
+.pri-icons-record-vendorproduct:before {
+    content: "\e934";
+}
+.pri-icons-reports-add-build:before {
+    content: "\e935";
+}
+.pri-icons-reports-add-discrepancy:before {
+    content: "\e936";
+}
+.pri-icons-reports-add-log:before {
+    content: "\e937";
+}
+.pri-icons-reports-create-new:before {
+    content: "\e939";
+}
+.pri-icons-reports-create-new-form-source:before {
+    content: "\e938";
+}
+.pri-icons-reports-new-part:before {
+    content: "\e93a";
+}
+.pri-icons-reports-view-build:before {
+    content: "\e93b";
+}
+.pri-icons-reports-view-groups:before {
+    content: "\e93c";
+}
+.pri-icons-reports-view-list-down:before {
+    content: "\e93d";
+}
+.pri-icons-reports-view-list-up:before {
+    content: "\e93e";
+}
+.pri-icons-reports-view-log:before {
+    content: "\e93f";
+}
+.pri-icons-simple-as-run:before {
+    content: "\e946";
+}
+.pri-icons-simple-build:before {
+    content: "\e947";
+}
+.pri-icons-simple-changelog:before {
+    content: "\e948";
+}
+.pri-icons-simple-discrepancy:before {
+    content: "\e949";
+}
+.pri-icons-simple-eco:before {
+    content: "\e94a";
+}
+.pri-icons-simple-list-down:before {
+    content: "\e94b";
+}
+.pri-icons-simple-list-up:before {
+    content: "\e94c";
+}
+.pri-icons-simple-part:before {
+    content: "\e94d";
+}
+.pri-icons-simple-procedure:before {
+    content: "\e94e";
+}
+.pri-icons-simple-rev:before {
+    content: "\e94f";
+}
+.pri-icons-thumbs-down:before {
+    content: "\e940";
+}
+.pri-icons-thumbs-up:before {
+    content: "\e941";
+}
+.pri-icons-trashcan:before {
+    content: "\e942";
+}
+.pri-icons-view:before {
+    content: "\e945";
+}
+.pri-icons-view-circle:before {
+    content: "\e944";
+}
+.pri-icons-view_changelog:before {
+    content: "\e943";
+}

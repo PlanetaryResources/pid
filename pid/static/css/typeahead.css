@@ -1,0 +1,223 @@
+
+.pri-typeahead .js-typeahead-components {
+    border-radius: 4px;
+    width: 100% !important;
+    height: 30px !important;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+    line-height: 1.42857143 !important;
+    border: 1px solid #ccc !important;
+}
+
+.pri-typeahead .typeahead__filter-button {
+    border-top-right-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
+    height: 30px !important;
+    z-index:100 !important;
+}
+
+.pri-typeahead .typeahead__list {
+    margin-top: 0;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.pri-typeahead .typeahead__result .typeahead-group {
+    margin-right: 5px;
+}
+
+#form-components .typeahead__list {
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.typeahead__list li a {
+    position: relative;
+}
+
+.typeahead__result .typeahead-logo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: transparent;
+    margin-top: 5px;
+}
+
+.typeahead__result .typeahead-logo img {
+    height: 26px;
+}
+
+.typeahead__result .typeahead-number {
+    min-width: 150px;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
+.typeahead__result .typeahead-name {
+    min-width: 210px;
+    max-width: 210px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
+.typeahead__result .typeahead-state {
+    min-width: 50px;
+    display: inline-block;
+}
+
+.typeahead__result .typeahead-group {
+    font-size: 10px;
+    color:#999;
+    min-width: 20px;
+    max-width: 20px;
+}
+
+/* Settings specific to typeahead in navbar */
+#global-search {
+    width: 350px;
+}
+.pri-navbar .pri-typeahead .typeahead__container {
+    margin-top: 12px;
+}
+.pri-navbar .pri-typeahead .js-typeahead-components {
+    border-top-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+.pri-navbar .pri-typeahead .typeahead__list {
+    width: 450px;
+    border-top-right-radius: 4px;
+}
+.pri-navbar .pri-typeahead .typeahead__result .typeahead-number {
+    width: 150px;
+}
+.pri-navbar .pri-typeahead .typeahead__result .typeahead-name {
+    width: 210px;
+}
+
+/* Settings specific to Parts on Designs */
+.part-components-typeahead .typeahead__list {
+    min-width: 600px;
+    max-width: 600px;
+}
+.part-components-typeahead .typeahead__result .typeahead-group {
+    margin-right: 5px;
+}
+.part-components-typeahead .typeahead__result .typeahead-number {
+    min-width: 120px;
+    max-width: 120px;
+}
+.part-components-typeahead .typeahead__result .typeahead-name {
+    min-width: 400px;
+    max-width: 400px;
+}
+.part-components-typeahead .typeahead__result .typeahead-state {
+    min-width: 30px;
+    max-width: 30px;
+}
+
+/* Settings specific to references */
+.references-typeahead .js-typeahead-components {
+    border-top-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+.references-typeahead .typeahead__list {
+    min-width: 600px;
+    max-width: 600px;
+}
+.references-typeahead .typeahead__result .typeahead-number {
+    min-width: 150px;
+    max-width: 150px;
+}
+.references-typeahead .typeahead__result .typeahead-name {
+    min-width: 380px;
+    max-width: 380px;
+}
+.references-typeahead .typeahead__result .typeahead-state {
+    min-width: 30px;
+    max-width: 30px;
+}
+
+/* Settings specific to procedure */
+.create-procedure-typeahead .typeahead__list {
+    min-width: 417px;
+    max-width: 417px;
+    margin-left: 15px;
+}
+.create-procedure-typeahead .typeahead__result .typeahead-number {
+    min-width: 100px;
+    max-width: 100px;
+    font-size: 12px;
+}
+.create-procedure-typeahead .typeahead__result .typeahead-name {
+    min-width: 250px;
+    max-width: 250px;
+    font-size: 12px;
+}
+
+/* Settings specific to anomaly */
+.create-anomaly-typeahead .typeahead__list {
+    min-width: 412px;
+    max-width: 412px;
+    margin-left: 15px;
+}
+.create-anomaly-typeahead .typeahead__result .typeahead-number {
+    min-width: 100px;
+    max-width: 100px;
+    font-size: 12px;
+}
+.create-anomaly-typeahead .typeahead__result .typeahead-name {
+    min-width: 240px;
+    max-width: 240px;
+    font-size: 12px;
+}
+.create-anomaly-asrun-typeahead .typeahead__list {
+    min-width: 412px;
+    max-width: 412px;
+    margin-left: 15px;
+}
+.create-anomaly-asrun-typeahead .typeahead__result .typeahead-number {
+    min-width: 100px;
+    max-width: 100px;
+    font-size: 12px;
+}
+.create-anomaly-asrun-typeahead .typeahead__result .typeahead-name {
+    min-width: 240px;
+    max-width: 240px;
+    font-size: 12px;
+}
+
+/* Settings specific to eco */
+.create-eco-typeahead .typeahead__list {
+    min-width: 363px;
+    max-width: 363px;
+    margin-left: 15px;
+}
+.create-eco-typeahead .typeahead__result .typeahead-number {
+    min-width: 100px;
+    max-width: 100px;
+    font-size: 12px;
+}
+.create-eco-typeahead .typeahead__result .typeahead-name {
+    min-width: 200px;
+    max-width: 200px;
+    font-size: 12px;
+}
+
+#anomaly-design-typeahead {
+    margin-top: -15px;
+}
+
+.typeahead__result .typeahead-group .pri-typeahead-icon {
+    font-size: 20px;
+    color: #226176;
+}

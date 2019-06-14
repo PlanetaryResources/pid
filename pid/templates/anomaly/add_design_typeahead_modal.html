@@ -1,0 +1,153 @@
+
+<div id="add_design_typeahead" style="width: 600px;">
+    <var id="result-container-parts" class="result-container">Start typing to search</var>
+    <div class="row">
+        <div class="col-xs-10 typeahead__container pri-typeahead create-anomaly-typeahead">
+            <form id="form-add-design" name="form-add-design">
+                <div class="typeahead__container pri-typeahead add-design-anomaly-typeahead">
+                    <div class="typeahead__field">
+                        <span class="typeahead__query">
+                            <input id="search_designs_anomaly" class="js-typeahead-components" name="components[query]" type="search" placeholder="Search" autocomplete="off">
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-xs-2">
+            <div class="pri-select-wrapper">
+                <select class="form-control input-sm" id="design-revision-select" disabled>
+                    <option>Revision</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <form id="addDesignForm" class="form-horizontal top-pad-15" method="POST" action="/anomaly/add_design" role="form">
+                <input type="hidden" name="anomaly_id" value="{{ anomaly.id }}"/>
+                <input type="hidden" name="design_id" />
+                <input type="hidden" name="vendor_part_id" />
+                <br>
+                <button type="submit" class="btn pri-btn-primary" disabled>Add Design</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        setTimeout(function() { $('#search_designs_anomaly').focus() }, 0);  // Focus on search field when open
+        $.typeahead({
+            input: '#search_designs_anomaly',
+            minLength: 3,
+            maxItem: 15,
+            order: 'desc',
+            hint: true,  // Shows a hint while user is typing
+            dynamic: true,  // Queries backend for each input rather than just once
+            searchOnFocus: true,
+            display: ['number', 'name'],
+            correlativeTemplate: ['number', 'name'],
+            matcher: function (item) {
+                let includedPartIds = {{ designs |tojson }};
+                let includedVendorPartIds = {{ vendor_parts|tojson }};
+                // Exclude already included designs
+                if (includedPartIds.indexOf(item.id) > -1 && item.class === Design) {
+                    return false;
+                } else if (includedVendorPartIds.indexOf(item.id) > -1 && item.class === VendorPart) {
+                    return false
+                }
+                return true;
+            },
+            template: function (query, item) {
+                let template = '<span class="typeahead-group">{[icon]}</span>';
+                template += '<span class="typeahead-number" title="{[number|raw]}">{[number]}</span>';
+                template += '<span class="typeahead-name" title="{[name|raw]}">{[name]}</span>';
+                if (typeof item.thumb_url !== 'undefined' && item.thumb_url !== null) {
+                    template += '<span class="typeahead-logo"><img class="img-rounded" src="{[thumb_url]}"></span>';
+                }
+                return template;
+            },
+            source: {
+                'Design': {
+                    ajax: {
+                        url: '/design/typeahead_search_designs',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}"
+                        },
+                        path: 'data'
+                    }
+                },
+                'Vendor Part': {
+                    ajax: {
+                        url: '/vendorpart/typeahead_search_vendor_parts',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}"
+                        },
+                        path: 'vendor_parts'
+                    }
+                }
+            },
+            callback: {
+                onNavigateAfter: function (node, lis, a, item, query, event) {
+                    if (~[38,40].indexOf(event.keyCode)) {
+                        let resultList = node.closest("form").find("ul.typeahead__list"),
+                            activeLi = lis.filter("li.active"),
+                            offsetTop = activeLi[0] && activeLi[0].offsetTop - (resultList.height() / 2) || 0;
+                        resultList.scrollTop(offsetTop);
+                    }
+                },
+                onClickAfter: function (node, query, result, resultCount, resultCountPerGroup) {
+                    event.preventDefault();
+                    let addDesignForm = $('#addDesignForm');
+                    if (result.class === Design) {
+                        addDesignForm.find('input[name="design_id"]').val(result.id);
+                        addDesignForm.find('button').removeAttr('disabled');
+                        let options = [];
+                        let instances = result['revisions'];
+                        for (let i = 0; i < instances.length; i++) {
+                            let instance = instances[i];
+                            options.push('<option value="' + instance.id + '" >' + instance.revision + '</option>');
+                        }
+                        let designRevisionSelect = $('#design-revision-select');
+                        designRevisionSelect.html(options.join("")).val('');
+                        if (instances.length > 0) {
+                            designRevisionSelect.removeAttr('disabled');
+                            designRevisionSelect.val(designRevisionSelect.find("option:first").val());
+                        }
+                        else {
+                            $('#design-revision-select').attr('disabled', 'disabled');
+                        }
+                    }
+                    else if (result.class === VendorPart) {
+                        addDesignForm.find('input[name="vendor_part_id"]').val(result.id);
+                        addDesignForm.find('button').removeAttr('disabled');
+                    }
+                }
+            } // end typeahead callback
+        }); // end typeahead
+        $('#addDesignForm').ajaxForm({
+            beforeSerialize: function($form, options) {
+                let revisionId = $('#design-revision-select').val();
+                if (revisionId !== 'Revision') {
+                    $form.find("[name='design_id']").val(revisionId);
+                }
+            },
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#add_design_typeahead', add_design_to_anomaly_modal);
+                return true;
+            },
+            error: function(response, statusText, xhr, $form) {
+                enableModal('#add_design_typeahead', add_design_to_anomaly_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#add_design_typeahead').replaceWith(response.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                enableModal('#add_design_typeahead', add_design_to_anomaly_modal);  // Needs to be enabled to close
+                $('#anomaly_designs').append(response);
+                add_design_to_anomaly_modal.close();
+            }
+        });
+    });
+</script>

@@ -1,0 +1,32 @@
+<p>The following task has been assigned to you:</p>
+<p style="font-size: 18px;">{{ task.task_number }} - {{ task.title }}</p>
+{% if task.summary %}
+<p>{{ task.summary|safe }}</p>
+{% endif %}
+<table cellspacing="5">
+    <tr>
+        <td>Criticality</td>
+        <td>{{ task.urgency }}</td>
+    </tr>
+    <tr>
+        <td>Need Date</td>
+        <td>{{ task.need_date.strftime('%Y-%m-%d') }}</td>
+    </tr>
+    <tr>
+        <td>Requested By</td>
+        <td>{{ task.requested_by.get_name() }}</td>
+    </tr>
+    <tr>
+        <td colspan="2" align="center" style="padding-top: 20px;">
+            <div>
+                <!--[if mso]>
+                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ task.get_url(external=True) }}" style="height:40px;v-text-anchor:middle;width:200px;" arcsize="10%" strokecolor="#1e3650" fillcolor="#A8BACD">
+                <w:anchorlock/>
+                <center style="color:#000000;font-family:sans-serif;font-size:13px;font-weight:bold;">View Task</center>
+                </v:roundrect>
+                <![endif]-->
+                <a href="{{ task.get_url(external=True) }}" style="background-color:#A8BACD;border:1px solid #1e3650;border-radius:4px;color:#000000;display:inline-block;font-family:sans-serif;font-size:13px;font-weight:bold;line-height:40px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all;">View Task</a>
+            </div>
+        </td>
+    </tr>
+</table>

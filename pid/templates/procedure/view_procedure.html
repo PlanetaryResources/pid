@@ -1,0 +1,208 @@
+{% extends "layout.html" %}
+
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+{% from "shared/bookmark.html" import bookmark %}
+{% from "shared/creation_fields.html" import creation_fields %}
+{% from 'shared/thumbnail.html' import thumbnail %}
+{% from "shared/view_changelog_button.html" import view_changelog_button %}
+{% from "shared/view_revisionlog_button.html" import view_revisionlog_button %}
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+{% from 'shared/workflow.html' import workflow with context %}
+
+{% block page_title %}{{ proc.procedure_number }} - {{ proc.name }}{% endblock %}
+
+{% block content %}
+<div id="view_procedure">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="row sticky-header-row">
+                <div class="col-xs-1">
+                  <div class="pri-record-icon-wrapper">
+                    <i class="pri-record-icon pri-icons-record-procedure" aria-hidden="true"></i>
+                  </div>
+                </div>
+                <div class="col-xs-11">
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <span class="pri-header">{{ proc.procedure_number }}</span>
+                        </div>
+                        <div class="col-xs-1">
+                            <div class="pri-header-select revision">
+                                <select class="form-control" onchange="window.location.href='/procedure/{{proc.procedure_number}}-'+this.value+window.location.hash">
+                                    {% for revision in revisions %}
+                                    <option value="{{ revision.revision }}"{% if revision.revision == proc.revision %} selected{% endif %}>
+                                        {{ revision.revision }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-7">
+                            {{ render_xeditable_text_field(field=proc.name, parent_object=proc, api_url="/procedure/update", non_edit_additional_css="margin-top: 20px;",
+                            field_name='name', display_label=False, input_class="pri-subheader") }}
+                        </div>
+                        <div class="col-xs-2">
+                            <div id="workflow_container">
+                                {{ workflow(record=proc) }}
+                            </div>
+                            {{ bookmark(parent_object=proc, current_user=current_user) }}
+                        </div>
+                    </div>
+                </div>
+            </div>  {# End div row sticky-header-row #}
+            <div class="row header-info">
+                <div class="col-xs-2" id="thumbnail_parent">
+                    {{ thumbnail(record=proc) }}
+                </div>
+                <div class="col-xs-10">
+                    <div class="row">
+                      <div class="col-xs-6">
+                        {{ render_ajax_select_field(field=proc.owner, primary_key=proc.id, parent_object=proc, api_url="/procedure/update",
+                        field_name='owner', label='OWNER', options=users, input_size='input-sm', non_edit_additional_css="margin-top: 6px; margin-left: -15px;",
+                        option_id='id', option_name='get_name()', horizontal_labels=True) }}
+                      </div>
+                      <div class="col-xs-6 minus-one-column">
+                        {{ render_ajax_select_field(field=proc.project, primary_key=proc.id, parent_object=proc, api_url="/procedure/update",
+                        field_name='project', label='PROJECT', options=projects, input_size='input-sm', non_edit_additional_css="margin-top: 6px; margin-left: -15px;",
+                        option_id='id', option_name='name', horizontal_labels=True) }}
+                      </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6">
+                          <div class="row">
+                            <div class="col-xs-2">
+                              <label class="control-label pri-field-label ">CREATE</label>
+                            </div>
+                            <div class="col-xs-10">
+                              {% if proc.can_user_edit('revision') %}
+                              <i class="pri-app-icon create pri-icons-reports-add-log" onclick="reviseProcedureModal({{proc.id}});" data-toggle="tooltip" title="Create New Revision"></i>
+                              {% else %}
+                              <i class="pri-app-icon create pri-icons-reports-add-log disabled" data-toggle="tooltip" title="Can only revise after procedure is released"></i>
+                              {% endif %}
+                              {% if proc.can_user_edit('as_runs') %}
+                              <i class="pri-app-icon create pri-icons-create-asrun" onclick="createAsRunModal({{proc.id}});" data-toggle="tooltip" title="Create As-Run"></i>
+                              {% else %}
+                              <i class="pri-app-icon create pri-icons-create-asrun disabled" data-toggle="tooltip" title="Can only create as-run after procedure is released"></i>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-xs-6 minus-one-column">
+                          <div class="row">
+                            <div class="col-xs-2">
+                              <label class="control-label pri-field-label ">VIEW</label>
+                            </div>
+                            <div class="col-xs-10">
+                              {{ view_revisionlog_button(parent_object=proc) }}
+                              {{ view_changelog_button(parent_object=proc) }}
+                            </div>
+                          </div>
+                        </div>
+                    </div>  {# end row #}
+                    <div class="row" style="padding-top: 10px;">
+                        <div class="col-xs-12">
+                            {% set parts = proc.parts + proc.vendor_parts %}
+                            <label class="pri-table-header">Parts</label>
+                            <i style="left:65px;top:0px;z-index:2;width:20px;" class="pri-app-icon pri-icons-question-circle tooltip-icon" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="bottom"></i>
+                            <table class="table table-condensed table-hover pri-table">
+                                {% if parts %}
+                                <thead>
+                                {% else %}
+                                <thead style="display:none;">
+                                {% endif %}
+                                    <tr>
+                                        <th width="25%">PART NUMBER(s)</th>
+                                        <th width="10%">REV</th>
+                                        <th width="60%">NAME / DESCRIPTION</th>
+                                        <th widh="10%"></th>
+                                    </tr>
+                                </thead>
+                                {% if parts %}
+                                <tbody id="procedure-part-list">
+                                    {% for part in parts %}
+                                    {% include "procedure/procedure_part.html" %}
+                                    {% endfor %}
+                                </tbody>
+                                {% else %}
+                                <tbody id="procedure-part-list">
+                                    <tr class="no-parts-added">
+                                        <td colspan="6"><i>No parts added.</i></td>
+                                    </tr>
+                                </tbody>
+                                {% endif %}
+                                {% if proc.can_user_edit('parts') %}
+                                <tfoot>
+                                    <tr onclick="addPartToProcedureModal({{proc.id}});">
+                                        <td colspan="6">
+                                            <span><i class="pri-app-icon sm pri-icons-add"></i>Add P/N</span>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>  {# end row #}
+                </div>  {# end col-xs-10 #}
+            </div>  {# End div row header-info #}
+        </div>  {# end col-xs-12 #}
+    </div>  {# end row #}
+    <div class="row" style="padding-top: 15px;">
+        <div class="col-xs-12">
+            <div class="panel">
+                <ul class="nav nav-tabs nav-justified">
+                    <li class="active"><a data-toggle="tab" href="#info">INFO</a></li>
+                    <li><a data-toggle="tab" href="#as-runs">AS-RUNS</a></li>
+                    <li><a data-toggle="tab" href="#links">LINKS</a></li>
+                    <li><a data-toggle="tab" href="#approvals">APPROVALS</a></li>
+                    <li><a data-toggle="tab" href="#images">IMAGES</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="info" class="tab-pane active">
+                        {% include "procedure/tab_info.html" %}
+                    </div>
+                    <div id="as-runs" class="tab-pane">
+                        {% include "procedure/tab_as_runs.html" %}
+                    </div>
+                    <div id="links" class="tab-pane">
+                        {% include "procedure/tab_links.html" %}
+                    </div>
+                    <div id="approvals" class="tab-pane">
+                        {% include "procedure/tab_approvals.html" %}
+                    </div>
+                    <div id="images" class="tab-pane">
+                        {% include "procedure/tab_images.html" %}
+                    </div>
+                </div>  {# End tab-content #}
+            </div>  {# End panel #}
+        </div>  {# End col-xs-12 #}
+    </div>  {# End row #}
+    <div class="row">
+        <div class="col-xs-12">
+            {{ creation_fields(parent_object=proc, moment=moment) }}
+        </div>
+    </div>  {# End row #}
+</div>  {# End container #}
+<div data-jbox-content="view-procedure" style="display:none;">
+    <ul>
+        <li>Specify which Part Number(s) this Procedure will be used to create / test / alter or otherwise affect.</li>
+        <li>Add P/Ns for anything that will have its pedigree or unique history affected by this work.</li>
+        <li>If this Procedure describes the build of an assembly, add the assembly P/N.</li>
+        <li>If this Procedure describes a test that applies to two different P/N variants, e.g. -1 & -2, add both P/Ns</li>
+        <li>Use your judgement:</li>
+        <ul>
+            <li>If this Procedure describes a random launch vibration test of a spacecraft: Add the spacecraft P/N</li>
+            <li>Add any components which you need to point to this test as pedigree proof that they meet their own requirements.<br>A Star Tracker? Maybe, if it wasn't qualified before delivery. A bolt? Probably not.</li>
+        </ul>
+    </ul>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        var tooltip_settings = { content: $('[data-jbox-content="view-procedure"]') };
+        new jBox('Tooltip', $.extend({}, global_jbox_tooltip_options, tooltip_settings));
+        $('.sticky-header-row').sticky({topSpacing: $('.navbar').height(), zIndex: 4, getWidthFrom: '#view_procedure .panel'});
+    });
+</script>
+{% endblock %}

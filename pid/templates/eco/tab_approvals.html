@@ -1,0 +1,14 @@
+
+{% from 'shared/approver_list.html' import approver_list with context %}
+{% from 'shared/workflow_log.html' import workflow_log with context %}
+
+<div class="row top-pad-15">
+    <div class="col-xs-12">
+        {{ approver_list(parent_object=eco) }}
+    </div>
+</div>
+<div class="row top-pad-15">
+    <div class="col-xs-12">
+        {{ workflow_log(parent_object=eco) }}
+    </div>
+</div>

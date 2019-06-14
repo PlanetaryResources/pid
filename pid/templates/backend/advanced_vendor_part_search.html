@@ -1,0 +1,231 @@
+<form id="vendor-part-search-form" class="form-horizontal advanced-search-form {% if record_type != 'vendor-part' %} hidden {% endif %}" action="/vendorpart/advanced_search">
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="vendor-part-design-num-wrapper">Part Number</label>
+        <div class="col-xs-10" id="vendor-part-design-num-wrapper">
+            <div class="row">
+                <div class="col-xs-3">
+                    <select class="form-control input-sm" name="part_number_query_type">
+                        <option value="includes" selected>
+                            Includes
+                        </option>
+                        <option value="starts-with">
+                            Starts w/
+                        </option>
+                        <option value="ends-with">
+                            Ends w/
+                        </option>
+                    </select>
+                </div>
+                <div class="col-xs-3">
+                    <input type="text" class="form-control" name="part_number_query" />
+                </div>
+                <div class="col-xs-6">
+                    <div class="row">
+                        <label class="col-xs-3 control-label" for="vendor-part-state-wrapper">State</label>
+                        <div class="col-xs-6" id="vendor-part-state-wrapper">
+                            <select class="form-control input-sm" name="state" id="design-state">
+                                <option value="">-- any --</option>
+                                {% for state in VendorPart.workflow.states %}
+                                    <option value="{{state}}">{{state}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-xs-2">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="true" name="in_open_state" />
+                                    Open
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="vendor-part-text">Text Fields</label>
+        <div class="col-xs-10" id="vendor-part-text">
+            <input type="text" class="form-control" name="text_fields_query" placeholder="Searches name, description, summary, and notes"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="vendor-part-project">Project</label>
+        <div class="col-xs-10" id="vendor-part-project">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <select class="form-control input-sm" name="project_id">
+                                <option value="">-- any --</option>
+                                {% for project in projects %}
+                                <option value="{{ project.id }}">
+                                    {{ project.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="row">
+                        <label class="col-xs-3 control-label" for="vendor-part-owner">Owner</label>
+                        <div class="col-xs-9" id="vendor-part-owner">
+                            <select class="form-control input-sm" name="owner_id">
+                                <option value="">-- any --</option>
+                                {% for owner in users %}
+                                <option value="{{ owner.id }}">
+                                    {{ owner.get_name() }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="vendor-part-vendor">Vendor</label>
+        <div class="col-xs-10" id="vendor-part-vendor">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <select class="form-control input-sm" name="vendor_id">
+                                <option value="">-- any --</option>
+                                {% for vendor in vendors %}
+                                <option value="{{ vendor.id }}">
+                                    {{ vendor.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="row">
+                        <label class="col-xs-3 control-label" for="vendor-part-material">Material</label>
+                        <div class="col-xs-9" id="vendor-part-material">
+                            <select class="form-control input-sm" name="material_id">
+                                <option value="">-- any --</option>
+                                {% for material in materials %}
+                                <option value="{{ material.id }}">
+                                    {{ material.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="vendor-part-has">Has</label>
+        <div class="col-xs-10" id="vendor-part-has">
+            <div class="row" style="padding-bottom: 5px;">
+                <div class="col-xs-6">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="true" name="open_anomalies" />
+                            Open Anomalies
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for=" created-by">Created By/On</label>
+        <div class="col-xs-10" id=" created-by">
+            <div class="row">
+                <div class="col-xs-4">
+                    <select class="form-control input-sm" name="created_by_id">
+                        <option value="">-- any --</option>
+                        {% for owner in users %}
+                        <option value="{{ owner.id }}">
+                            {{ owner.get_name() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-xs-8">
+                    <div class="input-group input-daterange">
+                        <input type="text" class="form-control input-sm" name="created_on_start" id="vendor_part_created_on_start">
+                            <div class="input-group-addon" style="color: black;">to</div>
+                        <input type="text" class="form-control input-sm" name="created_on_end" id="vendor_part_created_on_end">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-4">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" value="true" name="exclude_obsolete" checked/>
+                    Exclude Obsolete
+                </label>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <a href="#" class="clear-selections pull-right">Clear Selections</a>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-12">
+            <button class="btn btn-default pri-btn-primary" id="search-vendor-part-btn">Search</button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var vendorPartResultsTable = $('#vendor-part-search-results').DataTable({
+            dom: '<"pull-left"r<"#vp-action-btns">><"pull-right"B>t<"pull-left"i><"pull-right"p>',
+            columnDefs: [
+                {targets: [0], render: renderUrlColumn},
+                {targets: [10], render: renderDateColumn},
+                {targets: [2], render: renderStateIcon }
+            ],
+            columns: [
+                {data: 'part_number', name: 'part_number', defaultContent: ''},
+                {data: 'name', name: 'name', defaultContent: ''},
+                {data: 'state', name: 'state', defaultContent: ''},
+                {data: 'summary', name: 'summary', defaultContent: '', visible: false},
+                {data: 'notes', name: 'notes', defaultContent: '', visible: false},
+                {data: 'project', name: 'project', defaultContent: '', visible: false},
+                {data: 'owner', name: 'owner', defaultContent: '', visible: false},
+                {data: 'material', name: 'material', defaultContent: '', visible: false},
+                {data: 'vendor', name: 'vendor', defaultContent: '', visible: false},
+                {data: 'created_by', name: 'created_by', defaultContent: '', visible: false},
+                {data: 'created_at', name: 'created_at', defaultContent: '', visible: false},
+                {data: 'anomalies', name: 'anomalies', defaultContent: '', visible: false}
+            ],
+            buttons: [
+                {extend: 'colvis', text: 'Show Columns', columns: ':gt(0)', className: 'pri-btn-secondary'}
+            ]
+        });
+
+        // Catch submission of forms and load data through datatables
+        $('#search-vendor-part-btn').on('click', function (e) {
+            start_search();
+            e.preventDefault();
+            var queryParams = $('#vendor-part-search-form').formSerialize();
+            vendorPartResultsTable.ajax.url('/vendorpart/advanced_search?' + queryParams).load(search_complete, true);
+        });
+
+        addSaveAndCopyToDataTable(vendorPartResultsTable, '#vp-action-btns');
+
+        $('#vendor_part_created_on_start').datepicker().on('changeDate', function(e) {
+            $('#vendor_part_created_on_end').datepicker('show');
+        });
+        $('#vendor_part_created_on_end').datepicker();
+
+        if ('{{record_type}}' === 'vendor-part') {
+            refreshSearchParams('{{record_type}}', vendorPartResultsTable);
+        }
+    });
+</script>

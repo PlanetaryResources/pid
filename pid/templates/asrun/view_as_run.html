@@ -1,0 +1,198 @@
+{% extends "layout.html" %}
+
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+{% from "shared/bookmark.html" import bookmark %}
+{% from "shared/creation_fields.html" import creation_fields %}
+{% from 'shared/thumbnail.html' import thumbnail %}
+{% from "shared/view_changelog_button.html" import view_changelog_button %}
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+{% from 'shared/workflow.html' import workflow with context %}
+
+{% block page_title %}{{ as_run.procedure.procedure_number }}.{{ pad_with_zeros(as_run.as_run_number|string, 3) }}{% endblock %}
+
+{% block content %}
+<div id="view_as_run">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="row sticky-header-row">
+                <div class="col-xs-1">
+                  <div class="pri-record-icon-wrapper">
+                    <i class="pri-record-icon pri-icons-record-as-run" aria-hidden="true"></i>
+                  </div>
+                </div>
+                <div class="col-xs-11">
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <a href="{{ as_run.procedure.get_url() }}" class="pri-header">{{ as_run.procedure.identifier }}</a>
+                            <div class="pri-header-select instance-lot-number">
+                                <select class="form-control" onchange="window.location.href='/asrun/{{as_run.procedure_number}}/'+this.value+window.location.hash">
+                                    {% for instance in instances %}
+                                    <option value="{{ pad_with_zeros(instance|string, 3)}}"{% if instance == as_run.as_run_number %} selected{% endif %}>
+                                        {{ pad_with_zeros(instance|string, 3) }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <span class="pri-subheader">{{ as_run.procedure.name }}</span>
+                        </div>
+                        <div class="col-xs-2">
+                            <div id="workflow_container">
+                                {{ workflow(record=as_run) }}
+                            </div>
+                            {{ bookmark(parent_object=as_run, current_user=current_user) }}
+                        </div>
+                    </div>
+                </div> <!-- end col-xs-10 -->
+            </div> <!-- end row sticky-header-row -->
+            <div class="row header-info">
+                <div class="col-xs-2" id="thumbnail_parent">
+                    {{ thumbnail(record=as_run) }}
+                </div>
+                <div class="col-xs-10">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ render_xeditable_text_field(field=as_run.name, parent_object=as_run, api_url="/asrun/update", horizontal_labels=True, non_edit_additional_css="margin-top: 10px; margin-left: 5px;",
+                                field_name='name', label='DESCRIPTION', placeholder="Reason for this round of work; Pre/Post vibe checkout | build for flight | bring-up for FlatSat") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            {{ render_ajax_select_field(field=as_run.owner, parent_object=as_run, api_url="/asrun/update", non_edit_additional_css="margin-top: 6px; margin-left: -10px;",
+                                field_name='owner', label='OWNER', options=users, horizontal_labels=True, label_container_class='col-xs-2', label_additional_css="margin-right: 10px;",
+                                option_id='id', option_name='get_name()', input_size='input-sm') }}
+                        </div>
+                        <div class="col-xs-6 minus-one-column">
+                            {{ render_ajax_select_field(field=as_run.project, parent_object=as_run, api_url="/asrun/update", non_edit_additional_css="margin-top: 6px; margin-left: -10px;",
+                                field_name='project', label='PROJECT', options=projects, horizontal_labels=True, label_container_class='col-xs-2', label_additional_css="margin-right: 10px;",
+                                option_id='id', option_name='name', input_size='input-sm') }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="row"> <!-- Extra row to get labels to line up -->
+                                <div class="col-xs-3">
+                                    <label class="control-label pri-field-label ">VIEW</label>
+                                </div>
+                                <div class="col-xs-9">
+                                    {{ view_changelog_button(parent_object=as_run) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6"></div>
+                    </div>
+                    <div class="row" style="padding-top: 15px;">
+                        <div class="col-xs-12">
+                            <label class="pri-table-header">Associated Products</label><br>
+                            {% set parts = as_run.procedure.parts + as_run.procedure.vendor_parts %}
+                            {% if parts %}
+                            {% for part in parts %}
+                            {% include 'asrun/as_run_part.html' %}
+                            {% endfor %}
+                            {% else %}
+                            <i class="small">No associated products.</i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div> <!-- end col-xs-10 -->
+            </div> <!-- end row header-info -->
+        </div> <!-- end col-xs-12 -->
+    </div> <!-- end row -->
+    <div class="row" style="padding-top: 15px;">
+        <div class="col-xs-12">
+            <div class="panel">
+              <ul class="nav nav-tabs nav-justified">
+                <li class="active"><a data-toggle="tab" href="#info">INFO</a></li>
+                <li><a data-toggle="tab" href="#links">LINKS</a></li>
+                <li><a data-toggle="tab" href="#approvals">APPROVALS</a></li>
+                <li><a data-toggle="tab" href="#images">IMAGES</a></li>
+              </ul>
+              <div class="tab-content">
+                  <div id="info" class="tab-pane active">
+                      {% include "asrun/tab_info.html" %}
+                  </div>
+                  <div id="links" class="tab-pane">
+                      {% include "asrun/tab_links.html" %}
+                  </div>
+                  <div id="approvals" class="tab-pane">
+                      {% include "asrun/tab_approvals.html" %}
+                  </div>
+                  <div id="images" class="tab-pane">
+                      {% include "asrun/tab_images.html" %}
+                  </div>
+              </div>  {# End tab-content #}
+            </div>  {# End panel #}
+        </div>
+    </div>  {# End row #}
+    <div class="row">
+        <div class="col-xs-12">
+            {{ creation_fields(parent_object=as_run, moment=moment) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        addProductToAsRun = function (domId, productId, serialNumber, partType) {
+            $.ajax({
+                url: '/asrun/add_product',
+                type: 'POST',
+                data: {
+                    as_run_id: {{ as_run.id }},
+                    product_type: partType,
+                    product_id: productId
+                },
+                success: function(response) {
+                    $(domId).append(response);
+                    $.notify('Successfully added product');
+                },
+                error: function (response, p) {
+                    $.notify('Product already added.', {
+                        type: 'danger',
+                        delay: 300,
+                        element: domId
+                    });
+                }
+            });
+        };
+        viewAsRunRemoveProduct = function (event) {
+            let $el = $(event.currentTarget).parents('.as-run-product');
+            let productData = $el.data();
+            if (productData.partType === 'vendor') {
+                $.ajax({
+                    url: '/asrun/remove_product',
+                    type: 'POST',
+                    data: {
+                        as_run_id: {{ as_run.id }},
+                        product_type: productData.partType,
+                        product_id: productData.productId,
+                    },
+                    success: function(response) {
+                        $el.remove();
+                        $.notify('Successfully removed vendor product.');
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: '/asrun/remove_product',
+                    type: 'POST',
+                    data: {
+                        as_run_id: {{ as_run.id }},
+                        product_type: productData.partType,
+                        product_id: productData.productId,
+                    },
+                    success: function(response) {
+                        $el.remove();
+                        $.notify('Successfully removed product.');
+                    }
+                });
+            }
+            $el.remove();
+        };
+        $('.sticky-header-row').sticky({topSpacing: $('.navbar').height(), zIndex: 4, getWidthFrom: '#view_as_run .panel'});
+    });
+</script>
+{% endblock %}

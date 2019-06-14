@@ -1,0 +1,345 @@
+<div class="row" style="margin-top:10px;">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Records Awaiting Your Approval</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed table-striped table-hover" id="approvals">
+                    <thead>
+                        <tr>
+                            <th>Record ID</th>
+                            <th>Record Name</th>
+                            <th>Owner</th>
+                            <th>Your Capacity</th>
+                        </tr>
+                    </thead>
+                    <tbody data-link="row" class="rowlink">
+                        {% for approver in approvals %}
+                        {% set record = approver.get_record() %}
+                        <tr>
+                            <td>
+                                <i class="pri-icons-record-{{ record.get_class_name() }}" aria-hidden="true" data-toggle="tooltip" title="{{ record.get_class_name() }}"></i>
+                                <a href="{{ record.get_url() }}" style="margin-left: 5px;">{{ record.get_unique_identifier() }}</a>
+                            </td>
+                            <td>{{ record.get_name() }}</td>
+                            <td>{{ record.owner.get_name() }}</td>
+                            <td>{{ approver.capacity }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Your Records Awaiting Approval</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed table-striped table-hover" id="records_awaiting_approvals">
+                    <thead>
+                        <tr>
+                            <th>Record ID</th>
+                            <th>Record Name</th>
+                            <th>Approvers</th>
+                            <th>Capacities</th>
+                        </tr>
+                    </thead>
+                    <tbody data-link="row" class="rowlink">
+                        {% for record in records_awaiting_approval %}
+                        <tr>
+                            <td>
+                                <i class="pri-icons-record-{{ record.get_class_name() }}" aria-hidden="true" data-toggle="tooltip" title="{{ record.get_class_name() }}"></i>
+                                <a href="{{ record.get_url() }}" style="margin-left: 5px;">{{ record.get_unique_identifier() }}</a>
+                            </td>
+                            <td>{{ record.get_name() }}</td>
+                            <td>
+                                {% for approver in record.approvers %}
+                                {% if not approver.approved_at %}
+                                <span style="display: block;">{{ approver.approver.get_name() }}</span>
+                                {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for approver in record.approvers %}
+                                {% if not approver.approved_at %}
+                                <span style="display: block;">{{ approver.capacity }}</span>
+                                {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Your Designs</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed table-striped table-hover" id="designs">
+                    <thead>
+                        <tr>
+                            <th>Design</th>
+                            <th>Latest Rev</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody data-link="row" class="rowlink">
+                        {% for design in designs_for_user %}
+                            <tr>
+                                <td>
+                                    <a href="{{ design.get_url() }}">{{ design.design_number }}</a>
+                                </td>
+                                <td>{{ design.revision }}</td>
+                                <td>{{ design.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="button" class="btn pri-btn-primary center-block" onclick="createDesignModal();">Create Design</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Your Products</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed table-striped table-hover" id="products">
+                    <thead>
+                        <tr>
+                            <th>Part</th>
+                            <th>S/N</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody data-link="row" class="rowlink">
+                        {% for product in products_for_user %}
+                            <tr>
+                                <td>
+                                    <a href="{{ product.get_url() }}">
+                                        {{ product.part.part_number }}
+                                    </a>
+                                </td>
+                                <td>{{ product.serial_number }}</td>
+                                <td>{{ product.part.design.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Your Vendor Parts</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed table-striped table-hover" id="vendor_parts">
+                    <thead>
+                        <tr>
+                            <th>Design</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody data-link="row" class="rowlink">
+                        {% for vendor_part in vendor_parts_for_user %}
+                            <tr>
+                                <td>
+                                    <a href="{{ vendor_part.get_url() }}">{{ vendor_part.part_number }}</a>
+                                </td>
+                                <td>{{ vendor_part.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="button" class="btn pri-btn-primary center-block" onclick="createVendorPartModal();">Create Vendor Part</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Your Vendor Products</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed table-striped table-hover" id="vendor_products">
+                    <thead>
+                        <tr>
+                            <th>Design</th>
+                            <th>S/N</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody data-link="row" class="rowlink">
+                        {% for vendor_product in vendor_products_for_user %}
+                            <tr>
+                                <td>
+                                    <a href="{{ vendor_product.get_url() }}">
+                                        {{ vendor_product.vendor_part.part_number }}
+                                    </a>
+                                </td>
+                                <td>{{ vendor_product.serial_number }}</td>
+                                <td>{{ vendor_product.vendor_part.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Your Procedures</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed table-striped table-hover" id="procedures">
+                    <thead>
+                        <tr>
+                            <th>Number</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody data-link="row" class="rowlink">
+                        {% for procedure in procedures_for_user %}
+                            <tr>
+                                <td>
+                                    <a href="{{ procedure.get_url() }}">{{ procedure.procedure_number }}</a>
+                                </td>
+                                <td>{{ procedure.name }}</td>
+                            </tr>
+                            {% for as_run in procedure.find_all_as_runs() %}
+                            <tr>
+                                <td align="right"><a href="{{ as_run.get_url() }}">As Run</a></td>
+                                <td>
+                                    {{pad_with_zeros(as_run.as_run_number|string, 3)}}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="button" class="btn pri-btn-primary center-block" onclick="createProcedureModal();">Create Procedure</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>All Specifications</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed table-striped table-hover" id="specifications">
+                    <thead>
+                        <tr>
+                            <th>Number</th>
+                            <th>Rev</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody data-link="row" class="rowlink">
+                        {% for specification in specifications %}
+                            <tr>
+                                <td>
+                                    <a href="{{ specification.get_url() }}">{{ specification.specification_number }}</a>
+                                </td>
+                                <td>{{ specification.revision }}</td>
+                                <td>{{ specification.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="button" class="btn pri-btn-primary center-block" onclick="createSpecificationModal();">Create Specification</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Your Anomalies</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed table-striped table-hover" id="anomalies">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Design/As-Run</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody data-link="row" class="rowlink">
+                        {% for anomaly in anomalies_for_user  %}
+                            <tr>
+                                <td>
+                                    <a href="{{ anomaly.get_url() }}">{{ anomaly.key }}</a>
+                                </td>
+                                <td>
+                                    {% if anomaly.design %}
+                                    {{ anomaly.design.design_number }}
+                                    {% elif anomaly.vendor_part %}
+                                    {{ anomaly.vendor_part.part_number }}
+                                    {% elif anomaly.as_run %}
+                                    {{ anomaly.as_run.identifier }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ anomaly.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="button" class="btn pri-btn-primary center-block" onclick="createAnomalyModal();">Create Anomaly</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Your ECOs</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed table-striped table-hover" id="ecos">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Design</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody data-link="row" class="rowlink">
+                        {% for eco in ecos_for_user  %}
+                            <tr>
+                                <td>
+                                    <a href="{{ eco.get_url() }}">{{ eco.key }}</a>
+                                </td>
+                                <td>
+                                    {% if eco.design %}
+                                    {{ eco.design.design_number }}
+                                    {% elif eco.vendor_part %}
+                                    {{ eco.vendor_part.part_number }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ eco.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="button" class="btn pri-btn-primary center-block" onclick="createECOModal();">Create ECO</button>
+            </div>
+        </div>
+    </div>
+</div>

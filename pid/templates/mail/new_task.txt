@@ -1,0 +1,14 @@
+The following task has been assigned to you:
+
+{{ task.task_number }} - {{ task.title }}
+{% if task.summary %}
+
+{{ task.summary|striptags }}
+{% endif %}
+
+Criticality:   {{ task.urgency }}
+Need Date:     {{ task.need_date.strftime('%Y-%m-%d') }}
+Requested By:  {{ task.requested_by.get_name() }}
+
+Task URL:
+{{ task.get_url(external=True) }}

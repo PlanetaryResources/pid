@@ -1,0 +1,55 @@
+{% macro workflow(record) %}
+
+{% if record.state in record.workflow.pre_approval_state %}
+{% set approval_errors = record.get_approval_errors() %}
+{% if approval_errors %}
+{% set disable_approver = True %}
+{% endif %}
+{% endif %}
+
+{% if record.state == record.workflow.get_approval_state() and current_user in record.get_approvers() %}
+<button class="btn btn-default pri-btn-secondary" onclick="approvalsModal({{ record.id }}, '{{ record.get_class_name() }}')">Review</button>
+{% elif record.can_user_edit('state') %}
+{% if record.workflow.get_transitions_for_state(record.state, record.self_approved).keys()|length == 0 %}
+{{ record.state }}
+{% else %}
+<div class="workflow-selector dropdown">
+    <span class="dropdown-toggle" style="cursor: pointer;" type="button" id="dropdown-workflow" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    {{ record.state }}
+    <i class="fa fa-caret-down" aria-hidden="true" style="margin-left: 10px;"></i>
+    </span>
+    <ul class="pri-dropdown dropdown-menu" aria-labelledby="dropdown-workflow">
+        {% for state, transition in record.workflow.get_transitions_for_state(record.state, record.self_approved).items() %}
+        {% if transition in record.workflow.comment_transitions %}
+        <li plaid-data-state="{{ state }}">
+            <span style="color: lightgrey;display: block;padding: 3px 20px;clear: both;font-weight: normal;line-height: 1.42857143;white-space: nowrap;{% if not disable_approver %}display:none;{% endif %}" data-toggle="tooltip" title="{{ approval_errors|join('<br>') }}">{{ transition }}</span>
+            <a href="#" onclick="workflowCommentModal('{{ record.get_class_name() }}', {{ record.id }}, '{{ state }}', '{{ transition }}')" {% if disable_approver %}style="display:none;"{% endif %}>
+                {{ transition }}
+            </a>
+        </li>
+        {% elif transition in record.workflow.obsolete_transitions %}
+        <li plaid-data-state="{{ state }}">
+            <a href="#" onclick="workflowObsoleteModal('{{ record.get_class_name() }}', {{ record.id }}, '{{ state }}', '{{ transition }}')">
+                {{ transition }}
+            </a>
+        </li>
+        {% else %}
+        <li plaid-data-state="{{ state }}">
+            <a href="#" onclick="updateState('{{ record.get_class_name() }}', {{ record.id }}, '{{ state }}', '{{ transition }}')">
+                {{ transition }}
+            </a>
+        </li>
+        {% endif %}
+        {% if not loop.last %}
+        <li role="separator" class="divider"></li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %} {# end populate transitions #}
+{% else %}
+{{ record.state }}
+{% endif %} {# end if in approval or if user can edit #}
+<i class="pri-app-icon {{ record.workflow.get_icon_for_state(record.state) }} workflow-info-icon" aria-hidden="true" data-title="<img src='{{ record.workflow.get_workflow_image() }}' style='width: 250px' />" ></i>
+
+{% endmacro %}

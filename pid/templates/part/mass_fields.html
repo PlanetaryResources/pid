@@ -1,0 +1,35 @@
+
+{% from "shared/ajax_input_float_field.html" import render_ajax_input_float_field %}
+
+<div class="col-xs-2">
+    {% if part.components %}
+    <label class="control-label pri-field-label">CBE</label><label class="control-label pri-field-label normal">&nbsp;(g)</label><br/>
+    {{'%0.2f'| format(part.current_best_estimate|float)}}
+    {% else %}
+    <label class="control-label pri-field-label">CBE</label><label class="control-label pri-field-label normal">&nbsp;(g)</label><br/>
+    {{ render_ajax_input_float_field(field=part.current_best_estimate, parent_object=part,
+                             api_url="/part/update", field_name='current_best_estimate', label='Current Best Estimate',
+                             display_label=False, update_parents_id=part.id,
+                             populate_id="mass_fields_"+part.id|string) }}
+    {% endif %}
+</div>
+<div class="col-xs-1">
+    {% if part.components %}
+    <label class="control-label pri-field-label">UNC (%)</label><br/>
+    {{'%0.1f'| format(part.uncertainty|float)}}
+    {% else %}
+    {{ render_ajax_input_float_field(field=part.uncertainty, parent_object=part, digits=1,
+                             api_url="/part/update", field_name='uncertainty',
+                             label='UNC (%)', update_parents_id=part.id, parent_class=part.get_class_name(),
+                             populate_id="mass_fields_"+part.id|string) }}
+    {% endif %}
+</div>
+<div class="col-xs-2">
+    {% if part.components %}
+    <label class="control-label pri-field-label">PBE</label><label class="control-label pri-field-label normal">&nbsp;(g)</label><br/>
+    {{'%0.2f'| format(part.predicted_best_estimate|float)}}
+    {% else %}
+    <label class="control-label pri-field-label">PBE</label><label class="control-label pri-field-label normal">&nbsp;(g)</label><br/>
+    <div {% if part.can_user_edit('current_best_estimate') %}style="padding-top: 8px;"{% endif %}>{{'%0.2f'| format(part.predicted_best_estimate|float)}}</div>
+    {% endif %}
+</div>

@@ -1,0 +1,27 @@
+
+{% from 'common/reference_to_list.html' import references_to with context %}
+{% from 'shared/document_list.html' import document_list with context %}
+{% from 'shared/link_list.html' import link_list with context %}
+{% from "shared/trumbowyg.html" import trumbowyg %}
+
+<div class="row" style="padding-top: 10px;">
+    <div class="col-xs-12">
+        {{ trumbowyg(field=task.summary, parent=task, api_url="/task/update", field_name='summary', label='SUMMARY',
+                     placeholder="Summary of what's needed | Make 10x of 1234567-1 | Please finish Product record 1234567-1 S/N 005") }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {{ references_to(referencing_object=task) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {{ document_list(parent_object=task) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {{ link_list(parent_object=task) }}
+    </div>
+</div>

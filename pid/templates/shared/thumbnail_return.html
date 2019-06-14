@@ -1,0 +1,22 @@
+
+<div class="thumbnail" id="{{ record.get_class_name() }}_thumbnail">
+    {% if record.thumbnail %}
+    <img src="{{ record.thumbnail.get_url() }}" style="height:100%" alt="{{ record.thumbnail.title }}"/>
+    {% else %}
+    <img class="img-rounded" src="{{ url_for('static', filename='images/' + record.get_class_name() + '_example_thumbnail.png') }}" alt="Example"/>
+    {% endif %}
+    {% if record.can_user_edit('thumbnail') %}
+    <div class="caption text-center change-thumbnail" onclick="selectThumbnailModal({{ record.id }}, '{{ record.get_class_name() }}');">
+        <a href="#">
+            <i class="fa fa-camera" aria-hidden="true"></i> Change thumbnail
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Photoswipe for the thumbnail, maybe overkill?
+        $('#{{class_name}}_thumbnail').photoSwipe();
+    });
+</script>

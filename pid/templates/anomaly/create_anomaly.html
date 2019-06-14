@@ -1,0 +1,503 @@
+<div id="create_anomaly_modal">
+    <form id="createAnomalyForm" class="form-horizontal" method="POST" action="/anomaly/create" role="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="designs" />
+        <input type="hidden" name="vendor_parts" />
+        <input type="hidden" name="as_runs" />
+        <div class="form-group">
+            <div class="row">
+                <label class="control-label col-xs-3" style="text-align:right;">Against</label>
+                <div class="col-xs-8">
+                    {% for subfield in form.affected %}
+                    <div class="radio-inline">
+                        {{ subfield }}
+                        {{ subfield.label }}
+                    </div>
+                    {% endfor %}
+                    <i style="position: relative; top: 5px;" class="pri-app-icon pri-icons-question-circle tooltip-icon other-tooltip" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="bottom"></i>
+                </div>
+            </div>
+        </div>
+        <div class="form-group {% if form.name.errors %} has-error{% endif %}">
+            <div class="row">
+                <label class="col-xs-3 control-label" for="name">Anomaly Title</label>
+                <div class="col-xs-8">
+                    {{ form.name(placeholder="One-line anomaly title", class_="form-control") }}
+                    {% if form.name.errors %}
+                    <span class="help-block">{{ form.name.errors|join(', ') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div id="against_designs" {% if not form.affected.data == 'design' %}class="hidden"{% endif %}>
+            <div class="form-group {% if form.designs.errors %} has-error{% endif %}">
+                <label class="col-xs-3 control-label" for="parts">Against Design(s)<br>or Vendor Part(s)</label>
+                <div class="col-xs-9">
+                    <div class="pri-list" id="create-anomaly-designs-list" style="margin-top: 0px">
+                        <div class="row header-row">
+                            <div class="col-xs-4">
+                                <label class="control-label pri-field-label">DESIGN/PART NUMBER(s)</label>
+                            </div>
+                            <div class="col-xs-5">
+                                <label class="control-label pri-field-label">NAME / DESCRIPTION</label>
+                            </div>
+                            <div class="col-xs-2">
+                                <label class="control-label pri-field-label">REV</label>
+                            </div>
+                            <div class="col-xs-1">
+                                <label class="control-label pri-field-label"></label>
+                            </div>
+                        </div>
+                        {% for d in designs + vendor_parts %}
+                        <div class="row list-row pri-text" id="anomaly-design-{{ d.id }}" data-design-id="{{ d.id }}" data-design-class="{{ d.get_class_name() }}">
+                            <div class="col-xs-4 ellipsis-text">
+                                <span>{{ d.design_number }}</span>
+                            </div>
+                            <div class="col-xs-5 ellipsis-text">
+                                <span>{{ d.name }}</span>
+                            </div>
+                            <div class="col-xs-2">
+                                {% if d.revision  %}
+                                <div class="pri-select-wrapper">
+                                    <select class="form-control input-sm" id="design-revision-select-{{ d.id }}" onchange="$(this).parents('.list-row').attr('data-design-id', $(this).val());recalculateAnomalyInputs();">
+                                        {% for revision in d.find_all_revisions() %}
+                                        <option value="{{ revision.id }}" {% if revision.id == d.id %}selected{% endif %}>{{ revision.revision }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-xs-1">
+                                <span class="glyphicon glyphicon-trash pull-right action-icon" aria-hidden="true" onclick="createAnomalyRemoveRow(event)"></span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" id="designs-add-btn" class="btn pri-btn-secondary" style="margin-top:5px;margin-bottom: 15px;" >Add Design/Vendor Part</button>
+                    {% if form.designs.errors %}
+                    <span class="help-block">{{ form.designs.errors|join(', ') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-group hidden" id="anomaly-designs-typeahead">
+                <div class="row">
+                    <label class="control-label col-xs-3">&nbsp;</label><br/>
+                    <div class="col-xs-8 typeahead__container pri-typeahead" style="margin-top: -15px; margin-bottom:15px;margin-left:10px;">
+                        <div class="typeahead__field">
+                              <span class="typeahead__query">
+                                  <input id="create-anomaly-designs-typeahead-input" class="js-typeahead-components" value="" type="search" placeholder="Search" autocomplete="off" />
+                              </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- end against designs -->
+        <div id="against_as_runs" {% if not form.affected.data == 'asrun' %}class="hidden"{% endif %}>
+            <div class="form-group {% if form.as_runs.errors %} has-error{% endif %}">
+                <label class="col-xs-3 control-label" for="parts">Against As-Run</label>
+                <div class="col-xs-9">
+                    <div class="pri-list" id="create-anomaly-as-runs-list" style="margin-top: 0px">
+                        <div class="row header-row">
+                            <div class="col-xs-4">
+                                <label class="control-label pri-field-label">Procedure Number</label>
+                            </div>
+                            <div class="col-xs-5">
+                                <label class="control-label pri-field-label">NAME / DESCRIPTION</label>
+                            </div>
+                            <div class="col-xs-2">
+                                <label class="control-label pri-field-label">INSTANCE</label>
+                            </div>
+                            <div class="col-xs-1">
+                                <label class="control-label pri-field-label"></label>
+                            </div>
+                        </div>
+                        {% for ar in as_runs %}
+                        <div class="row list-row pri-text" id="anomaly-as-run-{{ ar.id }}" data-as-run-id="{{ ar.id }}" >
+                            <div class="col-xs-4 ellipsis-text">
+                                <span>{{ ar.procedure_number }}</span>
+                            </div>
+                            <div class="col-xs-5 ellipsis-text">
+                                <span>{{ ar.procedure.get_name() }}</span>
+                            </div>
+                            <div class="col-xs-2">
+                                <div class="pri-select-wrapper">
+                                    <select class="form-control input-sm" id="as-run-instance-select-{{ ar.id }}" onchange="$(this).parents('.list-row').attr('data-as-run-id', $(this).val());recalculateAnomalyInputs();">
+                                        {% for instance in ar.procedure.as_runs %}
+                                        <option value="{{ instance.id }}" {% if instance.id == ar.id %}selected{% endif %}>{{ instance.as_run_number }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-1">
+                                <span class="glyphicon glyphicon-trash pull-right action-icon" aria-hidden="true" onclick="createAnomalyRemoveRow(event)"></span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if not as_runs %}  {# User should only be able to add one as-run #}
+                    <button type="button" id="as-runs-add-btn" class="btn pri-btn-secondary" style="margin-top:5px;margin-bottom: 15px;" >Add As-Run</button>
+                    {% endif %}
+                    {% if form.as_runs.errors %}
+                    <span class="help-block">{{ form.as_runs.errors|join(', ') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-group hidden" id="anomaly-as-runs-typeahead">
+                <div class="row">
+                    <label class="control-label col-xs-3">&nbsp;</label><br/>
+                    <div class="col-xs-8 typeahead__container pri-typeahead" style="margin-top: -15px; margin-bottom:15px;margin-left:10px;">
+                        <div class="typeahead__field">
+                              <span class="typeahead__query">
+                                  <input id="create-anomaly-as-runs-typeahead-input" class="js-typeahead-components" value="" type="search" placeholder="Search" autocomplete="off" />
+                              </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- end against asruns -->
+        <div class="form-group {% if form.criticality.errors %} has-error{% endif %}">
+            <div class="row">
+                <label class="col-xs-3 control-label" for="criticality_id">Criticality</label>
+                <div class="col-xs-8">
+                    {{ form.criticality(class_="form-control") }}
+                    {% if form.criticality.errors %}
+                    <span class="help-block">{{ form.criticality.errors|join(', ') }}</span>
+                    {% endif %}
+                    <i style="right:-35px;top:7px;" class="pri-app-icon pri-icons-question-circle tooltip-icon criticality-tooltip" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="bottom"></i>
+                </div>
+            </div>
+        </div>
+        <div class="form-group {% if form.owner.errors %} has-error{% endif %}">
+            <div class="row">
+                <label class="col-xs-3 control-label" for="owner_id">Owner</label>
+                <div class="col-xs-8">
+                    {{ form.owner(class_="form-control") }}
+                    {% if form.owner.errors %}
+                    <span class="help-block">{{ form.owner.errors|join(', ') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-offset-1 col-xs-10">
+                    <button type="submit" class="btn pri-btn-primary">Create Anomaly</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="jbox-data-criticality" style="display:none;">
+    <p><b>ODD</b></p>
+    <p>Something mildly strange happened</p>
+    <p><b>WORRISOME</b></p>
+    <p>Something strange happened that is going to bug you until you figure out what it was</p>
+    <p><b>SERIOUS</b></p>
+    <p>Something bad happened that needs to be addressed ASAP</p>
+    <p><b>SoF</b></p>
+    <p>S*#@'s on Fire. Stop whatever else is happening and fix this now.</p>
+</div>
+<div id="jbox-data-other" style="display:none;">
+    Create an unassociated Anomaly when an issue arises that is not applicable to any PRI Design or documented work; e.g.
+    <ul>
+        <li>An issue arose during work that was supposed to have been documented but wasn't</li>
+        <li>The cleanroom leaked during the last rain storm"</li>
+    </ul>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        initial_focus('#name');
+
+        let $anomalyForm = $('#createAnomalyForm');
+        let $designListField = $anomalyForm.find('input[name="designs"]');
+        let $vendorPartListField = $anomalyForm.find('input[name="vendor_parts"]');
+        let $asRunListField = $anomalyForm.find('input[name="as_runs"]');
+
+        let tooltip_settings = {
+            attach: '.criticality-tooltip',
+            content: $('#jbox-data-criticality')
+        };
+        new jBox('Tooltip', $.extend({}, global_jbox_tooltip_options, tooltip_settings));
+        tooltip_settings = {
+            attach: '.other-tooltip',
+            content: $('#jbox-data-other')
+        };
+        new jBox('Tooltip', $.extend({}, global_jbox_tooltip_options, tooltip_settings));
+
+        // Showing/Hiding of design/as-run typeaheads
+        $anomalyForm.find('input[type="radio"]').click(function() {
+            if($(this).val() === 'design') {
+                $('#against_as_runs').addClass('hidden');
+                $('#against_designs').removeClass("hidden");
+            } else if($(this).val() === 'asrun') {
+                $('#against_designs').addClass("hidden");
+                $('#against_as_runs').removeClass('hidden');
+            }
+            else {
+                $('#against_designs').addClass("hidden");
+                $('#against_as_runs').addClass('hidden');
+            }
+        });
+
+        $('#designs-add-btn').click(function () {
+            $('#anomaly-designs-typeahead').removeClass('hidden');
+            $('.jBox-container').height('auto');
+            setTimeout(function() { $('#create-anomaly-designs-typeahead-input').focus() }, 0);
+        });
+        $('#as-runs-add-btn').click(function () {
+            $('#anomaly-as-runs-typeahead').removeClass('hidden');
+            $('.jBox-container').height('auto');
+            setTimeout(function() { $('#create-anomaly-as-runs-typeahead-input').focus() }, 0);
+        });
+
+        createAnomalyRemoveRow = function (event) {
+            $(event.currentTarget).parents('.list-row').remove();
+            recalculateAnomalyInputs();
+        };
+
+        recalculateAnomalyInputs = function () {
+            let design_ids = [];
+            let vendor_part_ids = [];
+            let as_run_ids = [];
+            $('#create-anomaly-designs-list').find('.list-row').each(function() {
+                if ($(this).attr('data-design-class') === Design) {
+                    design_ids.push($(this).attr('data-design-id'));
+                } else {
+                    vendor_part_ids.push($(this).attr('data-design-id'));
+                }
+            });
+            $('#create-anomaly-as-runs-list').find('.list-row').each(function() {
+                as_run_ids.push($(this).attr('data-as-run-id'));
+            });
+            $designListField.val(design_ids.join(","));
+            $vendorPartListField.val(vendor_part_ids.join(","));
+            $asRunListField.val(as_run_ids.join(","));
+        };
+
+        $.typeahead({
+            input: '#create-anomaly-designs-typeahead-input',
+            hint: true,
+            minLength: 3,
+            maxItem: 15,
+            order: 'desc',
+            dynamic: true,
+            searchOnFocus: true,
+            display: ['number', 'name'],
+            correlativeTemplate: ['number', 'name'],
+            template: function (query, item) {
+                let template = '<span class="typeahead-group">{[icon]}</span>';
+                template += '<span class="typeahead-number" title="{[number|raw]}">{[number]}</span>';
+                template += '<span class="typeahead-name" title="{[name|raw]}">{[name]}</span>';
+                if (typeof item.thumb_url !== 'undefined' && item.thumb_url !== null) {
+                    template += '<span class="typeahead-logo"><img class="img-rounded" src="{[thumb_url]}"></span>';
+                }
+                return template;
+            },
+            matcher: function (item, displayKey) {
+                // Exclude already included designs
+                let includedDesignIds = $designListField.val().split(',');
+                let includedVendorPartIds = $vendorPartListField.val().split(",");
+                let design_ids = [];
+                if (item.class === Design) {
+                    for (let i = 0; i < item.revisions.length; i++) {
+                        design_ids.push(item.revisions[i].id.toString());
+                    }
+                    return !includedDesignIds.some(r=> design_ids.includes(r));
+                } else if (item.class === VendorPart) {
+                    return !includedVendorPartIds.includes(item.id.toString())
+                }
+            },
+            source: {
+                "Design": {
+                    ajax: {
+                        url: '/design/typeahead_search_designs',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}"
+                        },
+                        path: 'data'
+                    }
+                },
+                "Vendor Parts": {
+                    ajax: {
+                        url: '/vendorpart/typeahead_search_vendor_parts',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}"
+                        },
+                        path: 'vendor_parts'
+                    }
+                }
+            },
+            callback: {
+                onClickAfter: function(node, query, result, resultCount, resultCountPerGroup) {
+                    event.preventDefault();
+                    let latest_rev_id = 0;
+                    let domId = '';
+                    if (result.class === Design) {
+                        latest_rev_id = result.revisions.slice(-1)[0].id;
+                        domId = 'anomaly-design-' + latest_rev_id;
+                    } else {
+                        latest_rev_id = result.id;
+                        domId = 'anomaly-vendor-part-' + latest_rev_id;
+                    }
+
+                    let tpl = '<div class="row list-row pri-text" id="' + domId + '" data-design-id="' + latest_rev_id + '" data-design-class="' + result.class + '">' +
+                        '<div class="col-xs-4">' +
+                        '<span>' + result.number + '</span>' +
+                        '</div>' +
+                        '<div class="col-xs-5 ellipsis-text">' +
+                        '<span>' + result.name + '</span>' +
+                        '</div>' +
+                        '<div class="col-xs-2" id="select-wrapper-' + result.class + '-' + latest_rev_id + '">' +
+                        '</div>' +
+                        '<div class="col-xs-1">' +
+                        '<span class="glyphicon glyphicon-trash pull-right action-icon" aria-hidden="true" onclick="createAnomalyRemoveRow(event)"></span>' +
+                        '</div>' +
+                        '</div>';
+
+                    $('#create-anomaly-designs-list').append(tpl);
+                    $('#create-anomaly-designs-typeahead-input').val('');
+                    $('#anomaly-designs-typeahead').addClass('hidden');
+                    $('.jBox-container').height('auto');
+
+                    if (result.class === Design) {
+                        let options = [];
+                        options.push('<div class="pri-select-wrapper">');
+                        options.push('<select class="form-control input-sm" id="design-revision-select-' + latest_rev_id + '">');
+                        let instances = result['revisions'];
+                        for (let i = 0; i < instances.length; i++) {
+                            let instance = instances[i];
+                            options.push('<option value="' + instance.id + '" >' + instance.revision + '</option>');
+                        }
+                        options.push('</select>');
+                        options.push('</div>');
+                        let $selectWrapper = $('#select-wrapper-' + result.class + '-' + latest_rev_id);
+                        $selectWrapper.html(options.join("")).val('');
+                        let $designRevisionSelect = $('#design-revision-select-' + latest_rev_id);
+                        $designRevisionSelect.val($designRevisionSelect.find("option:last").val());
+
+                        $designRevisionSelect.change(function() {
+                            $(this).parents('.list-row').attr('data-design-id', $(this).val());
+                            recalculateAnomalyInputs();
+                        });
+                    }
+
+                    recalculateAnomalyInputs();
+                }
+            }
+        });  // end create-anomaly-designs-typeahead
+
+        $.typeahead({
+            input: '#create-anomaly-as-runs-typeahead-input',
+            hint: true,
+            minLength: 3,
+            maxItem: 15,
+            order: 'desc',
+            dynamic: true,
+            searchOnFocus: true,
+            display: ['number', 'name'],
+            correlativeTemplate: ['number', 'name'],
+            template: function (query, item) {
+                let template = '<span class="typeahead-group">{[icon]}</span>';
+                template += '<span class="typeahead-number" title="{[number|raw]}">{[number]}</span>';
+                template += '<span class="typeahead-name" title="{[name|raw]}">{[name]}</span>';
+                if (typeof item.thumb_url !== 'undefined' && item.thumb_url !== null) {
+                    template += '<span class="typeahead-logo"><img class="img-rounded" src="{[thumb_url]}"></span>';
+                }
+                return template;
+            },
+            matcher: function (item, displayKey) {
+                // Exclude already included asruns and procedures with no asruns
+                if (parseInt(item.as_runs.length) === 0) {
+                    return false;
+                }
+                let includedAsRunIds = $asRunListField.val().split(',');
+                let as_run_ids = [];
+                for (let i = 0; i < item.as_runs.length; i++) {
+                    as_run_ids.push(item.as_runs[i].id.toString());
+                }
+                return !includedAsRunIds.some(r=> as_run_ids.includes(r));
+            },
+            source: {
+                "As Runs": {
+                    ajax: {
+                        url: '/procedure/typeahead_search',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}"
+                        },
+                        path: 'data'
+                    }
+                }
+            },
+            callback: {
+                onClickAfter: function(node, query, result, resultCount, resultCountPerGroup) {
+                    event.preventDefault();
+                    let latest_instance_id = result.as_runs.slice(-1)[0].id;
+                    let domId = 'anomaly-as-run-' + result.id;
+                    let tpl = '<div class="row list-row pri-text" id="' + domId + '" data-as-run-id="' + latest_instance_id + '">' +
+                        '<div class="col-xs-4 ellipsis-text">' +
+                        '<span>' + result.number + '</span>' +
+                        '</div>' +
+                        '<div class="col-xs-5 ellipsis-text">' +
+                        '<span>' + result.name + '</span>' +
+                        '</div>' +
+                        '<div class="col-xs-2">' +
+                        '<div class="pri-select-wrapper">' +
+                        '<select class="form-control input-sm" id="as-run-instance-select-' + result.id + '">' +
+                        '</select>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="col-xs-1">' +
+                        '<span class="glyphicon glyphicon-trash pull-right action-icon" aria-hidden="true" onclick="createAnomalyRemoveRow(event)"></span>' +
+                        '</div>' +
+                        '</div>';
+
+                    $('#create-anomaly-as-runs-list').append(tpl);
+                    $('#create-anomaly-as-runs-typeahead-input').val('');
+                    $('#anomaly-as-runs-typeahead').addClass('hidden');
+                    $('#as-runs-add-btn').addClass('hidden');  // Users should only be able to add one as-run
+                    $('.jBox-container').height('auto');
+
+                    let options = [];
+                    let instances = result['as_runs'];
+                    for (let i = 0; i < instances.length; i++) {
+                        let instance = instances[i];
+                        options.push('<option value="' + instance.id + '" >' + instance.number + '</option>');
+                    }
+                    let $asRunInstanceSelect = $('#as-run-instance-select-' + result.id);
+                    $asRunInstanceSelect.html(options.join("")).val('');
+                    $asRunInstanceSelect.val($asRunInstanceSelect.find("option:last").val());
+
+                    $asRunInstanceSelect.change(function() {
+                        $(this).parents('.list-row').attr('data-as-run-id', $(this).val());
+                        recalculateAnomalyInputs();
+                    });
+
+                    recalculateAnomalyInputs();
+                }
+            }
+        });
+        $anomalyForm.ajaxForm({
+            beforeSerialize: function($form, options) {
+                recalculateAnomalyInputs();
+                return true;
+            },
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#create_anomaly_modal', create_anomaly_modal);
+                return true;
+            },
+            error: function(response, statusText, xhr, $form) {
+                enableModal('#create_anomaly_modal', create_anomaly_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#create_anomaly_modal').replaceWith(response.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                window.location = response.url;
+            }
+        });
+    });
+</script>

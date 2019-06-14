@@ -1,0 +1,10 @@
+Your record pending approval requires edit and has been sent back to In Work:
+
+Record:          {{ record.get_unique_identifier() }} - {{ record.get_name() }}
+Rejected by:     {{ approver.approver.get_name() }}
+{% if comment %}
+Comment:         {{ comment }}
+{% endif %}
+
+Record URL:
+{{ record.get_url(external=True) }}

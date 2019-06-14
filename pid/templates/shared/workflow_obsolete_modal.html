@@ -1,0 +1,57 @@
+<div id="workflow_obsolete_modal">
+    <div class="alert alert-danger text-center"><strong>WARNING!</strong></div>
+    <p>You are about to OBSOLETE this record. This will lock the record from any further editing.</p>
+    <form class="form-horizontal" method="POST" action="/{{ parent_class }}/update_state" id="workflow_obsolete_modal_form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="parent_id" value="{{ parent_id }}"/>
+        <input type="hidden" name="state" value="{{ state }}"/>
+        <input type="hidden" name="transition" value="{{ transition }}"/>
+        <div class="form-group">
+            <div class="col-xs-offset-2 col-xs-10">
+                <div class="checkbox">
+                <label><input type="checkbox" name="understood"> <i>I have read, understood and agree with the above statement</i></label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="comment" class="col-xs-2 control-label">Comment</label>
+            <div class="col-xs-10">
+                <textarea class="form-control" id="workflow_comment" name="comment"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-12">
+                <button type="submit" class="btn pri-btn-primary" name="form_submit" disabled>Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("input[name='understood']").change(understoodChanged);
+        function understoodChanged() {
+            if ($(this).is(':checked')) {
+                $("#workflow_obsolete_modal_form [name='form_submit']").removeAttr('disabled');
+            }
+            else {
+                $("#workflow_obsolete_modal_form [name='form_submit']").attr('disabled', 'disabled');
+            }
+        }
+        $('#workflow_obsolete_modal_form').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#workflow_obsolete_modal', workflow_obsolete_modal);
+                return true;
+            },
+            error: function(responseText, statusText, xhr, $form) {
+                enableModal('#workflow_obsolete_modal', workflow_obsolete_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#workflow_obsolete_modal').replaceWith(responseText.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                // Open page for new revision
+                location.reload();
+            }
+        });
+    });
+</script>

@@ -1,0 +1,195 @@
+<div id="create_build_modal_{{part.id}}" style="width: 700px;">
+    <form id="create_build_modal_{{part.id}}_form" class="form-horizontal" method="POST" action="/product/build/create" role="form">
+        <input type="hidden" name="csrf_token" id="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="part_id" id="part_id" value="{{part.id}}"/>
+        <input type="hidden" name="build_identifier" id="build_identifier" value="{{build_identifier}}">
+        <input type="hidden" name="existing_build_id" id="existing_build_id" value="{{existing_build_id}}">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="well text-center">
+                    Build for <strong>{{part.design.get_unique_identifier()}} {{part.design.name}}</strong> with Build# <strong>{{build_identifier}}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="form-group{% if form.product_type.errors %} has-error{% endif %}">
+            <label for="product_type" class="control-label col-xs-3">{{ form.product_type.label }}</label>
+            <div class="col-xs-offset-1 col-xs-3">
+                {% for subfield in form.product_type %}
+                <div class="radio">
+                    {{ subfield }}
+                    {{ subfield.label }}
+                </div>
+                {% endfor %}
+                {% if form.product_type.errors %}
+                <span class="help-block">{{ form.product_type.errors|join(', ') }}</span>
+                {% endif %}
+            </div>
+            <div class="col-xs-4 input-group-sm">
+                {% if form.serial_numbers.errors %}
+                <div class="has-error">
+                {% endif %}
+                {% if form.lot_record.errors %}
+                {{ form.serial_numbers(class_="form-control", placeholder='e.g. 002-010, 015', disabled=True) }}
+                {% else %}
+                {{ form.serial_numbers(class_="form-control", placeholder='e.g. 002-010, 015') }}
+                {% endif %}
+                {% if form.serial_numbers.errors %}
+                </div>
+                {% endif %}
+                {% if form.lot_record.errors %}
+                <div class="has-error">
+                {{ form.lot_record(class_="form-control", placeholder=lot_identifier) }}
+                {% else %}
+                {{ form.lot_record(class_="form-control", placeholder=lot_identifier, disabled=True) }}
+                {% endif %}
+                {% if form.lot_record.errors %}
+                </div>
+                {% endif %}
+                {% if form.serial_numbers.errors %}
+                <div class="has-error">
+                <span class="help-block">{{ form.serial_numbers.errors|join(', ') }}</span>
+                </div>
+                {% endif %}
+                {% if form.lot_record.errors %}
+                <div class="has-error">
+                <span class="help-block">{{ form.lot_record.errors|join(', ') }}</span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-xs-1">
+            </div>
+        </div>
+        <div class="form-group{% if form.hardware_type.errors %} has-error{% endif %}">
+            <label for="hardware_type" class="col-xs-3 control-label">{{ form.hardware_type.label }}</label>
+            <div class="col-xs-5">
+                {{ form.hardware_type(class_="form-control") }}
+                {% if form.hardware_type.errors %}
+                <span class="help-block">{{ form.hardware_type.errors|join(', ') }}</span>
+                {% endif %}
+                <i style="top:8px;right:-40px;" class="pri-app-icon pri-icons-question-circle tooltip-icon" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="bottom"></i>
+            </div>
+            <div class="col-xs-4"></div>
+        </div>
+        <div class="form-group{% if form.project.errors %} has-error{% endif %}">
+            <label for="project" class="col-xs-3 control-label">{{ form.project.label }}</label>
+            <div class="col-xs-5">
+                {{ form.project(class_="form-control") }}
+                {% if form.project.errors %}
+                <span class="help-block">{{ form.project.errors|join(', ') }}</span>
+                {% endif %}
+            </div>
+            <div class="col-xs-4"></div>
+        </div>
+        <div class="form-group{% if form.vendor.errors %} has-error{% endif %}">
+            <label for="vendor" class="col-xs-3 control-label">{{ form.vendor.label }}</label>
+            <div class="col-xs-5">
+                {{ form.vendor(class_="form-control") }}
+                {% if form.vendor.errors %}
+                <span class="help-block">{{ form.vendor.errors|join(', ') }}</span>
+                {% endif %}
+            </div>
+            <div class="col-xs-4"></div>
+        </div>
+        <div class="form-group">
+            <label for="owner" class="col-xs-3 control-label">{{ form.owner.label }}</label>
+            <div class="col-xs-4">
+                {{ form.owner(class_="form-control") }}
+            </div>
+            <div class="col-xs-5"></div>
+        </div>
+        <hr>
+        <div class="form-group">
+            <div class="col-xs-12">
+                <button type="submit" class="btn pri-btn-primary">Create Product(s)</button>
+            </div>
+        </div>
+    </form>
+    <div data-jbox-content="create-build" style="display:none;">
+        <p><b>FLIGHT</b></p>
+        <p>Hardware that represents Planetary Resources - built and tracked with the care and pedigree required for flight and/or delivery as a PRI product.</p>
+        <p><b>EM / QUAL</b></p>
+        <p>Engineering / Qualification : Identical to Flight hardware but specifically intended for ground-based use/testing only</p>
+        <p><b>DEVELOPMENTAL</b></p>
+        <p>Not intended to be or represent Flight hardware but is inteneded to inform the development/design of Flight hardware</p>
+        <p><b>GSE</b></p>
+        <p>Fixturing or other tooling designed to interact with and support the manufacture / build / test / transportation / etc. of Flight hardware</p>
+        <p><b>EQUIPMENT</b></p>
+        <p>Infrastructure, tools, test equipment, etc. used at PRI for product development (oscilloscopes, thermal chambers, CNC mills, etc.)</p>
+        <p><b>MISC</b></p>
+        <p>Truly random stuff - tap handles and JIRA horse rear-end awards.</p>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        initial_focus('#serial_numbers');
+        var tooltip_settings = { content: $('[data-jbox-content="create-build"]') };
+        hardware_type_tooltip = new jBox('Tooltip', $.extend({}, global_jbox_tooltip_options, tooltip_settings));
+        $("input[name='product_type']").change(radioValueChanged);
+        function radioValueChanged() {
+            radioValue = $(this).val();
+            if (radioValue === 's/n') {
+                $("input[name='serial_numbers']").removeAttr('disabled');
+                $("input[name='serial_numbers']").focus();
+                $("input[name='lot_record']").attr('disabled', 'disabled');
+                $("input[name='lot_record']").val('');
+            }
+            else if (radioValue === 'lot') {
+                $("input[name='lot_record']").val('{{lot_identifier}}');
+                $("input[name='lot_record']").removeAttr('disabled');
+                $("input[name='lot_record']").focus();
+                $("input[name='serial_numbers']").attr('disabled', 'disabled');
+                $("input[name='serial_numbers']").val('');
+            }
+            else {
+                $("input[name='serial_numbers']").attr('disabled', 'disabled');
+                $("input[name='serial_numbers']").val('');
+                $("input[name='lot_record']").attr('disabled', 'disabled');
+                $("input[name='lot_record']").val('');
+            }
+        }
+        $('#create_build_modal_{{part.id}}_form').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#create_build_modal_{{part.id}}', create_part_build_modal);
+                return true;
+            },
+            error: function(responseText, statusText, xhr, $form) {
+                enableModal('#create_build_modal_{{part.id}}', create_part_build_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#create_build_modal_{{part.id}}').replaceWith(responseText.responseText);
+            },
+            success: function(responseText, statusText, xhr, $form) {
+                if ( responseText.serial_numbers  && typeof responseText.serial_numbers !== 'undefined' ) {
+                    if (responseText.serial_numbers.length == 1) {
+                        // Redirect to show the newly created product (serial)
+                        var product_number = responseText.product_number;
+                        var url = window.location.origin + "/product/" + product_number;
+                        window.location = url;
+                    }
+                    else {
+                        enableModal('#create_build_modal_{{part.id}}', create_part_build_modal);
+                        create_part_build_modal.destroy();
+                        flash('Created ' + responseText.serial_numbers.length + ' products.', 'success');
+                    }
+                }
+                else if ( responseText.lot_record  && typeof responseText.lot_record !== 'undefined' ) {
+                    // Redirect to show the newly created product (lot)
+                    var product_number = responseText.product_number;
+                    var url = window.location.origin + "/product/" + product_number;
+                    window.location = url;
+                }
+                else {
+                    // Redirect to show the newly created product (stock)
+                    var product_number = responseText.product_number;
+                    var url = window.location.origin + "/product/" + product_number;
+                    window.location = url;
+                }
+            }
+        });
+        if (~'{{existing_serial_numbers}}'.indexOf('STCK')) {
+            //$('#product_type-2').attr('disabled', 'disabled'); // TODO: verbally notify disabled
+            $('#product_type-2').remove();
+            $('label[for="product_type-2"]').text('STOCK already exists');
+        }
+    });
+</script>

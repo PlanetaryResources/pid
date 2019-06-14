@@ -1,0 +1,21 @@
+{% macro bookmark(parent_object, current_user) %}
+{% if not current_user.has_bookmarked(parent_object) %}
+<i class="fa fa-lg fa-bookmark-o pri-bookmark" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Add Bookmark"></i>
+{% else %}
+<i class="fa fa-lg fa-bookmark pri-bookmark" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="Remove Bookmark"></i>
+{% endif %}
+{% block js scoped %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.pri-bookmark').click(function() {
+            if ($('.pri-bookmark').hasClass('fa-bookmark-o')) {
+                add_bookmark('{{ current_user.id }}', '{{ parent_object.id }}', '{{ parent_object.get_class_name() }}');
+            }
+            else {
+                remove_bookmark('{{ current_user.id }}', '{{ parent_object.id }}', '{{ parent_object.get_class_name() }}');
+            }
+        })
+    });
+</script>
+{% endblock %}
+{% endmacro%}

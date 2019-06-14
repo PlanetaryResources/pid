@@ -1,0 +1,15 @@
+
+{% extends "layout.html" %}
+
+{% block page_title %}Bad Request{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+    <div class="text-center">
+        <h1>Bad Request</h1>
+        <p style="font-weight: normal">An error happened when trying to submit your form:</p>
+        <p style="font-weight: normal">{{ reason }}</p>
+        <p style="font-weight: normal">You can try to <a href="javascript:window.history.back();">go back</a> and refresh the page and try again.</p>
+    </div>
+</div>
+{% endblock %}

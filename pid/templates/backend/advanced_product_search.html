@@ -1,0 +1,246 @@
+<form id="product-search-form" class="form-horizontal advanced-search-form {% if record_type != 'product' %} hidden {% endif %}">
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="product-part-num">Part Number</label>
+        <div class="col-xs-10" id="product-part-num">
+            <div class="row">
+                <div class="col-xs-2">
+                    <select class="form-control input-sm" name="product_part_number_query_type">
+                        <option value="includes" selected>
+                            Includes
+                        </option>
+                        <option value="starts-with">
+                            Starts w/
+                        </option>
+                        <option value="ends-with">
+                            Ends w/
+                        </option>
+                    </select>
+                </div>
+                <div class="col-xs-3">
+                    <input type="text" class="form-control" name="product_part_number_query"/>
+                </div>
+                <label class="col-xs-2 control-label" for="product-serial-number">Serial #</label>
+                <div class="col-xs-2" id="product-serial-number">
+                    <select class="form-control input-sm" name="product_serial_number_query_type">
+                        <option value="includes" selected>
+                            Includes
+                        </option>
+                        <option value="starts-with">
+                            Starts w/
+                        </option>
+                        <option value="ends-with">
+                            Ends w/
+                        </option>
+                    </select>
+                </div>
+                <div class="col-xs-3">
+                    <input type="text" class="form-control" name="product_serial_number_query"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-2" for="product-name-desc">Text Fields</label>
+        <div class="col-xs-10" id="product-name-desc">
+            <input type="text" class="form-control" name="text_fields_query" placeholder="Includes name, notes, and description fields" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-2" for="product-state">State</label>
+        <div class="col-xs-10" id="product-state">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="row">
+                        <div class="col-xs-9">
+                            <select class="form-control input-sm" name="state">
+                                <option value="">-- any --</option>
+                                {% for state in Product.workflow.states %}
+                                    <option value="{{state}}">{{state}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="true" name="in_open_state" />
+                                    Open
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="row">
+                        <label class="col-xs-3 control-label" for="product-hw-type">H/W Type</label>
+                        <div class="col-xs-9" id="product-hw-type">
+                            <select class="form-control input-sm" name="hardware_type_id">
+                                <option value="">-- any --</option>
+                                {% for type in hardware_types %}
+                                <option value="{{ type.id }}">
+                                    {{ type.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-2" for="product-vendor">Project</label>
+        <div class="col-xs-10" id="product-vendor">
+            <div class="row">
+                <div class="col-xs-6">
+                    <select class="form-control input-sm" name="project_id">
+                        <option value="">-- any --</option>
+                        {% for project in projects %}
+                        <option value="{{ project.id }}">
+                            {{ project.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-xs-6">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-2" for="product-owner">Owner</label>
+        <div class="col-xs-10" id="product-owner">
+            <div class="row">
+                <div class="col-xs-6">
+                    <select class="form-control input-sm" name="owner_id">
+                        <option value="">-- any --</option>
+                        {% for owner in users %}
+                        <option value="{{ owner.id }}">
+                            {{ owner.get_name() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-xs-6">
+                    <div class="row">
+                        <label class="col-xs-3 control-label" for="product-material">Material</label>
+                        <div class="col-xs-9" id="product-material">
+                            <select class="form-control input-sm" name="material_id">
+                                <option value="">-- any --</option>
+                                {% for material in materials %}
+                                <option value="{{ material.id }}">
+                                    {{ material.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-2" for="product-has">Has</label>
+        <div class="col-xs-10" id="product-has">
+            <div class="row" style="padding-bottom: 5px;">
+                <div class="col-xs-6">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="true" name="open_discrepancies" />
+                            Open Discrepancies
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-2" for="product-created-by">Created By/On</label>
+        <div class="col-xs-10" id="product-created-by">
+            <div class="row">
+                <div class="col-xs-4">
+                    <select class="form-control input-sm" name="created_by_id">
+                        <option value="">-- any --</option>
+                        {% for owner in users %}
+                        <option value="{{ owner.id }}">
+                            {{ owner.get_name() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-xs-8">
+                    <div class="input-group input-daterange">
+                        <input type="text" class="form-control input-sm" name="created_on_start" id="product_created_on_start">
+                            <div class="input-group-addon" style="color: black;">to</div>
+                        <input type="text" class="form-control input-sm" name="created_on_end" id="product_created_on_end">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-4">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" value="true" name="exclude_obsolete" checked/>
+                    Exclude Scrapped
+                </label>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <a href="#" class="clear-selections pull-right">Clear Selections</a>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-12">
+            <button class="btn btn-default pri-btn-primary" id="search-product-btn">Search</button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var productSearchResultsTable = $('#product-search-results').DataTable({
+            dom: '<"pull-left"r<"#product-action-btns">><"pull-right"B>t<"pull-left"i><"pull-right"p>',
+            columnDefs: [
+                {targets: [0], render: renderUrlColumn},
+                {targets: [9], render: renderDateColumn},
+                {targets: [2], render: renderStateIcon }
+            ],
+            columns: [
+                {data: 'id', name: 'id'},
+                {data: 'title', name: 'title'},
+                {data: 'state', name: 'state'},
+                {data: 'hardware_type', name: 'hardware_type', defaultContent: '', visible: false},
+                {data: 'owner', name: 'owner', defaultContent: '', visible: false},
+                {data: 'material', name: 'material', defaultContent: '', visible: false},
+                {data: 'notes', name: 'notes', visible: false},
+                {data: 'project', name: 'project', visible: false},
+                {data: 'created_by', name: 'created_by', visible: false},
+                {data: 'created_at', name: 'created_at', visible: false}
+            ],
+            buttons: [
+                {extend: 'colvis', text: 'Show Columns', columns: ':gt(0)', className: 'pri-btn-secondary'}
+            ]
+        });
+
+        // Catch submission of forms and load data through datatables
+        $('#search-product-btn').on('click', function (e) {
+            start_search();
+            e.preventDefault();
+            var queryParams = $('#product-search-form').formSerialize();
+            productSearchResultsTable.ajax.url('/product/advanced_search?' + queryParams).load(search_complete, true);
+        });
+
+        addSaveAndCopyToDataTable(productSearchResultsTable, '#product-action-btns');
+
+        $('#product_created_on_start').datepicker().on('changeDate', function(e) {
+            $('#product_created_on_end').datepicker('show');
+        });
+        $('#product_created_on_end').datepicker();
+
+        if ('{{record_type}}' === 'product') {
+            refreshSearchParams('{{record_type}}', productSearchResultsTable);
+        }
+    });
+</script>

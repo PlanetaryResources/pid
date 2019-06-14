@@ -1,0 +1,41 @@
+
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+
+<table class="table table-condensed table-hover pri-table">
+    <thead>
+        <tr>
+            <th width="10%">Rev</th>
+            <th width="40%">Release Date</th>
+            <th width="50%">Reason for Revision</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in parent_object.revision_log.entries %}
+        {% if parent_object.design_number %}
+        {% set current_object = parent_object.__class__.get_by_design_number_and_revision(parent_object.design_number, entry.revision) %}
+        {% elif parent_object.procedure_number %}
+        {% set current_object = parent_object.__class__.get_by_procedure_number_and_revision(parent_object.procedure_number, entry.revision) %}
+        {% elif parent_object.specification_number %}
+        {% set current_object = parent_object.__class__.get_by_specification_number_and_revision(parent_object.specification_number, entry.revision) %}
+        {% endif %}
+        <tr>
+            <td><a href="{{ current_object.get_url() }}">{{ entry.revision }}</a></td>
+            <td>{{ moment(entry.revisioned_at).format('YYYY.MM.DD HH:mm UTCZ') }}</td>
+            <td>
+                {% if current_object.can_user_edit('revision_log') %}
+                {{ render_xeditable_text_field(field=entry.reason, parent_object=entry, api_url="/common/update_revision_log",
+                    field_name='reason', label='Reason', input_class="", display_label=False) }}
+                {% else %}
+                {{ entry.reason }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        flask_moment_render_all();  // For rendering timestamp
+    });
+</script>

@@ -1,0 +1,6 @@
+Your record has been approved and released/closed:
+
+Record:    {{ record.get_unique_identifier() }} - {{ record.get_name() }}
+
+Record URL:
+{{ record.get_url(external=True) }}

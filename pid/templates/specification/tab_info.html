@@ -1,0 +1,21 @@
+
+{% from 'shared/document_list.html' import document_list with context %}
+{% from 'shared/link_list.html' import link_list with context %}
+{% from "shared/trumbowyg.html" import trumbowyg %}
+
+<div class="row">
+    <div class="col-xs-12">
+        {{ trumbowyg(field=spec.summary, parent=spec, api_url="/specification/update",
+        field_name='summary', label='SUMMARY', placeholder='Additional helpful explanation of this Specification - or if it\'s simple enough, write the Spec here.') }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {{ document_list(parent_object=spec) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {{ link_list(parent_object=spec) }}
+    </div>
+</div>

@@ -1,0 +1,939 @@
+/* =============================================================================
+   App specific CSS file.
+   PR Styling Guide: http://confluence.prioffice.net/pages/viewpage.action?pageId=4525139
+   ========================================================================== */
+
+/* universal */
+
+html {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+body {
+    padding-top: 55px;
+    background-color: #e9f1f6;
+    min-height: 100%;
+    position: relative;
+    padding-bottom: 45px; /* For footer */
+    font-family: 'Roboto';
+}
+
+section {
+    overflow: auto;
+}
+
+textarea {
+    resize: vertical;
+}
+
+#parent-container {
+    margin: -5px auto 0;
+    padding: 0px;
+    width: 1024px !important;
+}
+
+/* Hide everything until everything on page has loaded, to prevent jumpiness */
+#loading-mask {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    width: 100%;
+    height: 100%;
+    background-image : url('../images/loading.gif');
+    background-repeat:no-repeat;
+    background-position:center;
+    background-color: #e9f1f6;
+    z-index: 99; /* Higher than anything else in the document */
+}
+/* Generic loading class to show for instance in modals etc */
+.pri-loader {
+    background-image : url('../images/loading.gif');
+    background-repeat:no-repeat;
+    background-position:center;
+    background-color: #e9f1f6;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+.pri-loader.transparent {
+    background-color:transparent;
+}
+
+/* Forms */
+
+.navbar-form input[type="text"],
+.navbar-form input[type="password"] {
+    width: 180px;
+}
+
+.form-register {
+    width: 50%;
+}
+
+.form-register .form-control {
+    position: relative;
+    font-size: 16px;
+    height: auto;
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.file-row {
+    margin: 10px auto;
+}
+
+/* To fix nested rows in Bootstrap from overflowing
+   See: http://willschenk.com/bootstrap-advanced-grid-tricks/ */
+.row .row {
+    margin: 0px 0px;
+}
+
+.top-pad-10 {
+    padding-top: 10px;
+}
+
+.top-pad-15 {
+    padding-top: 15px;
+}
+
+.ellipsis-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* TODO: Do we need these? */
+/*.dropdown-default {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 160px;
+  padding: 5px 0;
+  margin: 2px 0 0;
+  font-size: 14px;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+          background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, .15);
+  border-radius: 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+.dropdown-default.pull-right {
+  right: 0;
+  left: auto;
+}
+.dropdown-default .divider {
+  height: 1px;
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+}
+.dropdown-default > li > a {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.42857143;
+  color: #333;
+  white-space: nowrap;
+}
+.dropdown-default > li > a:hover,
+.dropdown-default > li > a:focus {
+  color: #262626;
+  text-decoration: none;
+  background-color: #f5f5f5;
+}
+.dropdown-default > .active > a,
+.dropdown-default > .active > a:hover,
+.dropdown-default > .active > a:focus {
+  color: #fff;
+  text-decoration: none;
+  background-color: #428bca;
+  outline: 0;
+}
+.dropdown-default > .disabled > a,
+.dropdown-default > .disabled > a:hover,
+.dropdown-default > .disabled > a:focus {
+  color: #777;
+}
+.dropdown-default > .disabled > a:hover,
+.dropdown-default > .disabled > a:focus {
+  text-decoration: none;
+  cursor: not-allowed;
+  background-color: transparent;
+  background-image: none;
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+}*/
+
+.wysihtml5-sandbox {
+    /* To get scrollbar flush with WYSI editor */
+    padding: 6px 0px 6px 6px !important;
+}
+
+.panel-plaid .panel-heading {
+    font-size:100%;
+    background: -webkit-linear-gradient(90deg, transparent, transparent 15px, rgba(255,255,255,.1) 15px, rgba(255,255,255,.1) 30px) 0 0,
+    -webkit-linear-gradient(-180deg, transparent, transparent 15px, rgba(255,255,255,.1) 15px, rgba(255,255,255,.1) 30px) 15px 15px,
+    -webkit-linear-gradient(90deg, transparent, transparent 20px, rgba(255,0,0,.2) 20px, rgba(255,0,0,.2) 22px, transparent 22px) 0 0,
+    -webkit-linear-gradient(-180deg, transparent, transparent 18px, rgba(225,158,0,.3) 18px, rgba(225,158,0,.3) 24px, transparent 24px) 0 0,
+    -webkit-linear-gradient(-180deg, transparent, transparent 15px, rgba(0,100,50,1) 15px, rgba(0,100,50,1) 16px, transparent 16px) 0 0;
+    background-color: #3554a4;
+    background-size: 30px 30px;
+}
+
+.panel-heading > .panel-title.pri-panel-title {
+    color: black;
+}
+
+.pri-panel-body {
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+    border-left: 1px solid;
+}
+
+/* For anchors within pages, offset top navbar */
+a.anchor {
+    display: block;
+    position: relative;
+    top: -70px;
+    visibility: hidden;
+}
+
+/* Standard text styles */
+.pri-header {
+    font-size: 20px;
+    line-height: 20px;
+    font-weight: bold;
+    color: #226176;
+}
+
+.pri-subheader {
+    font-size: 18px;
+    line-height: 18px;
+    color: #226176;
+}
+
+.pri-secondary-header {
+    font-size: 18px;
+    font-weight: bold;
+    color: #226176;
+}
+
+.pri-secondary-subheader {
+    font-size: 16px;
+    color: #226176;
+}
+
+.pri-text {
+    font-size: 12px;
+    color: #000000;
+}
+
+.pri-text-bold {
+    font-size: 12px;
+    color: #000000;
+    font-weight: bold;
+}
+
+/* Standard button styles */
+.pri-btn-primary {
+    font-size: 14px;
+    color: #000;
+    background-color: #A8BACD;
+    border: 1px solid #888;
+    padding: 6px 10px;
+    display: block;
+    margin: 0 auto;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+    text-transform: uppercase;
+    border-radius: 3px;
+}
+.pri-btn-primary:hover {
+    background-color: #51889E;
+    color: #000;
+    border: 1px solid #888;
+}
+
+.pri-btn-secondary {
+    font-size: 12px;
+    line-height: 12px;
+    background: #fff;
+    border: 1px solid #999;
+    color: #000;
+    padding: 5px;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+}
+
+.pri-btn-secondary:hover {
+    background: linear-gradient(to top,#ccc, #fff);
+    border: 1px solid #999;
+    color: black;
+}
+
+.pri-btn-alter {
+    font-size: 12px;
+    font-weight: bold;
+    color: #2B879E;
+    background-color: white;
+    border: 1px solid #000000;
+    text-transform: uppercase;
+}
+
+.pri-btn-view {
+    font-size: 12px;
+    font-weight: normal;
+    color: #000000;
+    background-color: white;
+    border: 1px solid #000000;
+    text-transform: uppercase;
+}
+
+.pri-btn-view-small {
+    font-size: 10px;
+    font-weight: normal;
+    color: #000000;
+    background-color: white;
+    border: 1px solid #000000;
+    text-transform: uppercase;
+}
+
+/* Standard label styles */
+.panel-heading.pri-panel-heading {
+    background-color: #2B879E; /*#787878;*/
+}
+
+.panel-heading.pri-panel-heading > .panel-title {
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #000000;
+}
+
+.pri-section-label {
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #000000;
+    background-color: #787878;
+}
+
+.pri-subsection-label {
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #000000;
+}
+
+.pri-subsection-label small {
+    font-weight: normal;
+}
+
+.pri-field-label {
+    font-size: 10px;
+    font-weight: 400;
+    color: #787878;
+    text-transform: uppercase;
+}
+
+.pri-field-label.normal {
+    text-transform: none;
+}
+
+.pri-app-icon {
+    font-size: 40px;
+    cursor: pointer;
+    margin-right: 20px;
+}
+
+.pri-app-icon.sm {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.pri-app-icon.xs {
+    font-size: 15px;
+    margin-right: 5px;
+}
+
+.pri-app-icon.xs-margin {
+    margin: 5px;
+}
+
+.pri-app-icon.no-margin {
+    margin: 0;
+}
+
+/* Standard icon styles */
+.pri-app-icon.create {
+    color: #2BB573;
+}
+
+.pri-app-icon.edit {
+    color: #839AB4;
+}
+
+.pri-app-icon.edit:hover {
+    color: #333e4c;
+}
+
+.pri-app-icon.create:hover {
+    color: #226176;
+}
+
+.pri-app-icon.disabled {
+    color: #E0DFDE;
+}
+.pri-app-icon.disabled:hover {
+    color: #E0DFDE;
+}
+
+.pri-record-icon {
+    color:#226176;
+    font-size:35px;
+    font-family: Roboto;
+}
+
+.pri-record-icon-wrapper {
+    font-size: 10px;
+    width: 90px;
+    line-height: 15px;
+    text-align: center;
+    font-family: Roboto;
+    font-weight: bold;
+    color: #226176;
+    position: relative;
+}
+
+.pri-record-icon:after {
+    color: #226176;
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 12px;
+    font-family: Roboto;
+    display: block;
+    margin: 0 auto;
+    text-transform: uppercase;
+}
+
+.pri-record-icon.pri-icons-record-design:after {
+    content: 'Design';
+}
+
+.pri-record-icon.pri-icons-record-as-run:after {
+    content: 'As-Run';
+}
+
+.pri-record-icon.pri-icons-record-anomaly:after {
+    content: 'Anomaly';
+}
+
+.pri-record-icon.pri-icons-record-vendor-part:after {
+    content: 'Vendor Part';
+}
+
+.pri-record-icon.pri-icons-record-eco:after {
+    content: 'ECO';
+}
+
+.pri-record-icon.pri-icons-record-procedure:after {
+    content: 'Procedure';
+}
+
+.pri-record-icon.pri-icons-record-product:after {
+    content: 'Product';
+}
+
+.pri-record-icon.pri-icons-record-vendor-product:after {
+    content: 'Vendor Product';
+}
+
+.pri-record-icon.pri-icons-record-specification:after {
+    content: 'Specification';
+}
+
+.pri-icons-checklist-box:after{
+    content: "Task";
+}
+
+/* Specific icon colors */
+.pri-icons-planned {
+    color: #0B75BC;
+}
+.pri-icons-in-work {
+    color: #1DAAE1;
+}
+.pri-icons-inspection {
+    color: #F1592A;
+}
+.pri-icons-open {
+    color: #FCB03F;
+}
+.pri-icons-corrective {
+    color: #F1592A;
+}
+.pri-icons-approval {
+    color: #226176;
+}
+.pri-icons-thumbs-up {
+    color: #8CC63F;
+}
+.pri-icons-thumbs-down {
+    color: #8CC63F;
+}
+.pri-icons-obsolete {
+    color: #BF1E2D;
+}
+[class^="pri-icons-critical-"] {
+    color: #FBB04E;
+    /* For red background in middle of icon only, a lot of manual work for this to work */
+    background: radial-gradient(ellipse at 50% 62%, rgba(237,29,35,1) 0%,rgba(237,29,35,1) 35%,rgba(237,29,35,0) 36%,rgba(255,255,255,0) 100%);
+}
+
+#thumbnail_parent .thumbnail {
+    position: relative;
+    cursor: pointer;
+}
+
+.thumbnail .change-thumbnail {
+    background: black;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    visibility: hidden;
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.thumbnail:hover .change-thumbnail {
+    visibility: visible;
+}
+
+.thumbnail .change-thumbnail a {
+    color: white;
+    font-size: 10px;
+    padding: 5px;
+}
+
+.center-text {
+    text-align: center;
+}
+
+/* For showing chevron etc on collapsible panels */
+/* See http://astronautweb.co/snippet/font-awesome/ for content values for icons */
+.collapsible-panel .panel-heading h3:after {
+    font-family: FontAwesome;
+    content: "\f077";
+    float: right;
+    transition: transform 0.2s linear;
+    transform: rotate(0);
+}
+.collapsible-panel.collapsed .panel-heading h3:after {
+    transform: rotate(180deg);
+}
+.collapsible-panel.collapsed .panel-heading {
+    border-radius: 4px;
+}
+
+.as-run-product {
+    cursor: pointer;
+    float: left;
+    margin-right: 10px;
+}
+.as-run-product .delete-product {
+    visibility: hidden;
+    display:inline-block;
+    margin-right:5px;
+}
+
+.as-run-product:hover .delete-product {
+    visibility: visible;
+}
+/* Vertical align table elements */
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+.action-icons {
+    visibility: hidden;
+}
+.action-icons-row:hover .action-icons {
+    visibility: visible;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* TODO: Is this entire row really needed? */
+/* For blue pagination to match buttons for DataTables */
+.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
+    background-color: #839AB4;
+    border-color: #839AB4;
+}
+
+.placeholder {
+    font-style: italic;
+    content: attr(placeholder);
+    color: #999;
+    pointer-events: none;
+}
+::-webkit-input-placeholder { /* WebKit browsers */
+    font-style: italic;
+    content: attr(placeholder);
+    color: #999;
+    pointer-events: none;
+}
+
+.nav-tabs {
+    background-color: #d9e1ea;
+}
+
+.nav-tabs > li:not(:last-child) {
+    border-right: 2px solid #e9f1f6;
+}
+.nav-tabs > li >a {
+    color: #888888;
+    font-size: 14px;
+}
+
+.nav-tabs > li.active {
+    border-bottom: 1px solid #d9e1ea;
+}
+
+.tab-content {
+    padding-top: 50px;
+    margin-top: -40px; /* To extend shadow to tab list */
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+}
+
+.workflow-info-icon {
+    position: absolute;
+    left: -10px;
+    top: 15px;
+    font-size: 20px;
+    cursor: help;
+}
+
+.tooltip-icon {
+    position: absolute;
+    right: -5px;
+    top: 12px;
+    font-size: 20px;
+    cursor: help;
+}
+
+.create-icon-label, .edit-icon-label {
+    line-height: 35px;
+}
+
+/* Custom select styles */
+.pri-select-wrapper select {
+    border: none;
+    background: transparent;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    padding-left: 0px;
+    line-height: 25px;
+}
+
+.pri-select-wrapper:before {
+    content: '';
+    border-bottom: 1px solid #eaeaea;
+    width: 75%;
+    position: absolute;
+    bottom: 0px;
+}
+
+.pri-select-wrapper:after {
+    content: '\f0d7';
+    font-family: FontAwesome;
+    width: 10px;
+    position: absolute;
+    bottom: 0px;
+    right: 20%;
+    color: gray;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.pri-select-wrapper {
+    position: relative;
+}
+
+.pri-select-wrapper select:disabled {
+    border: none;
+    background: transparent;
+    color: #888888;
+    font-style: italic;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    padding-left: 0px;
+    line-height: 25px;
+}
+
+[data-notify="container"] {
+    width: 300px;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+}
+/* Softer green for success notify */
+[data-notify="container"].alert-success {
+    background: #7fd3ba;
+}
+
+.pri-table thead th {
+    font-size: 10px;
+    font-weight: 400;
+    color: #226176;
+    text-transform: uppercase;
+}
+
+.pri-table tfoot {
+    font-size: 10px;
+    font-weight: 400;
+    background: #F1F2F2;
+    color: #666666;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.pri-table tfoot:hover {
+    background: #E6E7E8
+}
+
+.pri-table > tfoot > tr > td {
+    line-height: 25px;
+    vertical-align: middle;
+}
+
+.pri-table td {
+    font-size: 12px;
+}
+
+.pri-table-header {
+    color: #226176;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.pri-table .pri-app-icon {
+    color: #2BB573;
+}
+
+.pri-table a {
+    line-height: 1.42857143;
+}
+
+.minus-one-column {
+    margin-left: -8.3%;
+}
+
+#view_vendor_part .mass-fields input:first-of-type {
+    width: 95px;
+    display: inline-block;
+}
+
+#view_vendor_part .mass-fields input:last-of-type {
+    width: 65px;
+    display: inline-block;
+}
+
+#dashboard .panel-default > .panel-heading {
+    border-bottom: none;
+    background-color: #d9e1ea;
+}
+
+.alert {
+    background: #7fd3ba;
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
+/* To prevent tooltips from new line. They should be short anyway */
+.tooltip-inner {
+    white-space:nowrap;
+    max-width:none;
+}
+
+.pri-bookmark {
+    position: absolute;
+    right: -12px;
+    top: 14px;
+    font-size: 22px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* All pri-dropdown are taken from orignal Bootstrap, as Bootflat's solution is not very nice */
+.pri-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 160px;
+    padding: 5px 0;
+    margin: 2px 0 0;
+    font-size: 12px;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 4px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+.pri-dropdown > li > a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+}
+.pri-dropdown > li > a:hover,
+.pri-dropdown > li > a:focus {
+    color: #262626;
+    text-decoration: none;
+    background-color: #f5f5f5;
+}
+.pri-dropdown > .active > a,
+.pri-dropdown > .active > a:hover,
+.pri-dropdown > .active > a:focus {
+    color: #fff;
+    text-decoration: none;
+    background-color: #428bca;
+    outline: 0;
+}
+
+.jBox-title {
+    height: 45px;
+    background: #eaeaea !important;
+    color: #226176;
+    font-size: 14px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #E0DFDE !important;
+}
+
+/* For typeahead results to be able to flow over the jBox container */
+.jBox-container, .jBox-content {
+    overflow: visible;
+}
+
+.pri-jbox {
+    font-size: 12px;
+}
+
+.pswp__button--download, .pswp__button--download:before {
+    background: url('../images/download.png') 12px 12px no-repeat;
+    background-size: 20px 20px;
+    width: 44px;
+    height: 44px;
+}
+
+.form-type-wrapper {
+    border: 1px solid;
+    border-radius: 5px;
+    padding: 10px 25px;
+}
+
+.pri-state-icon.pri-icons-planned {
+    color: #0B75BC;
+}
+
+.pri-state-icon.pri-icons-in-work {
+    color: #1DAAE1;
+}
+
+.pri-state-icon.pri-icons-inspection {
+    color: #F1592A;
+}
+
+.pri-state-icon.pri-icons-open {
+    color: #FCB03F;
+}
+
+.pri-state-icon.pri-icons-corrective {
+    color: #F1592A;
+}
+
+.pri-state-icon.pri-icons-approval {
+    color: #226176;
+}
+
+.pri-state-icon.pri-icons-thumbs-up {
+    color: #8CC63F;
+}
+
+.pri-state-icon.pri-icons-thumbs-down {
+    color: #8CC63F;
+}
+
+.pri-state-icon.pri-icons-obsolete {
+    color: #BF1E2D;
+}
+
+/* For tables using DataTables js library that are rendered while hidden (display:none)
+   fixes table/column widths
+ */
+table.advanced-search-results-table {
+    min-width: 100%;
+    max-width: 100% !important;
+    color: black;
+    font-family: 'Roboto', 'sans-serif';
+}
+
+.advanced-search-container {
+    background: white;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4);
+    padding: 10px 0px;
+}
+
+
+.advanced-search-results-table .pri-state-icon {
+    font-size: 20px;
+}
+
+.advanced-search-results-table .pri-state-icon span {
+    font-family: 'Roboto', 'sans-serif';
+    vertical-align: middle;
+    font-size: 14px;
+    color: black;
+    padding-left: 5px
+}
+/* Overwrites change to default Bootstrap grid behavior introduced above based on
+ http://willschenk.com/bootstrap-advanced-grid-tricks/ */
+.advanced-search-container .row .row {
+    margin: 0px -15px;
+    overflow-y: auto;
+}
+
+.advanced-search-container .checkbox {
+    padding-left: 15px;
+}
+
+.trumbowyg-dropdown {
+    z-index: 100;
+}
+
+.jBox-scroll > .jBox-container > .jBox-content {
+    overflow-y: auto;
+    overflow-x: hidden;
+}

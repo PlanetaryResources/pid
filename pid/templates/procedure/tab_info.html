@@ -1,0 +1,21 @@
+
+{% from 'shared/document_list.html' import document_list with context %}
+{% from 'shared/link_list.html' import link_list with context %}
+{% from "shared/trumbowyg.html" import trumbowyg %}
+
+<div class="row" style="padding-top: 10px;">
+    <div class="col-xs-12">
+        {{ trumbowyg(field=proc.summary, parent=proc, api_url="/procedure/update",
+        field_name='summary', label='SUMMARY', placeholder="Additional explanation of this Procedure or its scope - or if it's simple enough, put the work instructions here") }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {{ document_list(parent_object=proc) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {{ link_list(parent_object=proc) }}
+    </div>
+</div>

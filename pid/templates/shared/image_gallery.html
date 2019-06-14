@@ -1,0 +1,90 @@
+{% macro image_gallery(record) %}
+{% set images = record.images %}
+{% set parent_object_id = record.id %}
+{% set api_url = url_for('api.generic_images', record_id=record.id, record_class=record.get_class_name()) %}
+
+<div class="image-gallery">
+    <!-- TODO: Change look for images -->
+    <div class="row image-row">
+      <div class="col-xs-12">
+          <div class="image-dropzone" data-parent-id="{{parent_object_id}}" data-parent-type="{{parent_object_type}}">
+              <div class="row images-container">
+                  {% for image in images %}
+                  {% include "shared/image_gallery_item.html" %}
+                  {% endfor %}
+              </div>
+
+              <div class="image-upload-actions">
+                  <div class="image-upload-btn">
+                      <span class="btn pri-btn-alter fileinput-button">
+                        <span>SELECT FILES</span>
+                      </span>
+                      <span class="pri-text" style="margin-left: 10px;">... or Drag and Drop Files Here</span>
+                  </div>
+              </div>
+              <div class="dropzone-previews hidden"></div>
+          </div>
+
+      </div>
+    </div>
+
+</div>
+    <script type="text/javascript">
+      $( document ).ready(function() {
+        $(".image-dropzone").each(function (index, element) {
+
+          new Dropzone(element, {
+            init: function() {
+              this.on("dragover", function(file) {
+                console.log("Drag over.");
+                $(".images-container").addClass("dragover");
+              });
+              this.on("dragleave", function(file) {
+                console.log("Drag leave.");
+                $(".images-container").removeClass("dragover");
+              });
+
+              this.on("drop", function(file) {
+                console.log("Drop.");
+                $(".images-container").removeClass("dragover");
+              });
+            },
+            url: "{{api_url}}",
+            parallelUploads: 20,
+            clickable: $(element).find(".fileinput-button")[0],
+            previewsContainer: $(element).find(".dropzone-previews")[0],
+            /**
+             * Set csrfToken for the dropzone form submission
+             * @param arg1
+             * @param xhr
+             * @param formData
+             */
+            sending: function (arg1, xhr, formData) {
+              xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token() }}');
+            },
+            /**
+             * Add new image to the image list after successful creation
+             * @param image the image uploaded to the server
+             * @param response object with file db attributes
+             */
+            success: function (image, response) {
+              //TODO: signal user of success? Or is adding the new row enough? What if there's an error?
+              // $(element).siblings('.upload-sucss'ce).fadeIn(100).fadeOut(2000);
+
+              $(".images-container").append(response);
+              $('.images-container').photoSwipe('update')
+            },
+            complete: function (file) {
+              this.removeFile(file);
+            },
+            error: function (file, response) {
+              $.notify(response, { type: 'danger' });
+            }
+          });
+        });
+
+        // https://github.com/yaquawa/jquery.photoswipe
+        $('.images-container').photoSwipe();
+      });
+</script>
+{% endmacro %}

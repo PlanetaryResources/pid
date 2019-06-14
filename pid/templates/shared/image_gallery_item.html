@@ -1,0 +1,67 @@
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+{% set url = api_url + '/' + image.id|string %}
+{% set uid = 'description-' + image.get_class_name() + '-' + image.id|string + '-xeditable'%}
+<div class="image-wrapper col-xs-3" id="gallery-image-{{image.id}}">
+    <div class="image-item-container">
+        <i class="glyphicon glyphicon-trash" aria-hidden="true"
+           onclick="deleteImage(event, '{{url}}')" data-image-id="{{image.id}}"></i>
+        <img src="{{ image.get_url() }}" alt="{{ image.title }}"/>
+    </div>
+    <div class="image-filename">
+        <span class="pri-text-bold">{{image.path[33:]}}</span>
+    </div>
+    <div>
+    <span style="display:none;" id="{{uid}}_span">
+      <a href="#" id="{{uid}}_editable" data-type="text" data-pk="{{image.id}}" data-url="{{url}}">{{image.description|sn}}</a>
+    </span>
+
+        <div class="xeditable-inline xeditable-text" id="{{uid}}_input">
+            <div class="pri-text image-description" id="{{uid}}_editor">{{image.description | default("Add Description", True)}}</div>
+            <div class="xeditable-inline-indicator" id="{{uid}}_indicator">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#{{uid}}_editable').editable({
+            toggle: 'manual',
+            // TODO: Change input_length to be calculated based on how wide viewing window is
+            tpl: "<textarea type='text' class='{{input_class}}' placeholder='Add Description'/>",
+            inputclass: '',
+            success: function(response, newValue) {
+                // Replace field with template coming in response
+                $('#gallery-image-{{image.id}}').replaceWith(response);
+
+                highlight($('#{{uid}}_input'));
+                highlight($('#{{uid}}_editor'));
+
+                //TODO: Duplicate code here
+                // Hide the xeditable form
+                $('#{{uid}}_span').hide();
+                $('#{{uid}}_editable').editable('hide');
+                $('.editableform-loading').remove();
+                $('.images-container').photoSwipe('update');
+                // Show user a notification
+                $.notify('{{label}} successfully updated');
+            },
+        }).on('hidden', function(e, reason) {
+            // Hide xeditable if focus is lost
+            if (reason == "cancel" || reason == "nochange" || reason == "onblur" || reason == "manual") {
+                $('#{{uid}}_input').show();
+                $('#{{uid}}_editable').editable('hide');
+                $('#{{uid}}_span').hide();
+            }
+        });
+        $('#{{uid}}_input').click(function(e) {
+            // Show xeditable when user clicks on element
+            e.stopPropagation();
+            $('#{{uid}}_editable').editable('show');
+            $('#{{uid}}_span').show()
+            $('#{{uid}}_input').hide();
+        });
+
+    });
+</script>

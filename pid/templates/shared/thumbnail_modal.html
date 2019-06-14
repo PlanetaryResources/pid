@@ -1,0 +1,50 @@
+<div id="select_thumbnail">
+    <div class="image-gallery">
+        <div class="row image-row">
+            {% for image in record.images %}
+            <div class="image-wrapper col-xs-3">
+                <div class="image-item-container">
+                <a href="/{{ record.get_class_name() }}/update" class="update_thumbnail" data-image-id="{{ image.id }}">
+                    <img src="{{ image.get_url() }}" alt="{{ image.title }}"/>
+                </a>
+                </div>
+                <div class="caption text-center">
+                    <a href="/{{ record.get_class_name() }}/update" class="update_thumbnail" data-image-id="{{ image.id }}">Select</a>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="image-wrapper col-xs-3">
+                <div class="image-item-container">
+                    <a href="/{{ record.get_class_name() }}/update" class="update_thumbnail" data-image-id="default">
+                        <img src="{{ url_for('static', filename='images/' + record.get_class_name() + '_example_thumbnail.png') }}" alt="Example"/>
+                    </a>
+                </div>
+                <div class="caption text-center">
+                    <a href="/{{ record.get_class_name() }}/update" class="update_thumbnail" data-image-id="default">Select</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.update_thumbnail').click(function (event){
+            event.preventDefault();
+            $.ajax({
+                url: $(this).attr('href'),
+                type: 'POST',
+                data: {
+                    pk: '{{ record.id }}',
+                    name: 'thumbnail_id',
+                    value: $(this).attr('data-image-id')
+                },
+                success: function(response) {
+                    select_thumbnail_modal.destroy();
+                    $('#thumbnail_parent').html(response);
+                    $.notify('Thumbnail changed');
+                }
+            })
+        });
+    });
+</script>

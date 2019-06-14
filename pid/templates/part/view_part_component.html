@@ -1,0 +1,125 @@
+{% from "shared/ajax_input_field.html" import render_ajax_input_field %}
+
+{% if part_component.part %}
+    {% set reference = part_component.part %}
+    {% set reference_url = '/design/' + reference.design.design_number + '-' + reference.design.revision %}
+    {% set display_part_number = reference.part_number %}
+    {% set display_name = reference.get_name() %}
+    {% set display_rev = reference.design.revision %}
+    {% set display_state = reference.design.state %}
+{% elif part_component.vendor_part %}
+    {% set reference = part_component.vendor_part %}
+    {% set reference_url = '/vendorpart/' + reference.part_number %}
+    {% set display_part_number = reference.part_number %}
+    {% set display_name = reference.get_name() %}
+    {% set display_rev = '' %}
+    {% set display_state = reference.state %}
+{% endif %}
+
+{% if part_component.part %}
+<tr id="part_component_{{part_component.id}}" class="action-icons-row" data-part-component-part-id="{{reference.id}}" data-part-component-parent-id="{{part_component.parent.id}}">
+{% else %}
+<tr id="part_component_{{part_component.id}}" class="action-icons-row">
+{% endif %}
+    <td>
+        {{ render_ajax_input_field(field=part_component.quantity, parent_object=part_component,
+                             api_url="/part/update_part_component", field_name='quantity',
+                             label='Quantitiy', display_label=False, input_size='input-sm',
+                             update_mass_id=part_component.parent.id) }}
+    </td>
+    <td><a href="{{ reference_url }}">{{ display_part_number }}</a></td>
+    <td>{{ display_name|sn }}</td>
+    <td>{{'%0.2f'| format(reference.current_best_estimate|float)}}</td>
+    <td>{{'%0.1f'| format(reference.uncertainty|float)}}</td>
+    <td>{{'%0.2f'| format(reference.predicted_best_estimate|float)}}</td>
+    <td>{{ display_state|sn }}</td>
+    <td>
+        {% if part_component.can_user_edit('components') %}
+        <div class="action-icons">
+            <span class="cursor-pointer{%if part_component.ordering == 0%} invisible{%endif%}" id="reorder_part_component_up_{{part_component.id}}"><i class="fa fa-long-arrow-up" aria-hidden="true" style="padding-right:5px"></i></span>
+            <span class="cursor-pointer{%if part_component.ordering == (part_component.parent.components|length - 1)%} invisible{%endif%}" id="reorder_part_component_down_{{part_component.id}}"><i class="fa fa-long-arrow-down" aria-hidden="true" style="padding-right:5px"></i></span>
+            <span class="cursor-pointer" id="delete_part_component_{{part_component.id}}"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></span>
+        </div>
+        {% endif %}
+    </td>
+</tr>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#quantity-partcomponent-{{part_component.id}}-ajax").change(function() {
+            if ($(this).val() == 0) {
+                // Update mass visually
+                update_mass('#mass_fields_{{part_component.parent.id}}', {{part_component.parent.id}});
+                // Remove row visually
+                $('#part_component_{{part_component.id}}').remove()
+                // If last row in table, show material fields again
+                var rowCount = $('#part_components_for_part_{{part_component.parent.id}} tr').length;
+                if (rowCount == 0) {
+                    reload_material_fields({{part_component.parent.id}});
+                }
+                $.notify('Part Component successfully deleted');
+            }
+        });
+        $('#delete_part_component_{{part_component.id}}').click(function(e) {
+            $.ajax({
+                url: '/part/delete_part_component',
+                type: 'POST',
+                data: {
+                    pk: '{{part_component.id}}'
+                },
+                success: function(data) {
+                    // Update mass visually
+                    update_mass('#mass_fields_{{part_component.parent.id}}', {{part_component.parent.id}});
+                    // Remove row visually
+                    $('#part_component_{{part_component.id}}').remove()
+                    // If last row in table, show material fields again and remove table header
+                    var rowCount = $('#part_components_for_part_{{part_component.parent.id}} tr').length;
+                    if (rowCount == 0) {
+                        reload_material_fields({{part_component.parent.id}});
+                        $('#part_components_for_part_{{part_component.parent.id}}').parent().find('thead').remove()
+                    }
+                    $.notify('Part Component successfully deleted');
+                },
+                error: function() {
+                    $.notify('Part Component could not be deleted', { type: 'danger' });
+                }
+            });
+        });
+        $('#reorder_part_component_up_{{part_component.id}}').click(function(e) {
+            $.ajax({
+                url: '/part/update_part_component',
+                type: 'POST',
+                data: {
+                    pk: '{{part_component.id}}',
+                    'name': 'reorder',
+                    'value': 'up'
+                },
+                success: function(data) {
+                    $('#part_components_for_part_{{part_component.parent.id}}').html(data);
+                    highlight($('#part_component_{{part_component.id}}'));
+                },
+                error: function() {
+                    $.notify('Part Component could not be reordered', { type: 'danger' });
+                }
+            });
+        });
+        $('#reorder_part_component_down_{{part_component.id}}').click(function(e) {
+            $.ajax({
+                url: '/part/update_part_component',
+                type: 'POST',
+                data: {
+                    pk: '{{part_component.id}}',
+                    'name': 'reorder',
+                    'value': 'down'
+                },
+                success: function(data) {
+                    $('#part_components_for_part_{{part_component.parent.id}}').html(data);
+                    highlight($('#part_component_{{part_component.id}}'));
+                },
+                error: function() {
+                    $.notify('Part Component could not be reordered', { type: 'danger' });
+                }
+            });
+        });
+    });
+</script>

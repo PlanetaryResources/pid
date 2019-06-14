@@ -1,0 +1,293 @@
+<div class="row">
+    <div class="col-xs-12">
+        <h5>10/09/2017 - 1.0 Release!</h5>
+        <p>
+            <strong>We are proud to announce that PLAID version 1.0 is finally released!</strong>
+        </p>
+        <p>
+            <strong>Improvements (since 0.0.9-alpha)</strong>
+            <ul>
+                <li>Added emails to many steps in workflow/approval logic.</li>
+                <li>Added records awaiting approval to dashboard.</li>
+                <li>Change logs on all records have been majorly improved.</li>
+                <li>Improved UX of all modals. Mac Retinas in default resolution should be less of a problem now.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Bugfixes (since 0.0.9-alpha)</strong>
+            <ul>
+                <li>Record states are now selectable again in advanced searches.</li>
+                <li>Padawans can no longer remove supervisor from list of approvers.</li>
+                <li>Self-approved is now reset when a record is revised.</li>
+                <li>ECOs can no longer be added to closed Design records.</li>
+                <li>Software version field on Anomaly and ECO is now editable.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Misc (since 0.0.9-alpha)</strong>
+            <ul>
+                <li>Tons and tons of backend improvements.</li>
+                <li>Added links to PLAID space on Confluence as well as links to report bugs/request features in JIRA (links are in footer).</li>
+                <li>Moved database to PostgreSQL 9.6.5 (from 9.5).</li>
+                <li>Action icons that earlier would have opened an empty modal are now grayed out instead.</li>
+            </ul>
+        </p>
+        <h5 style="margin-top: 40px;">09/26/2017 - 0.0.9-alpha Release</h5>
+        <p>
+            <strong>Improvements</strong>
+            <ul>
+                <li>Added workflows and approvals to all records in PLAID.</li>
+                <li>Added padawan and supervisor capabilities to users.</li>
+                <li>Can now select specific revisions of designs when creating an anomaly or ECO.</li>
+                <li>Anomalies and ECOs now support multiple designs.</li>
+                <li>Anomalies can now be created against 'Other'.</li>
+                <li>Can now view build information and add new products/vendor products to existing builds.</li>
+                <li>Added approvals table to dashboard.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Bugfixes</strong>
+            <ul>
+                <li>Nothing major.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Misc</strong>
+            <ul>
+                <li>PLAID now runs over HTTP2 for a significant speed boost.</li>
+                <li>Revision log entries are now editable for open records.</li>
+                <li>Vendor product serial numbers are now editable.</li>
+                <li>A modal with a list of designs is now shown if a user creates multiple designs at once.</li>
+                <li>Added software version field to anomalies and as runs.</li>
+            </ul>
+        </p>
+        <h5 style="margin-top: 40px;">8/10/2017 - 0.0.8-alpha release</h5>
+        <p>
+            <strong>Improvements</strong>
+            <ul>
+                <li>Minor improvements to advanced search.</li>
+                <li>Minor improvements to tasks tab on dashboard.</li>
+                <li>Users are now sent an email when a task is assigned to them.</li>
+                <li>App now shows number of currently active users in footer.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Bugfixes</strong>
+            <ul>
+                <li>Fixed bug where users were unable to create new vendor products.</li>
+                <li>Fixed bug with permissions on procedures.</li>
+                <li>Fixed bug where app would die if user tried to enter duplicate vendor part serial number.</li>
+                <li>Fixed bug where redirection to a specific page did not work after login.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Misc</strong>
+            <ul>
+                <li>PLAID now runs in a Docker container.</li>
+                <li>Celery and RabbitMQ implemented to handle backgrounding tasks.</li>
+                <li>Better and more informative CSRF token error handling.</li>
+            </ul>
+        </p>
+        <h5 style="margin-top: 40px;">7/11/2017 - 0.0.7-alpha release</h5>
+        <p>
+            <strong>Improvements</strong>
+            <ul>
+                <li>Improved search logic when adding components to a Part under a Design. Search will no longer return inseparable components not belonging to this specific design and this specific revision. Search will no longer return parts that already have added this specific part as an component (prevents circular reference). Search will no longer return parts that are under this specific design and revision (unless inseparable component, prevents incest).</li>
+                <li>Improved advanced search. UI/UX fixes, search indicator, etc.</li>
+                <li>Added internal PLAID settings page (only accessible by admins).</li>
+                <li>Buttons to sort Tasks on Dashboard now work.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Bugfixes</strong>
+            <ul>
+                <li>Forbidden revisions are now skipped app wide.</li>
+                <li>Better error checking with revise design form.</li>
+                <li>Fixed thumbnails not working on Task.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Misc</strong>
+            <ul>
+                <li>Added "Inspection" as a state to Product and Vendor Product.</li>
+                <li>Changed "Manufacturer" label to "Distributor".</li>
+                <li>Added "N/A" as default distributor.</li>
+                <li>Internal code cleanup.</li>
+            </ul>
+        </p>
+        <h5 style="margin-top: 40px;">6/29/2017 - 0.0.6-alpha release</h5>
+        <p>
+            <strong>Improvements</strong>
+            <ul>
+                <li>Added error feedback to form when user is creating an Anomaly or adding a Procedure to a Design.</li>
+                <li>Added datepicker to Tasks.</li>
+                <li>Advanced search in top nav is now available to all users.</li>
+                <li>Create build modals now get pre-populated with some information from design and part like project etc.</li>
+                <li>Made it more clear when a product is not at latest revision, or it's design is not released.</li>
+                <li>Added shortcut to create As-Run from the table of As-Runs on a Procedure.</li>
+                <li>Moved some fields around on Product and Vendor Product to make them more similar and information easier to find.</li>
+                <li>Improved global quick search with better ordering and now showing how many matches at bottom of results list.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Bugfixes</strong>
+            <ul>
+                <li>Fixed bug where user was unable to add parts to an As-Run during creation.</li>
+                <li>Fixed bug where opening a modal, closing it, then opening it again and submitting would result in incorrect page redirects.</li>
+                <li>Corrected as-built lists on products. Link to design is now to latest revision, description points to part, state points to installed product if any.</li>
+                <li>Serial number list on as-built list for product now includes serial numbers from other revisions of same design/part as well.</li>
+                <li>Fixed bug where thumbnail could not be changed on Tasks, Procedures and Specifications.</li>
+                <li>Fixed bug with documents, URLs and discrepancies not being able to update inline due to bugs with permissions logic.</li>
+                <li>Discrepancy table header now shows when user creates the first discrepancy.</li>
+                <li>References are now usable on Tasks.</li>
+                <li>Fixed bug where user was unable to add an Anomaly to a Vendor Part.</li>
+                <li>Fixed bug where Trumbowyg dropdown menus would not be on top of other elements.</li>
+                <li>Refactored part component ordering logic. User can no longer move components on top further up, or components on bottom further down.</li>
+                <li>Users can no longer open multiple instances of the same modal.</li>
+                <li>Revising a Design, Procedure or Specification now sets the new revision to 'In Work'.</li>
+                <li>Better parsing of 'weird' serial numbers for vendor products. All products should now be accessible.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Misc</strong>
+            <ul>
+                <li>Updated datepicker in app and improved it everywhere it's used.</li>
+                <li>Various style improvements.</li>
+                <li>Added initial input focus to most (all?) modals upon opening them.</li>
+                <li>Started adding loading indicators to modals. So far only added to "Add Extra Product Component" modal but will roll out to all in future.</li>
+            </ul>
+        </p>
+        <h5 style="margin-top: 40px;">6/19/2017 - 0.0.5-alpha release</h5>
+        <p>
+            <strong>Improvements</strong>
+            <ul>
+                <li>Added advanced search functionality for all objects. Not fully polished yet.</li>
+                <li>Added permissions to all objects.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Bugfixes</strong>
+            <ul>
+                <li>Searching part components to longer returns inseparable components of other designs.</li>
+                <li>Fix for not being able to access vendor parts with special characters in name.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Misc</strong>
+            <ul>
+                <li>Design List now opens in a new tab rather than a modal. Improvements to Design List.</li>
+                <li>Softer success green.</li>
+                <li>Continued cleanup in JS.</li>
+                <li>Added gzip compression to NGINX, improves page load times.</li>
+                <li>Updated Python packages.</li>
+            </ul>
+        </p>
+        <h5 style="margin-top: 40px;">6/02/2017 - 0.0.4-alpha release</h5>
+        <p>
+            <strong>Improvements</strong>
+            <ul>
+                <li>Added CSV and PDF export functionality to design lists.</li>
+                <li>Improved expand/collapse of tree view on design lists.</li>
+                <li>Improved tasks section on dashboard.</li>
+                <li>Added loading animation displayed when a page takes a while to load.</li>
+                <li>Moved PRI and PRLux to top of vendor/manufacturer select lists.</li>
+                <li>Moved Create New Company from top navbar to vendor/manufacturer select lists.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Bugfixes</strong>
+            <ul>
+                <li>Made back/forward in browser work when switching tabs.</li>
+                <li>Fixed a lot of modal resizing weirdness when a typeahead is present.</li>
+                <li>Update Product button is now hidden if Product is already at latest revision.</li>
+                <li>Referenced by now works when an object has been revised.</li>
+                <li>Fixed bug occuring when user tried to enter a non-number as amount of designs when creating new design.</li>
+                <li>Fixed bug occuring when trying to create a new company using a name that already exists in database.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Misc</strong>
+            <ul>
+                <li>Removed user switching on dashboard (except tasks). Will be replaced by advanced search functionality in future.</li>
+                <li>Updated JS and Python libraries.</li>
+                <li>Continued cleaning up and moving inline JS.</li>
+                <li>Various styling improvements.</li>
+                <li>Added color to workflow icons.</li>
+            </ul>
+        </p>
+        <h5 style="margin-top: 40px;">5/26/2017 - 0.0.3-alpha release</h5>
+        <p>
+            <strong>Improvements</strong>
+            <ul>
+                <li>When creating a Procedure from a Design or Vendor Part, the create modal will now auto populate with information from that Design or Vendor Part.</li>
+                <li>Added ability to toggle which columns to display on the Design List.</li>
+                <li>Added help for criticality definitions on Anomaly.</li>
+                <li>Added help for parts section on Procedure.</li>
+                <li>Made adding a new Discrepancy on Build, Product and Vendor Product behave the same as when adding a new URL.</li>
+                <li>Made the adding and editing of URL, Document and Discrepancy listen to Enter and Escape keypress, saving and cancelling respectively.</li>
+                <li>Continued moving JavaScript from inline to external file, further improving webpage load times.</li>
+                <li>Better check for next free part identifier when creating new parts on a Design. Also prevents user from creating a new Part with an identifier already in use for that Design.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Bugfixes</strong>
+            <ul>
+                <li>Corrected As Run to show it's parent Procedures name rather than it's own.</li>
+                <li>Fixed bug where owner and project on an As Run did not update correctly.</li>
+                <li>Fixed bug where project on Anomaly did not update correctly.</li>
+                <li>Fixed bug where project on ECO did not update correctly.</li>
+                <li>A lot of change log related bug fixes, some of which was blocking for instance material fields from being updated.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Misc</strong>
+            <ul>
+                <li>Updated JavaScript libraries.</li>
+                <li>Removed unneeded JavaScript and CSS libraries.</li>
+            </ul>
+        </p>
+        <h5 style="margin-top: 40px;">5/22/2017 - 0.0.2-alpha release</h5>
+        <p>
+            <strong>Improvements</strong>
+            <ul>
+                <li>Added a download button rather than share button when viewing images.</li>
+                <li>Added 'Help' and 'Feedback' to top navbar.</li>
+                <li>Moved a lot of JavaScript from inline to external file to improve load times.</li>
+                <li>Improved top row styling to allow for much longer design/serial numbers and design/product names.</li>
+                <li>Added beginning of change log functionality to Anomaly, As Run, ECO, Part, Procedure, Specification and Task. Be aware that this functionality still is not fully complete.</li>
+                <li>Added summary field to Product.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Bugfixes</strong>
+            <ul>
+                <li>Fixed bug where a designs revision log would always start with A regardless of what user specified.</li>
+                <li>Fixed bug where select lists would be empty when pressing back/forwards buttons in browser.</li>
+                <li>Fixed bug where urgency of Task was not saved when creating a new Task.</li>
+                <li>Fixed bug where WYSIWYG editor would save an empty field.</li>
+                <li>Added error message when user tries to upload an image file in the upload documents area.</li>
+                <li>Updated work flow states for As Runs.</li>
+                <li>Fixed behaviour of the create As Run modal on a Procedure, which was acting weird after user had added Part(s) to the Procedure.</li>
+            </ul>
+        </p>
+        <p>
+            <strong>Misc</strong>
+            <ul>
+                <li>Fixed a few typos and wording here and there.</li>
+                <li>Added placeholders to input fields that were missing them.</li>
+                <li>Updated Python and JavaScript dependencies.</li>
+                <li>Changed needed by date entry on Task to be YYYY-MM-DD format.</li>
+                <li>Added missing labels to various modals.</li>
+            </ul>
+        </p>
+        <h5 style="margin-top: 40px;">5/15/2017 - 0.0.1-alpha release</h5>
+        <p>
+            Initial release of PLAID to a limited number of alpha testers. For
+            more information see:
+            <br>
+            <a href="https://confluence.planetaryresources.com/display/~sean/Alpha+Testing">
+                https://confluence.planetaryresources.com/display/~sean/Alpha+Testing
+            </a>
+        </p>
+    </div>
+</div>

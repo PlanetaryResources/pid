@@ -1,0 +1,231 @@
+<div id="create_eco_modal">
+    <form id="createECOForm" class="form-horizontal" method="POST" action="/eco/create" role="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="designs" />
+
+        <div class="form-group {% if form.name.errors %} has-error{% endif %}">
+            <label class="col-xs-3 control-label" for="name">ECO Title</label>
+            <div class="col-xs-8">
+                {{ form.name(placeholder="One-line ECO title", class_="form-control") }}
+                {% if form.name.errors %}
+                <span class="help-block">{{ form.name.errors|join(', ') }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group {% if form.designs.errors %} has-error{% endif %}">
+            <label class="col-xs-3 control-label" for="parts">For Design(s)</label>
+            <div class="col-xs-9">
+                <div class="pri-list" id="create-eco-design-list" style="margin-top: 0px">
+                    <div class="row header-row">
+                        <div class="col-xs-3">
+                            <label class="control-label pri-field-label">DESIGN NUMBER(s)</label>
+                        </div>
+                        <div class="col-xs-6">
+                            <label class="control-label pri-field-label">NAME / DESCRIPTION</label>
+                        </div>
+                        <div class="col-xs-2">
+                            <label class="control-label pri-field-label">REV</label>
+                        </div>
+                        <div class="col-xs-1">
+                            <label class="control-label pri-field-label"></label>
+                        </div>
+                    </div>
+                    {% for design in designs %}
+                    <div class="row list-row pri-text" id="eco-design-{{ design.id }}" data-design-id="{{ design.id }}" >
+                        <div class="col-xs-3">
+                            <span>{{ design.design_number }}</span>
+                        </div>
+                        <div class="col-xs-6 ellipsis-text">
+                            <span>{{ design.name }}</span>
+                        </div>
+                        <div class="col-xs-2">
+                            <div class="pri-select-wrapper">
+                                <select class="form-control input-sm" id="design-revision-select-{{ design.id }}" onchange="$(this).parents('.list-row').attr('data-design-id', $(this).val());recalculateECODesigns();">
+                                    {% for revision in design.find_all_revisions() %}
+                                    {% if revision.is_open() %}
+                                    <option value="{{ revision.id }}" {% if revision.id == design.id %}selected{% endif %}>{{ revision.revision }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-1">
+                            <span class="glyphicon glyphicon-trash pull-right action-icon" aria-hidden="true" onclick="createECORemoveDesign(event)"></span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" id="designs-add-btn" class="btn pri-btn-secondary" style="margin-top:5px;margin-bottom: 15px;" >Add Design</button>
+                {% if form.designs.errors %}
+                <span class="help-block">{{ form.designs.errors|join(', ') }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group hidden" id="eco-designs-typeahead">
+            <div class="row">
+                <label class="control-label col-xs-3">&nbsp;</label><br/>
+                <div class="col-xs-8 typeahead__container pri-typeahead create-eco-typeahead" style="margin-top: -15px; margin-bottom:15px;margin-left:10px;">
+                    <div class="typeahead__field">
+                          <span class="typeahead__query">
+                              <input id="create-eco-typeahead-input" class="js-typeahead-components" name="design" value="" type="search" placeholder="Search" autocomplete="off" />
+                          </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group {% if form.owner.errors %} has-error{% endif %}">
+            <label class="col-xs-3 control-label" for="owner_id">Owner</label>
+            <div class="col-xs-8">
+                {{ form.owner(class_="form-control") }}
+                {% if form.owner.errors %}
+                <span class="help-block">{{ form.owner.errors|join(', ') }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <hr>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-offset-1 col-xs-10">
+                    <button type="submit" class="btn pri-btn-primary">Create ECO</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        initial_focus('#name');
+
+        let $ecoForm = $('#createECOForm');
+        let $designListField = $ecoForm.find('input[name="designs"]');
+
+        $('#designs-add-btn').click(function () {
+            $('#eco-designs-typeahead').removeClass('hidden');
+            $('.jBox-container').height('auto');
+            setTimeout(function() { $('#create-eco-typeahead-input').focus() }, 0);
+        });
+
+        createECORemoveDesign = function (event) {
+            $(event.currentTarget).parents('.list-row').remove();
+            recalculateECODesigns();
+        };
+
+        recalculateECODesigns = function () {
+            let design_ids = [];
+            $('#create-eco-design-list').find('.list-row').each(function() {
+                design_ids.push($(this).attr('data-design-id'));
+            });
+            $designListField.val(design_ids.join(","));
+        };
+
+        $.typeahead({
+            input: '#create-eco-typeahead-input',
+            hint: true,
+            minLength: 3,
+            maxItem: 15,
+            order: 'desc',
+            dynamic: true,
+            searchOnFocus: true,
+            display: ['number', 'name'],
+            correlativeTemplate: ['number', 'name'],
+            template: function (query, item) {
+                let template = '<span class="typeahead-group">{[icon]}</span>';
+                template += '<span class="typeahead-number" title="{[number|raw]}">{[number]}</span>';
+                template += '<span class="typeahead-name" title="{[name|raw]}">{[name]}</span>';
+                if (typeof item.thumb_url !== 'undefined' && item.thumb_url !== null) {
+                    template += '<span class="typeahead-logo"><img class="img-rounded" src="{[thumb_url]}"></span>';
+                }
+                return template;
+            },
+            matcher: function (item, displayKey) {
+                // Exclude already included designs
+                let includedDesignIds = $designListField.val().split(',');
+                let design_ids = [];
+                for (let i = 0; i < item.revisions.length; i++) {
+                    design_ids.push(item.revisions[i].id.toString());
+                }
+                return !includedDesignIds.some(r=> design_ids.includes(r));
+            },
+            source: {
+                "Design": {
+                    ajax: {
+                        url: '/design/typeahead_search_designs',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}",
+                            search_only_open: true
+                        },
+                        path: 'data'
+                    }
+                }
+            },
+            callback: {
+                onClickAfter: function(node, query, result, resultCount, resultCountPerGroup) {
+                    event.preventDefault();
+                    let latest_rev_id = result.revisions.slice(-1)[0].id;
+                    let domId = "eco-design-" + latest_rev_id;
+
+                    let tpl = '<div class="row list-row pri-text" id="' + domId + '" data-design-id="' + latest_rev_id + '" >' +
+                        '<div class="col-xs-3">' +
+                        '<span>' + result.number + '</span>' +
+                        '</div>' +
+                        '<div class="col-xs-6 ellipsis-text">' +
+                        '<span>' + result.name + '</span>' +
+                        '</div>' +
+                        '<div class="col-xs-2">' +
+                        '<div class="pri-select-wrapper">' +
+                        '<select class="form-control input-sm" id="design-revision-select-' + latest_rev_id + '">' +
+                        '</select>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="col-xs-1">' +
+                        '<span class="glyphicon glyphicon-trash pull-right action-icon" aria-hidden="true" onclick="createECORemoveDesign(event)"></span>' +
+                        '</div>' +
+                        '</div>';
+
+                    $('#create-eco-design-list').append(tpl);
+                    $('#create-eco-typeahead-input').val('');
+                    $('#eco-designs-typeahead').addClass('hidden');
+                    $('.jBox-container').height('auto');
+
+                    let options = [];
+                    let instances = result['revisions'];
+                    for (let i = 0; i < instances.length; i++) {
+                        let instance = instances[i];
+                        options.push('<option value="' + instance.id + '" >' + instance.revision + '</option>');
+                    }
+                    let $designRevisionSelect = $('#design-revision-select-' + latest_rev_id);
+                    $designRevisionSelect.html(options.join("")).val('');
+                    $designRevisionSelect.val($designRevisionSelect.find("option:last").val());
+
+                    $designRevisionSelect.change(function() {
+                        $(this).parents('.list-row').attr('data-design-id', $(this).val());
+                        recalculateECODesigns();
+                    });
+
+                    recalculateECODesigns();
+                }
+            }
+        }); // End typeahead
+
+        $ecoForm.ajaxForm({
+            beforeSerialize: function($form, options) {
+                recalculateECODesigns();
+                return true;
+            },
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#create_eco_modal', create_eco_modal);
+                return true;
+            },
+            error: function(response, statusText, xhr, $form) {
+                enableModal('#create_eco_modal', create_eco_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#create_eco_modal').replaceWith(response.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                window.location = response.url;
+            }
+        });
+    });
+</script>

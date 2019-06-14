@@ -1,0 +1,157 @@
+{% extends "layout.html" %}
+{% set active_page = "styles" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Buttons</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td><button class="btn pri-btn-primary">Button 1</button></td>
+                        <td>Primary create buttons, modals (makes new database record)</td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn pri-btn-secondary">Button 2</button></td>
+                        <td>Secondary create button, in-page (revise, add part)</td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn pri-btn-alter">Button 3</button></td>
+                        <td>Alter / add info button (add component, document, reference)</td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn pri-btn-view">Button 4</button></td>
+                        <td>"View" button, displays information only, doesn't alter or create (view design list, builds)</td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn pri-btn-view-small">Button 5</button></td>
+                        <td>Small "View" button (change logs)</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Text</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td><span class="pri-header">Text 1</span></td>
+                        <td>Title information, most prominent</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pri-subheader">Text 2</span></td>
+                        <td>Little less prominent</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pri-text">Text 3</span></td>
+                        <td>General text</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pri-text-bold">Text 3 bold</span></td>
+                        <td>General text bold</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Labels</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td><label class="control-label pri-section-label" style="padding:5px;">Label 1</label></td>
+                        <td>Section header</td>
+                    </tr>
+                    <tr>
+                        <td><label class="control-label pri-subsection-label">Label 2</label></td>
+                        <td>Subsection header</td>
+                    </tr>
+                    <tr>
+                        <td><label class="control-label pri-field-label">Label 3</label></td>
+                        <td>Field label</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>Badges</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed">
+                    <tbody>
+                        <tr>
+                            <td width="30%"><div class="pri-badge vendor-design"><span>Vendor Part</span></div></td>
+                            <td>Vendor Part</td>
+                        </tr>
+                        <tr>
+                            <td><div class="pri-badge product"><span>Product</span></div></td>
+                            <td>Product</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>PRI Icons (use like class="pri-icons-add-circle" etc)</strong></h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-condensed">
+                    <tbody id="pri-icons-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        // all this is to populate PRI Icons from CSS files
+        var pri_icons = [];
+        $.each(document.styleSheets, function(sheetIndex, sheet) {
+            if (sheet.href && (sheet.href.includes('pri-icons') || sheet.href.includes('common'))) {
+                $.each(sheet.cssRules || sheet.rules, function(ruleIndex, rule) {
+                    if (rule.cssText && rule.cssText.includes('pri-icons-') && !rule.cssText.includes('pri-object-icon')) {
+                        var css_class = rule.selectorText.replace('.', '').replace('::before', '');
+                        if (! css_class.includes('[class^="pri-icons-"]')) {
+                            pri_icons.push(css_class);
+                        }
+                    }
+                });
+            }
+        });
+        html_to_append = '';
+        $.each(pri_icons, function(index, value) {
+            if (index % 2 == 0) {
+                html_to_append += '<tr>';
+            }
+            html_to_append += '<td width="5%"><span class="' + value + '" style="font-size: 60px;"></span></td>';
+            html_to_append += '<td>' + value + '</td>';
+            if (index % 2 == 1) {
+                html_to_append += '</tr>';
+            }
+        });
+        $('#pri-icons-table').append(html_to_append);
+    });
+</script>
+
+{% endblock %}

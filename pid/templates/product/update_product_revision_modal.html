@@ -1,0 +1,65 @@
+
+<div id="update_product_modal" style="width: 600px;">
+    <div class="alert alert-danger text-center"><strong>WARNING!</strong></div>
+    <p>You are about to change the Design description and criteria associated with this Product.</p>
+    <p>This will revert the record to IN WORK</p>
+    <p>This will potentially change the as-built component list if one exists; if component quantities of the new Design decrease, all selected Products will be removed from the as-built list and relevant Products will need to be re-selected.</p>
+    <form id="revise_product_modal_form" class="form-horizontal" method="POST" action="/product/revise" role="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="product_id" value="{{product.id}}"/>
+        <div class="form-group">
+            <label for="part" class="col-xs-4 control-label">Revise to:</label>
+            <div class="col-xs-4">
+                <div class="pri-select-wrapper">
+                    <select class="form-control" name="revision">
+                        {% for revision in revisions %}
+                        <option value="{{revision}}">{{revision}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-4"></div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-offset-2 col-xs-10">
+                <div class="checkbox">
+                <label><input type="checkbox" name="understood"> <i>I have read, understood and agree with the above statement</i></label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-12">
+                <button type="submit" class="btn pri-btn-primary" name="form_submit" disabled>UPDATE</button>
+            </div>
+            <div class="col-xs-4"></div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("input[name='understood']").change(understoodChanged);
+        function understoodChanged() {
+            if ($(this).is(':checked')) {
+                $("#revise_product_modal_form [name='form_submit']").removeAttr('disabled');
+            }
+            else {
+                $("#revise_product_modal_form [name='form_submit']").attr('disabled', 'disabled');
+            }
+        }
+        $('#revise_product_modal_form').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#update_product_modal', update_product_revision_modal);
+                return true;
+            },
+            error: function(response, statusText, xhr, $form) {
+                enableModal('#update_product_modal', update_product_revision_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#update_product_modal').replaceWith(response.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                window.location = response.url;
+            }
+        });
+    });
+</script>

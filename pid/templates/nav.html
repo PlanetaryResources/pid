@@ -1,0 +1,264 @@
+<nav class="navbar pri-navbar navbar-fixed-top" role="navigation">
+    <div class="container">
+        <!-- Can use class="navbar-link" in a tags for less bright links -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                {% if current_user and current_user.is_authenticated %}
+                <li><a class="navbar-brand" href="{{ url_for('backend.dashboard') }}"><div class="pri-icons-pr-logo pri-logo"></div></a></li>
+                <li><a class="navbar-brand" href="{{ url_for('backend.dashboard') }}"><div class="pri-a6-icon"></div></a></li>
+                <li {% if "dashboard" == active_page %} class="active"{% endif %}>
+                    <a href="{{ url_for('backend.dashboard') }}">{{ get_text('backend.dashboard') }}</a>
+                </li>
+                <li {% if "create" == active_page %} class="dropdown active" {% else %} class="dropdown" {% endif %}>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Create <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#" onclick="createDesignModal();">Design</a></li>
+                        <li><a href="#" onclick="createVendorPartModal();">Vendor Part</a></li>
+                        <li><a href="#" onclick="createProcedureModal();">Procedure</a></li>
+                        <li><a href="#" onclick="createAnomalyModal();">Anomaly</a></li>
+                        <li><a href="#" onclick="createECOModal();">ECO</a></li>
+                        <li><a href="#" onclick="createSpecificationModal();">Specification</a></li>
+                        <li><a href="#" onclick="createTaskModal();">Task</a></li>
+                    </ul>
+                </li>
+                <li{%if "advanced_search" == active_page%} class="active"{%endif%}><a href="{{ url_for('backend.advanced_search') }}">Advanced Search</a></li>
+                {% if current_user.is_admin() and config['ENV'] == 'dev' %}
+                <li{%if "styles" == active_page%} class="active"{%endif%}><a href="{{ url_for('backend.view_styles') }}">Styles</a></li>
+                {% endif %}
+                {% else %}
+                <li><a class="navbar-brand" href="{{ url_for('public.home') }}"><div class="pri-icons-pr-logo pri-logo"></div></a></li>
+                <li><a class="navbar-brand" href="{{ url_for('public.home') }}"><div class="pri-a6-icon"></div></a></li>
+                {% endif %}
+            </ul>
+            {% if current_user and current_user.is_authenticated %}
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <input type="hidden" id="temp_results_count">
+                    <form id="global-search" name="global-search" class="navbar-form form-search search-only">
+                        <div class="typeahead__container pri-typeahead">
+                            <div class="typeahead__field">
+                                <span class="typeahead__query">
+                                    <input id="global-search-input" class="js-typeahead-components" name="components[query]" type="search" placeholder="Quick Search" autocomplete="off">
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </li>
+                {% if current_user and current_user.is_authenticated and current_user.is_admin_or_superuser() %}
+                <li {% if "settings" == active_page %} class="dropdown active" {% else %} class="dropdown" {% endif %}>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-cog fa-lg" aria-hidden="true"></i>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        {% if current_user.is_admin() %}
+                        <li {% if "settings_admin" == active_sub_page %} class="active"{% endif %}>
+                            <a href="{{ url_for('admin.index') }}">Admin</a>
+                        </li>
+                        {% elif current_user.is_superuser() %}
+                        <li {% if "settings_superuser" == active_sub_page %} class="active"{% endif %}>
+                            <a href="{{ url_for('superuser.index') }}">Superuser</a>
+                        </li>
+                        {% endif %}
+                        <li {% if "settings_plaid" == active_sub_page %} class="active"{% endif %}>
+                            <a href="{{ url_for('backend.view_settings') }}">{{ get_text('backend.settings.href_title') }}</a>
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
+                <li {% if "user" == active_page %} class="dropdown active" {% else %} class="dropdown" {% endif %}>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-user fa-lg" aria-hidden="true"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">{{ current_user.get_name() }}</li>
+                        <li role="separator" class="divider"></li>
+                        <li><a class="navbar-link" href="{{ url_for('public.logout') }}">Log out</a></li>
+                    </ul>
+                </li>
+            </ul>
+            {% elif form %}
+            <form id="loginForm" method="POST" class="navbar-form form-inline navbar-right" action="/" role="login">
+                {{ form.csrf_token }}
+                <input type="hidden" name="next" value="{{ request.args.get('next')|sn }}" />
+                <div class="form-group">
+                    {{ form.username(placeholder="Username", class_="form-control", autofocus="autofocus") }} {{ form.password(placeholder="Password", class_="form-control") }}
+                </div>
+                <button type="submit" class="btn btn-default">Log in</button>
+            </form>
+            {% endif %}
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.typeahead({
+            input: '#global-search-input',
+            minLength: 3,
+            maxItem: 15,
+            order: 'asc',
+            href: '',
+            hint: true,  // Shows a hint while user is typing
+            dynamic: true,  // Queries backend for each input rather than just once
+            searchOnFocus: true,
+            display: ['number', 'name'],
+            correlativeTemplate: ['number', 'name'],
+            dropdownFilter: [{
+                key: 'object_type',
+                value: 'Anomaly',
+                template: 'Anomaly'
+            }, {
+                key: 'object_type',
+                value: 'As Run',
+                template: 'As Run'
+            }, {
+                key: 'object_type',
+                value: 'Design',
+                template: 'Design'
+            }, {
+                key: 'object_type',
+                value: 'ECO',
+                template: 'ECO'
+            }, {
+                key: 'object_type',
+                value: 'Procedure',
+                template: 'Procedure'
+            }, {
+                key: 'object_type',
+                value: 'Product',
+                template: 'Product'
+            }, {
+                key: 'object_type',
+                value: 'Specification',
+                template: 'Specification'
+            }, {
+                key: 'object_type',
+                value: 'Vendor Part',
+                template: 'Vendor Part'
+            }, {
+                key: 'object_type',
+                value: 'Vendor Product',
+                template: 'Vendor Product'
+            }],  // end dropdownfilter
+            template: function (query, item) {
+                var template = '<span class="typeahead-group">{[icon]}</span>';
+                template += '<span class="typeahead-number" title="{[number|raw]}">{[number]}</span>';
+                template += '<span class="typeahead-name" title="{[name|raw]}">{[name]}</span>';
+                if (typeof item.thumb_url != 'undefined' && item.thumb_url != null) {
+                    template += '<span class="typeahead-logo"><img class="img-rounded" src="{[thumb_url]}"></span>';
+                }
+                return template;
+            }, // end template
+            groupOrder: ['Design', 'Vendor Part', 'Anomaly', 'ECO', 'Procedure', 'Specification', 'Product', 'Vendor Product', 'As Run'],
+            source: {
+                'Anomaly': {
+                    ajax: {
+                        url: '/anomaly/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'As Run': {
+                    ajax: {
+                        url: '/asrun/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'Design': {
+                    ajax: {
+                        url: '/design/typeahead_search_designs',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'ECO': {
+                    ajax: {
+                        url: '/eco/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'Procedure': {
+                    ajax: {
+                        url: '/procedure/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'Product': {
+                    ajax: {
+                        url: '/product/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'Specification': {
+                    ajax: {
+                        url: '/specification/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+                'Vendor Part': {
+                    ajax: {
+                        url: '/vendorpart/typeahead_search_vendor_parts',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'vendor_parts'
+                    }
+                },
+                'Vendor Product': {
+                    ajax: {
+                        url: '/vendorproduct/typeahead_search',
+                        type: 'GET',
+                        data: { query: '{[query]}' },
+                        path: 'data'
+                    }
+                },
+            },  // end source
+            callback: {
+                onNavigateAfter: function (node, lis, a, item, query, event) {
+                    if (~[38,40].indexOf(event.keyCode)) {
+                        var resultList = node.closest("form").find("ul.typeahead__list"),
+                            activeLi = lis.filter("li.active"),
+                            offsetTop = activeLi[0] && activeLi[0].offsetTop - (resultList.height() / 2) || 0;
+                        resultList.scrollTop(offsetTop);
+                    }
+                },
+                onClickAfter: function (node, a, item, event) {
+                    event.preventDefault();
+                    window.location = item.url;
+                },
+                onResult: function (node, query, result, resultCount) {
+                    if (query === "") return;
+                    var text = "";
+                    if (result.length > 0 && result.length < resultCount) {
+                        text = "Showing <strong>" + result.length + "</strong> of <strong>" + resultCount + '</strong> elements matching "' + query + '"';
+                    } else if (result.length > 0) {
+                        text = 'Showing <strong>' + result.length + '</strong> elements matching "' + query + '"';
+                    } else {
+                        text = 'No results matching "' + query + '"';
+                    }
+                    $('#temp_results_count').val(text);
+                },
+                onLayoutBuiltBefore: function (node, query, result, resultHtmlList) {
+                    if (resultHtmlList) {
+                        return resultHtmlList.append('<li style="padding-left: 5px; padding-top: 3px; color: black;">'+$('#temp_results_count').val()+'</li>');
+                    }
+                }
+            }  // end typeahead callback
+        });  // end typeahead
+    }); // end doucment ready
+</script>
+{% endblock %}

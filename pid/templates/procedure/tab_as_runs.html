@@ -1,0 +1,60 @@
+<div class="row">
+    <div class="col-xs-12">
+        {% set as_runs = proc.find_all_as_runs() %}
+        <label class="pri-table-header">AS RUN INSTANCES</label>
+        {% if as_runs %}
+        <table class="table table-condensed table-hover pri-table">
+            <thead>
+                <tr>
+                    <th width="10%">Instance</th>
+                    <th width="10%">Doc Rev</th>
+                    <th width="50%">Products</th>
+                    <th width="20%">As-Run Description</th>
+                    <th width="20%">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for as_run in as_runs %}
+                <tr>
+                    <td><a href="{{ as_run.get_url() }}">{{pad_with_zeros(as_run.as_run_number|string, 3)}}</a></td>
+                    <td><a href="{{ as_run.procedure.get_url() }}">{{as_run.procedure.revision}}</a></td>
+                    <td>
+                        {% for product in as_run.products + as_run.vendor_products%}
+                        <a href="{{ product.get_url() }}">{{ product.product_number }}</a>
+                        {% endfor %}
+                    </td>
+                    <td><span class="pri-text">{{as_run.get_name()|sn}}</span></td>
+                    <td><span class="pri-text">{{as_run.state}}</span></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            {% if proc.can_user_edit('as_runs') %}
+            <tfoot>
+                <tr onclick="createAsRunModal({{proc.id}});">
+                    <td colspan="5">
+                        <span><i class="pri-app-icon sm pri-icons-create-asrun"></i>Create As-Run</span>
+                    </td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+        {% else %}
+        <table class="table table-condensed table-hover pri-table">
+            <tbody>
+                <tr class="no-procedures-added">
+                    <td><i>There are no as-run instances yet.</i></td>
+                </tr>
+            </tbody>
+            {% if proc.can_user_edit('as_runs') %}
+            <tfoot>
+                <tr onclick="createAsRunModal({{proc.id}});">
+                    <td>
+                        <span><i class="pri-app-icon sm pri-icons-create-asrun"></i>Create As-Run</span>
+                    </td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+        {% endif %}
+    </div>
+</div>

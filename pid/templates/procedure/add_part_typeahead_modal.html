@@ -1,0 +1,106 @@
+
+<div id="add_part_typeahead">
+    <div style="width: 600px;">
+        <var id="result-container-parts" class="result-container">Start typing to search</var>
+        <form id="form-add-parts" name="form-add-parts">
+            <div class="typeahead__container pri-typeahead add-part-procedure-typeahead">
+                <div class="typeahead__field">
+                    <span class="typeahead__query">
+                        <input id="search_parts_procedure" class="js-typeahead-components" name="components[query]" type="search" placeholder="Search" autocomplete="off">
+                    </span>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        setTimeout(function() { $('#search_parts_procedure').focus() }, 0);  // Focus on search field when open
+        $.typeahead({
+            input: '#search_parts_procedure',
+            minLength: 3,
+            maxItem: 15,
+            order: 'asc',
+            hint: true,  // Shows a hint while user is typing
+            dynamic: true,  // Queries backend for each input rather than just once
+            searchOnFocus: true,
+            addClass: "part-search-modal",
+            display: ['number', 'name'],
+            correlativeTemplate: ['number', 'name'],
+            matcher: function (item) {
+                let includedPartIds = {{parts | tojson}};
+                let includedVendorPartIds = {{vendor_parts|tojson}};
+                // Exclude already included parts
+                if (includedPartIds.indexOf(item.id.toString()) > -1 && item.table === 'designs') {
+                    return false;
+                } else if (includedVendorPartIds.indexOf(item.id.toString()) > -1 && item.table === 'vendor_parts') {
+                    return false
+                }
+                return true;
+            },
+            template: function (query, item) {
+                let template = '<span class="typeahead-group">{[icon]}</span>';
+                template += '<span class="typeahead-number" title="{[number|raw]}">{[number]}</span>';
+                template += '<span class="typeahead-name" title="{[name|raw]}">{[name]}</span>';
+                if (typeof item.thumb_url !== 'undefined' && item.thumb_url !== null) {
+                    template += '<span class="typeahead-logo"><img class="img-rounded" src="{[thumb_url]}"></span>';
+                }
+                return template;
+            },
+            source: {
+                'Part': {
+                    ajax: {
+                        url: '/part/typeahead_search_parts',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}",
+                            search_type: 'procedure'
+                        },
+                        path: 'parts'
+                    }
+                },
+                'Vendor Part': {
+                    ajax: {
+                        url: '/vendorpart/typeahead_search_vendor_parts',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}"
+                        },
+                        path: 'vendor_parts'
+                    }
+                }
+            },
+            callback: {
+                onNavigateAfter: function (node, lis, a, item, query, event) {
+                    if (~[38,40].indexOf(event.keyCode)) {
+                        let resultList = node.closest("form").find("ul.typeahead__list"),
+                            activeLi = lis.filter("li.active"),
+                            offsetTop = activeLi[0] && activeLi[0].offsetTop - (resultList.height() / 2) || 0;
+                        resultList.scrollTop(offsetTop);
+                    }
+                },
+                onClickAfter: function (node, a, item, event) {
+                    event.preventDefault();
+                    $.ajax({
+                        url: '/procedure/add_part',
+                        type: 'POST',
+                        data: {
+                           procedure_id: {{ procedure_id }},
+                           record_id: item.id,
+                           record_class: item.class
+                        },
+                        success: function(data) {
+                            // Append new part
+                            $('.no-parts-added').remove();
+                            let $procedurePartList = $('#procedure-part-list');
+                            $procedurePartList.parent().find('thead').show();
+                            $procedurePartList.append(data);
+                        }
+                    });
+                    add_part_to_procedure_modal.destroy();  // Close modal
+                }
+            } // end typeahead callback
+        }); // end typeahead
+    });
+</script>

@@ -1,0 +1,72 @@
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+
+{% if product_component.part %}
+<tr>
+    <td>
+        <a href="{{product_component.part.design.get_latest_revision_url()}}">{{ product_component.part.part_number }}</a>
+        <span class="pull-right">({{components|length}})</span>
+    </td>
+    <td>
+        <a href="{{product_component.product.get_url()}}">{{ product_component.product.serial_number }}</a>
+        <i id="toggle_for_collapsed_for_part_{{product_component.part.id}}" class="fa fa-caret-down fa-lg pull-right cursor-pointer" aria-hidden="true" data-toggle="tooltip" title="Toggle"></i>
+    </td>
+    <td>{{ product_component.part.get_name()|sn }}</td>
+    <td>{{ product_component.product.state|sn }}</td>
+</tr>
+<tr style="display:none;" id="collapsed_components_for_part_{{product_component.part.id}}">
+    <td></td>
+    <td>
+        {% for product_component in components %}
+            {{ render_ajax_select_field(field=product_component.product, parent_object=product_component, api_url="/product/component/update",
+                                        field_name='product', display_label=False, input_size='input-sm',
+                                        options=product_component.get_products_for_product_component(), option_name='serial_number',
+                                        option_id='id', allow_blank=True, blank_text='---',
+                                        populate_id='product_components') }}
+        {% endfor %}
+    </td>
+    <td></td>
+    <td></td>
+</tr>
+{% elif product_component.vendor_part %}
+<tr>
+    <td>
+        <a href="{{product_component.vendor_part.get_url()}}">{{ product_component.vendor_part.part_number }}</a>
+        <span class="pull-right">({{components|length}})</span>
+    </td>
+    <td>
+        <a href="{{product_component.vendor_product.get_url()}}">{{ product_component.vendor_product.serial_number }}</a>
+        <i id="toggle_for_collapsed_for_vendor_part_{{product_component.vendor_part.id}}" class="fa fa-caret-down fa-lg pull-right cursor-pointer" aria-hidden="true" data-toggle="tooltip" title="Toggle"></i>
+    </td>
+    <td>{{ product_component.vendor_part.get_name()|sn }}</td>
+    <td>{{ product_component.vendor_product.state|sn }}</td>
+</tr>
+<tr style="display:none;" id="collapsed_components_for_vendor_part_{{product_component.vendor_part.id}}">
+    <td></td>
+    <td>
+        {% for product_component in components %}
+            {{ render_ajax_select_field(field=product_component.vendor_product, parent_object=product_component, api_url="/product/component/update",
+                                        field_name='vendor_product', display_label=False, input_size='input-sm',
+                                        options=product_component.get_vendor_products_for_product_component(), option_name='serial_number',
+                                        option_id='id', allow_blank=True, blank_text='---',
+                                        populate_id='product_components') }}
+        {% endfor %}
+    </td>
+    <td></td>
+    <td></td>
+</tr>
+{% endif %}
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#toggle_for_collapsed_for_part_{{product_component.part.id}}").click(function () {
+            $("#collapsed_components_for_part_{{product_component.part.id}}").toggle();
+            $(this).toggleClass('fa-caret-down');
+            $(this).toggleClass('fa-caret-up');
+        });
+        $("#toggle_for_collapsed_for_vendor_part_{{product_component.vendor_part.id}}").click(function () {
+            $("#collapsed_components_for_vendor_part_{{product_component.vendor_part.id}}").toggle();
+            $(this).toggleClass('fa-caret-down');
+            $(this).toggleClass('fa-caret-up');
+        });
+    });
+</script>

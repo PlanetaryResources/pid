@@ -1,0 +1,29 @@
+<tr class="action-icons-row" id="eco-design-{{ design.id }}">
+    <td><a href="{{ design.get_url() }}">{{ design.design_number }}</a></td>
+    <td>
+        {% set rev_designs = design.find_all_revisions() %}
+        {% if rev_designs|length > 1 and eco.can_user_edit('designs') %}
+        <div class="pri-select-wrapper">
+            <select class="form-control input-sm" onchange="updateECODesign({{ eco.id }}, {{ design.id }}, this.value);">
+                {% for rev_design in design.find_all_revisions() %}
+                <option value="{{ rev_design.id }}"{% if rev_design.revision == design.revision %} selected{% endif %}>
+                    {{ rev_design.revision }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% else %}
+        {{ design.revision }}
+        {% endif %} {# end if rev_designs > 1 #}
+    </td>
+    <td>{{ design.name }}</td>
+    <td>
+        {% if eco.can_user_edit('designs') %}
+        <div class="action-icons text-right">
+            <span class="cursor-pointer" onclick="removeECODesign({{ eco.id }}, {{ design.id }})">
+                <i class="fa fa-trash-o fa-lg" aria-hidden="true"></i>
+            </span>
+        </div>
+        {% endif %}
+    </td>
+</tr>

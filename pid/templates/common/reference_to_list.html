@@ -1,0 +1,25 @@
+{% macro references_to(referencing_object) %}
+<label class="pri-table-header">References</label>
+<table class="table table-condensed table-hover pri-table">
+    <tbody class="pri-list rowlink" data-link="row" id="ref-to-list">
+        {% if referencing_object.references_to %}
+        {% for ref in referencing_object.references_to %}
+        {% include "common/reference_to_row.html" %}
+        {% endfor %}
+        {% else %}
+        <tr class="no-references-to">
+            <td colspan="4"><i>No references to anything.</i></td>
+        </tr>
+        {% endif %}
+    </tbody>
+    {% if referencing_object.can_user_edit('references') %}
+    <tfoot>
+        <tr onclick="addReferenceModal('{{ referencing_object.get_class_name() }}', {{ referencing_object.id }});">
+            <td colspan="4">
+                <span><i class="pri-app-icon sm fa fa-link" aria-hidden="true"></i>Add reference</span>
+            </td>
+        </tr>
+    </tfoot>
+    {% endif %}
+</table>
+{% endmacro %}

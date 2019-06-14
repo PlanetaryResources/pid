@@ -1,0 +1,21 @@
+
+{% from 'shared/document_list.html' import document_list with context %}
+{% from 'shared/link_list.html' import link_list with context %}
+{% from "shared/trumbowyg.html" import trumbowyg %}
+
+<div class="row">
+    <div class="col-xs-12">
+        {{ trumbowyg(field=vendor_part.notes, parent=vendor_part, api_url="/vendorpart/update",
+        field_name='notes', label='NOTES', placeholder="Additional design information for helpful reference or that's not covered in elsewhere in the record") }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {{ document_list(parent_object=vendor_part) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {{ link_list(parent_object=vendor_part) }}
+    </div>
+</div>

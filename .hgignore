@@ -1,0 +1,9 @@
+syntax: glob
+
+bin/
+include/
+lib/
+share/
+*.pyc
+*~
+*.swp

@@ -1,0 +1,77 @@
+{% from "product/as-built/as_built_list_component.html" import as_built_list_component %}
+{% extends "layout.html" %}
+{% block page_title %}{{ product.product_number }} - {{ product.part.design.name }}{% endblock %}
+
+{% block content %}
+<div id="view_product" style="margin-top: 20px;">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="row" style="margin-bottom: 20px;">
+                <div class="col-xs-2">
+                    <label class="control-label">PART NUMBER</label><br/>
+                    <span>{{product.part.part_number}}</span>
+                </div>
+                <div class="col-xs-2">
+                    <label class="control-label">S/N, LOT</label><br/>
+                    <span>{{product.serial_number}}</span>
+                </div>
+                <div class="col-xs-1">
+                    <label class="control-label">REV</label><br/>
+                    {{product.part.revision}}
+                </div>
+                <div class="col-xs-7">
+                    <label class="control-label">NAME/DESCRIPTION</label><br/>
+                    {{product.part.design.name}}
+                </div>
+            </div>
+            <table class="table table-condensed table-hover table-striped" id="as-built-list-{{product.id}}">
+                <thead>
+                    <tr>
+                        <th>NAME / DESCRIPTION</th>
+                        <th>PART NUMBER</th>
+                        <th>S/N, LOT</th>
+                        <th>MASS(g)</th>
+                        <th>H/W STATE</th>
+                        <th>REV</th>
+                        <th>LATEST REV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-tt-id="product-{{product.id}}">
+                    <td>{{product.part.design.name}}</td>
+                    <td>{{product.part.part_number}}</td>
+                    <td>
+                        <a href="{{product.get_url()}}">{{product.serial_number}}</a>
+                    </td>
+                    <td>{{'%0.2f'| format(product.measured_mass|float)}}</td>
+                    <td>{{product.part.design.state}}</td>
+                    <td>{{product.part.design.revision}}</td>
+                    <td>{{product.part.design.find_latest_revision()}}</td>
+                </tr>
+                {% for component in components + extra_components %}
+                {{as_built_list_component(component, component|length, 1, arrange_product_components, arrange_extra_product_components, 'product-' + product.id|string)}}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#as-built-list-{{product.id}}").treetable({
+            expandable: true,
+            initialState: 'expanded'
+        }).DataTable({
+            dom: '<"pull-right"B>',
+            paging: false,
+            ordering: false,
+            searching: false,
+            buttons: [
+                {extend: 'colvis', text: 'Show Columns', columns: ':gt(0)', className: 'pri-btn-secondary'},
+                {extend: 'csv', className: 'pri-btn-secondary'},
+                {extend: 'pdf', className: 'pri-btn-secondary'}
+            ]
+        });
+    });
+</script>
+{% endblock %}

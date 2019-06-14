@@ -1,0 +1,71 @@
+#
+# A dockerfile for running PLAID
+# Inspired by https://github.com/atbaker/sd-django/blob/master/Dockerfile
+#
+# BUILD DOCKER: docker build -t plaid .
+# OR: docker-compose up -d plaid
+# RUN DOCKER:   docker run -d --name plaid plaid
+
+# Use phusion/baseimage as base image. To make your builds reproducible, make
+# sure you lock down to a specific version, not to `latest`!
+# See https://github.com/phusion/baseimage-docker/blob/master/Changelog.md for
+# a list of version numbers.
+FROM phusion/baseimage:0.9.22
+MAINTAINER Jarle Hakas <jarle@planetaryresources.com>
+
+# Set environment variables
+ENV DEBIAN_FRONTEND noninteractive
+ENV LC_ALL C.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV TZ=America/Los_Angeles
+ENV PLAID_ENV prod
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
+
+# Add Python3.6 PPA and update the system fully
+RUN add-apt-repository -y ppa:jonathonf/python-3.6 && \
+    apt-get update && \
+    apt-get upgrade -y -o Dpkg::Options::="--force-confold"
+
+# Install required packages for PLAID
+RUN apt-get install -y python3.6 git && \
+    curl https://bootstrap.pypa.io/get-pip.py | python3.6 && \
+    pip install virtualenv
+
+# Check PLAID out from Stash and install required packages
+WORKDIR /app
+RUN git clone https://stash.planetaryresources.com/scm/tools/pid.git . && \
+    virtualenv /app/venv && \
+    /app/venv/bin/pip install -r requirements.txt
+
+# Create gunicorn and celery log files, make www-data owner of 'everything'
+RUN mkdir -p /var/log/plaid/plaid && \
+    touch /var/log/plaid/plaid/plaid.log && \
+    mkdir -p /var/log/plaid/gunicorn && \
+    touch /var/log/plaid/gunicorn/access.log && \
+    touch /var/log/plaid/gunicorn/error.log && \
+    mkdir -p /var/log/plaid/celery && \
+    touch /var/log/plaid/celery/worker.log && \
+    chown www-data /var/log/plaid/celery/worker.log && \
+    mkdir -p /app/uploads/images && \
+    mkdir -p /app/uploads/documents && \
+    chown -R www-data /app
+
+# Install Celery and Gunicorn runit service
+RUN mkdir /etc/service/celery && \
+    mkdir /etc/service/gunicorn
+ADD run_celery.sh /etc/service/celery/run
+ADD run_gunicorn.sh /etc/service/gunicorn/run
+RUN chmod +x /etc/service/celery/run && \
+    chmod +x /etc/service/gunicorn/run
+
+# Expose standard Flask/Gunicorn port which NGINX will access
+EXPOSE 5000
+
+# Clean up APT when done.
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Use baseimage-docker's init system.
+CMD ["/sbin/my_init"]

@@ -1,0 +1,137 @@
+
+<div id="search_product_components">
+    <div style="width: 600px;">
+        <form id="search_product_components_modal_form" class="form-horizontal" method="POST" action="/product/add_extra_product_component/" role="form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="part" class="col-xs-2 control-label">Part</label>
+                <div class="col-xs-10">
+                    <div class="typeahead__container pri-typeahead">
+                        <div class="typeahead__field">
+                            <span class="typeahead__query">
+                                <input id="search_parts" class="js-typeahead-components" name="components[query]" type="search" placeholder="Search" autocomplete="off" {%if part%}value="{{part.get_unique_identifier()}} {{part.get_name()}}"{%endif%}/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group{% if form.quantity.errors %} has-error{% endif %}">
+                <label for="quantity" class="col-xs-2 control-label">Quantity</label>
+                <div class="col-xs-3">
+                    {{ form.quantity(class_="form-control") }}
+                </div>
+                <div class="col-xs-7"></div>
+            </div>
+            {% if form.quantity.errors %}
+            <div class="form-group has-error" style="margin-top: -15px;">
+                <div class="col-xs-2"></div>
+                <div class="col-xs-10">
+                    <span class="help-block">{{ form.quantity.errors|join('<br>')|safe }}</span>
+                </div>
+            </div>
+            {% endif %}
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <button type="submit" class="btn pri-btn-primary" name="form_submit" disabled>Add Component</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        {% if part %}
+        initial_focus('#quantity');
+        $("#search_product_components_modal_form [name='quantity']").removeAttr('disabled');
+        $("#search_product_components_modal_form [name='form_submit']").removeAttr('disabled');
+        {% else %}
+        initial_focus('#search_parts');
+        $("#search_product_components_modal_form [name='quantity']").attr('disabled', 'disabled');
+        $("#search_product_components_modal_form [name='form_submit']").attr('disabled', 'disabled');
+        {% endif %}
+        $.typeahead({
+            input: '#search_parts',
+            minLength: 3,
+            maxItem: 15,
+            order: 'asc',
+            hint: true,  // Shows a hint while user is typing
+            dynamic: true,  // Queries backend for each input rather than just once
+            searchOnFocus: true,
+            display: ['number', 'name'],
+            correlativeTemplate: ['number', 'name'],
+            template: function (query, item) {
+                var template = '<span class="typeahead-group">{[icon]}</span>';
+                template += '<span class="typeahead-number" title="{[number|raw]}">{[number]}</span>';
+                template += '<span class="typeahead-name" title="{[name|raw]}">{[name]}</span>';
+                if (typeof item.thumb_url != 'undefined' && item.thumb_url != null) {
+                    template += '<span class="typeahead-logo"><img class="img-rounded" src="{[thumb_url]}"></span>';
+                }
+                return template;
+            }, // end template
+            source: {
+                'Part': {
+                    ajax: {
+                        url: '/part/typeahead_search_parts',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}",
+                            part_id: "{{product.part_id}}",
+                            search_type: 'product_component'
+                        },
+                        path: 'parts'
+                    }
+                },
+                'Vendor Part': {
+                    ajax: {
+                        url: '/vendorpart/typeahead_search_vendor_parts',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}"
+                        },
+                        path: 'vendor_parts'
+                    }
+                }
+            },
+            callback: {
+                onNavigateAfter: function (node, lis, a, item, query, event) {
+                    if (~[38,40].indexOf(event.keyCode)) {
+                        var resultList = node.closest("form").find("ul.typeahead__list"),
+                            activeLi = lis.filter("li.active"),
+                            offsetTop = activeLi[0] && activeLi[0].offsetTop - (resultList.height() / 2) || 0;
+                        resultList.scrollTop(offsetTop);
+                    }
+                },
+                onClickAfter: function (node, a, item, event) {
+                    $("#search_product_components_modal_form [name='part_id']").val(item.id);
+                    $("#search_product_components_modal_form [name='part_group']").val(item.group);
+                    $("#search_product_components_modal_form [name='quantity']").removeAttr('disabled');
+                    $("#search_product_components_modal_form [name='quantity']").focus()
+                    $("#search_product_components_modal_form [name='form_submit']").removeAttr('disabled');
+                },
+                onCancel (node, event) {
+                    $("#search_product_components_modal_form [name='quantity']").attr('disabled', 'disabled');
+                    $("#search_product_components_modal_form [name='quantity']").val('');
+                    $("#search_product_components_modal_form [name='form_submit']").attr('disabled', 'disabled');
+                }
+            } // end typeahead callback
+        }); // end typeahead
+        $('#search_product_components_modal_form').preventDoubleSubmission();
+        $('#search_product_components_modal_form').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#search_product_components', add_product_components_modal);
+                return true;
+            },
+            error: function(responseText, statusText, xhr, $form) {
+                enableModal('#search_product_components', add_product_components_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#search_product_components').replaceWith(responseText.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                // Have to reload page here since Typeahead gets messed up if reloading the HTML content dynamically
+                location.reload();
+            }
+        });
+    });
+</script>

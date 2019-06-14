@@ -1,0 +1,31 @@
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+
+{% set url = api_url + '/' + link.id|string %}
+{% set replace_id =  'link_{}_url'.format(link.id) %}
+
+<tr class="action-icons-row list-row" id="link-row-{{link.id}}">
+<td width="250px">
+    <input type="text" class="inline-link-input input-sm form-control" style="display: none;" id="url-link-{{link.id}}" value="{{link.url}}">
+    <span class="inline-link-display"><a href="{{link.url}}">{{link.url}}</a></span>
+    <input type="hidden" id="current-link-url-{{link.id}}" value="{{link.url|sn}}">
+</td>
+<td>
+    <input type="text" class="inline-link-input input-sm form-control" style="display: none;" id="description-link-{{link.id}}" value="{{link.description}}">
+    <span class="inline-link-display">{{link.description|sn}}</span>
+    <input type="hidden" id="current-link-description-{{link.id}}" value="{{link.description|sn}}">
+</td>
+<td width="100px">
+    {% if parent_object.can_user_edit('urls') %}
+    <div class="save-icon text-right" style="display: none;">
+        <div class="editable-buttons">
+            <button type="submit" class="btn btn-primary btn-sm editable-submit" onclick="saveURL({{link.id}}, '{{url}}');"><i class="glyphicon glyphicon-ok"></i></button>
+            <button type="button" class="btn btn-default btn-sm editable-cancel" onclick="cancelURL({{link.id}});"><i class="glyphicon glyphicon-remove"></i></button>
+        </div>
+    </div>
+    <div class="action-icons text-right">
+        <span class="cursor-pointer" onclick="editURL({{link.id}}, '{{url}}');"><i class="fa fa-lg fa-pencil" aria-hidden="true" style="padding-right:5px;"></i></span>
+        <span class="cursor-pointer" onclick="deleteURL(event, '{{url}}')"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></span>
+    </div>
+    {% endif %}
+</td>
+</tr>

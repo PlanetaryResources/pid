@@ -1,0 +1,60 @@
+
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+
+{% if part.components %}
+<div class="col-xs-6">
+</div>
+{% else %}
+<div class="col-xs-3">
+    {# Display dropdown for selecting material, if there are any. Otherwise show disabled dropdown #}
+    {% if materials %}
+    {{ render_ajax_select_field(
+                field=part.material, parent_object=part, api_url="/part/update", field_name='material', text_size='small', blank_text='--- Select Material ---',
+                label='MATERIAL', options=materials, option_id='id', option_name='name', input_size='input-sm', display_label=False, invisible_label=True,
+                populate_id='ajax_material_specification_'+part.id|string, allow_blank=True, non_edit_blank_text='<i>No Material Selected</i>') }}
+    {% else %} {# else if materials #}
+    <div class="pri-select-wrapper">
+        <label class="control-label invisible">N/A</label><br/>
+        <select class="form-control" disabled>
+            <option selected>No Materials Available</option>
+        </select>
+    </div>
+    {% endif %} {# end if materials #}
+</div>
+<div class="col-xs-3" id="ajax_material_specification_{{part.id}}">
+    {# Display dropdown for selecting material specification, if there is a material and if there are #}
+    {# material specifications to show. Otherwise show disabled dropdown #}
+    {% if part.can_user_edit('material') %}
+    {% if part.material %}
+    {% if part.material.specifications %}
+    {{ render_ajax_select_field(
+            field=part.material_specification, parent_object=part, api_url="/part/update", text_size='small', blank_text='--- Select Specification ---',
+            field_name='material_specification', label='MATERIAL SPECIFICATION', input_size='input-sm',  display_label=False, invisible_label=True,
+            options=part.material.specifications, option_id='id', option_name='name', allow_blank=True, non_edit_blank_text='<i>No Specification Selected</i>') }}
+    {% else %}
+    <div class="pri-select-wrapper">
+        <label class="control-label pri-field-label invisible">Material Specification</label><br/>
+        <select class="form-control input-sm" disabled>
+            <option selected>No Specifications Available</option>
+        </select>
+    </div>
+    {% endif %} {# end if part.material.specifications #}
+    {% else %}
+    <div class="pri-select-wrapper">
+        <label class="control-label pri-field-label invisible">Material Specification</label><br/>
+        <select class="form-control input-sm" disabled>
+            <option selected>Please Select Material First</option>
+        </select>
+    </div>
+    {% endif %} {# end if part.material #}
+    {% elif part.material_specification %}
+        {{ render_ajax_select_field(
+        field=part.material_specification, parent_object=part, api_url="/part/update", text_size='small', blank_text='--- Select Specification ---',
+        field_name='material_specification', label='MATERIAL SPECIFICATION', input_size='input-sm',  display_label=False, invisible_label=True,
+        options=part.material.specifications, option_id='id', option_name='name', allow_blank=True, non_edit_blank_text='<i>No Specification Selected</i>') }}
+    {% else %} {# else if part.can_user_edit #}
+    <label class="control-label pri-field-label invisible">Material Specification</label><br/>
+    <div class="input-sm"><i>No Specification Selected</i></div>
+    {% endif %}
+</div>
+{% endif %}

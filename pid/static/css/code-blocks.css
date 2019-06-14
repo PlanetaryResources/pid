@@ -1,0 +1,371 @@
+
+/* Shared Code Block styles */
+.pri-dropzone {
+    background: white;
+    border-radius: 5px;
+    position: relative;
+}
+
+.pri-dropzone.dragover {
+    border: 1px dashed;
+    opacity: 0.7;
+}
+
+.add-btn {
+    margin-left: 15px;
+}
+
+
+/* Image Gallery Code Block Styles */
+.image-gallery .glyhicon-trash {
+    cursor: pointer;
+}
+
+.image-gallery .image-wrapper {
+    height: 275px;
+    margin-bottom: 15px;
+}
+
+.image-gallery .image-row {
+    overflow-x: auto;
+}
+
+.image-gallery .images-container {
+    padding-top: 10px;
+    min-height: 50px;
+}
+
+.images-container.dragover {
+    border: 1px dashed;
+    opacity: 0.7;
+}
+
+.image-wrapper .form-inline {
+    width: 100%;
+}
+.image-wrapper .form-inline.editableform .editable-input, .control-group {
+    width: 100%;
+}
+
+.image-wrapper .editable-container {
+    width: 100%;
+}
+
+.image-item-container {
+    height: 150px;
+}
+
+.image-wrapper .editable-input textarea {
+    width: 100%;
+    height: 50px;
+    margin-bottom: 5px;
+    resize: none;
+}
+
+.image-wrapper .form-inline .editable-buttons {
+    width: 70px;
+    display: block;
+    margin: 0 auto;
+}
+
+.image-wrapper img {
+    height: auto;
+    width: auto;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    margin: 0 auto;
+}
+
+.image-wrapper .glyphicon-trash {
+    color: red;
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    z-index: 2;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.image-wrapper .image-filename {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding: 5px;
+    line-height: 12px;
+}
+
+.image-wrapper .image-description {
+    max-height: 36px;
+    overflow: hidden;
+    line-height:12px;
+    position: relative;
+    text-align: justify;
+    margin-right: 12px;
+    padding-right: 12px;
+}
+
+.image-wrapper .image-description:before {
+    content: '...';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.image-wrapper .image-description:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    background: white;
+}
+
+.image-wrapper .xeditable-inline {
+    height: 50px;
+    position: relative;
+    border: 1px solid #ddd;
+}
+
+.image-wrapper .xeditable-inline-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+}
+
+.image-wrapper .xeditable-inline-indicator .fa-pencil{
+    margin-top: 10px;
+    display: block;
+}
+
+.image-upload-actions {
+    position: relative;
+    height: 55px;
+}
+
+.image-upload-btn {
+    position: absolute;
+    right: 0;
+}
+
+
+/* Document List Code Block Styles */
+.document-list {
+    margin-top: 15px;
+}
+
+.doc-description .xeditable-inline:hover {
+    background-color: transparent;
+    border: none;
+}
+
+
+/* Link List Code Block Styles */
+.add-link-form {
+    padding: 15px;
+}
+
+.edit-link {
+    margin-right: 10px;
+}
+
+.goto-link {
+    margin-right: 10px;
+}
+
+/* Shared List styles */
+.list-row:hover .action-icon {
+    visibility: visible;
+}
+.list-row:hover {
+    background: #f5f5f5;
+}
+
+.list-row {
+    line-height: 16px;
+    border-bottom: 1px solid #ddd;
+    padding: 3px;
+}
+
+.list-row a {
+    cursor: pointer;
+    line-height: 20px;
+}
+
+.pri-list {
+    margin: 15px auto;
+    line-height: 20px;
+}
+.pri-list .header-row {
+    border-bottom: 1px solid #ddd;
+}
+
+.pri-list .action-icon {
+    cursor: pointer;
+    visibility: hidden;
+    line-height: 20px;
+}
+
+.pri-list .glyhicon {
+    cursor: pointer;
+}
+
+/* For in-line editors */
+.xeditable-text {
+    border:1px solid transparent;
+    padding: 0px 5px;
+}
+
+.xeditable-wysi {
+    min-height: 75px;
+    border: 1px solid #a9a9a9;
+    background-color: white;
+    padding: 10px;
+}
+
+.xeditable-inline {
+    position: relative;
+}
+
+.xeditable-inline:hover {
+    cursor: pointer;
+}
+
+.xeditable-inline:hover .xeditable-inline-indicator {
+    visibility: visible;
+}
+
+.xeditable-inline-indicator {
+    height: 100%;
+    padding: 5px 5px 5px 5px;
+    margin: -5px -5px -5px 0px;
+    width: 25px;
+    position: absolute;
+    right: 0;
+    z-index: 2;
+    visibility: hidden;
+}
+
+.xeditable-inline-indicator-wysi {
+    padding-top: 15px;
+    margin: 0;
+}
+
+.xeditable-inline-editor blockquote {
+    border: 0;
+    padding: 0 20px;
+    margin: 0;
+    font-size: 100%;
+}
+
+/* jBox Modal styles */
+.jBox-Confirm-footer {
+    height: 92px;
+    padding: 20px;
+    border-top: 1px solid #eee;
+}
+.jBox-Confirm-footer .jBox-Confirm-button-cancel {
+    display: none;
+}
+
+.jBox-Confirm-footer .jBox-Confirm-button-submit {
+    background-color: #3bafda;
+    color: white;
+    width: 100%;
+    border-radius: 4px;
+}
+
+.jBox-title {
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* wysigyg editor */
+.trumbowyg-box, .trumbowyg-editor, .trumbowyg-textarea {
+    min-height: 80px !important;
+}
+
+.trumbowyg-editor-indicator {
+    height: 100%;
+    padding: 5px 5px 5px 5px;
+    margin: -5px -5px -5px 0px;
+    width: 25px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    visibility: hidden;
+}
+
+.trumbowyg-box:hover .trumbowyg-editor-indicator {
+    visibility: visible;
+}
+
+.trumbowyg-editor[contenteditable=true]:empty:not(:focus)::before {
+    font-style: italic;
+}
+
+
+.dt-button-collection.dropdown-menu {
+    z-index: 999999;
+    background: #f9f9f9;
+    color: black;
+}
+
+.dt-button.buttons-columnVisibility a {
+    color: black;
+}
+
+.dt-button.buttons-columnVisibility a:focus {
+    color: inherit;
+    background: inherit;
+}
+.dt-button.buttons-columnVisibility.active a {
+    background: #7fd3ba;
+}
+
+.dt-button.buttons-columnVisibility.active a:before {
+    content: '\f00c';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    line-height: 20px;
+    left: 4px;
+    font-family: 'FontAwesome';
+}
+
+.branch.expanded .indenter a:after {
+    content: '\f056';
+    font-family: 'FontAwesome';
+    margin-right: 5px;
+    color: #226176;
+    position: relative;
+    left: -5px;
+}
+
+.branch.collapsed .indenter a:after {
+    content: '\f055';
+    font-family: 'FontAwesome';
+    margin-right: 5px;
+    color: #226176;
+    position: relative;
+    left: -5px;
+}
+
+.datepicker {
+    background-color: white;
+}
+
+.datepicker table {
+    background-color: white;
+}
+
+.input-group .input-group-addon {
+    background-color: #eee;
+}
+
+.input-group.date .glyphicon-calendar {
+    color: #2b879e;
+}

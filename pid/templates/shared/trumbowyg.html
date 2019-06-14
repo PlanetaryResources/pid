@@ -1,0 +1,93 @@
+
+{% macro trumbowyg(field, parent) %}
+
+{% set field_name = kwargs.pop('field_name', '')            %}  {# Name of field, sent to server for update #}
+{% set label = kwargs.pop('label', '')|title                %}  {# Label to display                         #}
+{% set api_url = kwargs.pop('api_url', '')                  %}  {# URL to call for update                   #}
+{% set placeholder = kwargs.pop('placeholder', '--')        %}  {# Placeholder text for the textarea        #}
+
+{# Create a unique id which is unique on entire page for easier reference #}
+{% set uid = field_name + '-' + parent.get_class_name() + '-' + parent.id|string + '-trumbowyg' %}
+
+<label class="control-label pri-field-label">{{label}}</label>
+<div id="{{uid}}" placeholder="{{placeholder}}" {% if not parent.can_user_edit(field_name) %}style="padding-bottom: 30px;"{%endif%}>{{field|default('', True)|safe}}</div>
+<button type="button" class="btn btn-primary pull-left trumbowyg-save" style="display: none;">Save</button>
+
+{% if parent.can_user_edit(field_name) %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        var original_content = '{{field|sn}}';
+        $('#{{uid}}').trumbowyg({
+            autogrow: true,
+            btnsDef: {
+                // Customizables dropdowns
+                image: {
+                    dropdown: ['base64'],
+                    ico: 'insertImage'
+                }
+            },
+            btns: [
+            //    ['viewHTML'],  // clicking triggers tbwblur, which "closes" the editor
+                ['undo', 'redo'],
+                ['formatting'],
+                'btnGrp-design',
+                ['superscript', 'subscript'],
+                ['link'],
+                ['image'],
+                'btnGrp-justify',
+                'btnGrp-lists',
+                ['foreColor', 'backColor'],
+                ['preformatted'],
+                ['horizontalRule'],
+                ['removeformat'],
+                ['cleanPaste'],
+                ['fullscreen']
+            ]
+        }).on('tbwinit', function(){
+            var parent = $('#{{uid}}').parent();
+            parent.find('.trumbowyg-button-pane').hide();
+            parent.append('<div class="trumbowyg-editor-indicator pull-right"><i class="fa fa-pencil" aria-hidden="true"></i></div>');
+            var trumbox_height = parent.height();
+            parent.find('.trumbowyg-editor-indicator').height(trumbox_height);
+            parent.find('.trumbowyg-editor-indicator').css({ 'padding-top' : trumbox_height/2.25 });  // 2.25 is more centered than 2 ¯\_(ツ)_/¯
+            parent.css('margin-top', 0); // Have to set the margin here for some reason ...
+        }).on('tbwfocus', function(){
+            var parent = $('#{{uid}}').parent();
+            parent.find('.trumbowyg-button-pane').show();
+            parent.parent().find('.trumbowyg-save').show();
+            parent.find('.trumbowyg-editor-indicator').hide();
+        }).on('tbwblur', function(){
+            // fired when user clicks outside dialog, save here, but also gets fired when user clicks 'view html code'
+            var new_content = $(this).trumbowyg('html');
+            if (original_content != new_content) {  // Change in content, fire off AJAX
+                $.ajax({
+                    url: '{{api_url}}',
+                    type: 'POST',
+                    data: {
+                        pk: '{{parent.id}}',
+                        name: '{{field_name}}',
+                        value: $(this).trumbowyg('html')
+                    },
+                    success: function(data) {
+                        highlight($('#{{uid}}'));
+                        original_content = new_content;
+                        $.notify('<strong>{{label}}</strong> updated');
+                    },
+                    error: function() {
+                        $.notify('<strong>{{label}}</strong> could not be updated', { type: 'danger' });
+                    }
+                }); // end ajax
+            } // end if
+            var parent = $('#{{uid}}').parent();
+            parent.find('.trumbowyg-button-pane').hide();
+            parent.parent().find('.trumbowyg-save').hide()
+            var trumbox_height = parent.height();
+            parent.find('.trumbowyg-editor-indicator').height(trumbox_height);
+            parent.find('.trumbowyg-editor-indicator').css({ 'padding-top' : trumbox_height/2.25 });
+            parent.find('.trumbowyg-editor-indicator').show();
+        }); // end trumbowyg
+    });
+</script>
+{% endif %}
+
+{% endmacro %}

@@ -1,0 +1,54 @@
+
+{% from 'common/reference_to_list.html' import references_to with context %}
+{% from 'common/reference_by_list.html' import references_by with context %}
+{% from 'shared/anomalies_list.html' import anomalies_list with context %}
+{% from 'shared/procedures_list.html' import procedures_list with context %}
+
+<div class="row">
+    <div class="col-xs-12">
+        {{ procedures_list(parent_object=design, prepopulate_id=design.parts[0].id) }}
+    </div>
+</div>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        {{ anomalies_list(parent_object=design) }}
+    </div>
+</div>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        <label class="pri-table-header">ECOs</label>
+        <table class="table table-condensed table-hover pri-table">
+            <tbody class="pri-list rowlink" data-link="row">
+                {% if design.ecos %}
+                {% for eco in design.ecos %}
+                <tr>
+                    <td width="150px"><a href="{{ eco.get_url() }}">{{ eco.key }}</a></td>
+                    <td>{{ eco.name|sn }}</td>
+                    <td width="100px">{{ eco.state|sn }}</td>
+                    <td width="100px" data-toggle="tooltip" title="Created At">{{ moment(eco.created_at).format('YYYY-MM-DD') }}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr class="no-ecos-added">
+                    <td colspan="4"><i>No ECOs for this {{ design.descriptor|lower }}.</i></td>
+                </tr>
+                {% endif %}
+            </tbody>
+            {% if design.can_user_edit('ecos') %}
+            <tfoot>
+                <tr onclick="addECOModal({{ design.id }});">
+                    <td colspan="4">
+                        <span><i class="pri-app-icon sm pri-icons-simple-eco"></i>Create ECO</span>
+                    </td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+<div class="row" style="padding-top:15px">
+    <div class="col-xs-12">
+        {{ references_to(referencing_object=design) }}
+        {{ references_by(referencing_object=design) }}
+    </div>
+</div>

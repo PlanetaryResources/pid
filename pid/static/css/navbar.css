@@ -1,0 +1,65 @@
+.pri-navbar {
+    background-color: #333e4c;
+    margin: 0px auto;
+    height: 55px;
+    color: #8d9baa;
+    font-size: 12px;
+}
+
+.pri-navbar .pri-logo {
+    color: #2b879e;
+    height: 40px;
+    width: 40px;
+    font-size: 40px;
+    margin-top: -8px;
+    margin-right: -10px;
+    position: relative;
+}
+
+.pri-navbar .pri-a6-icon {
+    height: 40px;
+    width: 40px;
+    margin-top: -8px;
+    margin-right: -15px;
+    background: url('../images/a6.png') no-repeat;
+    background-size: contain;
+}
+
+.navbar-brand:hover {
+    color: inherit !important;
+    background: inherit !important;
+}
+
+.pri-navbar .navbar-nav > li > a {
+    color: #8d9baa;
+    line-height: 25px;
+}
+
+.pri-navbar .navbar-nav > li i {
+    color: #8d9baa;
+}
+
+.pri-navbar .nav > li > a:hover, .pri-navbar .nav > li > a:focus {
+    background-color:  #1c2c38;
+    color: #FFFFFF;
+}
+
+.pri-navbar .nav > li > a:hover i, .pri-navbar .nav > li > a:focus i{
+    color: #26b99a;
+}
+
+.pri-navbar .navbar-nav > li > .dropdown-menu {
+    background-color: #1c2c38;
+}
+
+.pri-navbar .navbar-nav > li > .dropdown-menu > li {
+    background-color: #1c2c38;
+}
+
+.pri-navbar .active a {
+    background-color: #1c2c38;
+}
+
+.pri-navbar .dropdown-menu .active a:hover {
+    background-color: #333e4c;
+}

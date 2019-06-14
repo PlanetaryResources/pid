@@ -1,0 +1,34 @@
+<div>
+    {% if builds|length > 0 %}
+    <table class="table table-condensed table-hover pri-table">
+        <thead>
+            <tr>
+                <th>Build</th>
+                <th>S/N / LOT</th>
+                <th>Build Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for build in builds %}
+            <tr>
+                <td>
+                    {{ build.build_identifier }}
+                </td>
+                <td>
+                    {% for vendor_product in build.vendor_products %}
+                    <a href="{{ vendor_product.get_url() }}">
+                        {{ vendor_product.serial_number }}
+                    </a>
+                    <br>
+                    {% endfor %}
+                </td>
+                <td>{{ build.notes|sn|safe }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <i>No builds for this vendor part.</i>
+    {# TODO: Do this check before user clicks modal, so they can't even press button #}
+    {% endif %}
+</div>

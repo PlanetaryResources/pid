@@ -1,0 +1,10 @@
+One of your pending approvals has been reassigned:
+
+Record:          {{ record.get_unique_identifier() }} - {{ record.get_name() }}
+New Approver:    {{ approver.approver.get_name() }}
+{% if comment %}
+Comment:         {{ comment }}
+{% endif %}
+
+Record URL:
+{{ record.get_url(external=True) }}

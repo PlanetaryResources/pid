@@ -1,0 +1,20 @@
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+
+{% if material_specifications %}
+{{ render_ajax_select_field(field=vendor_part.material_specification, parent_object=vendor_part, api_url="/vendorpart/update", text_size='small',
+                        field_name='material_specification', label='MTRL SPEC', input_size='input-sm', blank_text='--- Select Specification ---',
+                        options=vendor_part.material.specifications, horizontal_labels=True, option_id='id', option_name='name', allow_blank=True) }}
+{% else %}
+<div class="row">
+    <div class="col-xs-3">
+        <label class="control-label pri-field-label small">MTRL SPEC</label>
+    </div>
+    <div class="col-xs-8">
+        <div class="pri-select-wrapper">
+            <select class="form-control input-sm" disabled>
+                <option selected>No Specifications</option>
+            </select>
+        </div>
+    </div>
+</div>
+{% endif %}

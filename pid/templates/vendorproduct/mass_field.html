@@ -1,0 +1,6 @@
+{% from "shared/ajax_input_float_field.html" import render_ajax_input_float_field %}
+
+<label class="control-label pri-field-label">Measured Mass</label><label class="control-label pri-field-label normal">&nbsp;(g)</label><br/>
+{{ render_ajax_input_float_field(field=vendor_product.measured_mass, parent_object=vendor_product,
+                 api_url="/vendorproduct/update", field_name='measured_mass',
+                 label='Measured Mass', display_label=False) }}

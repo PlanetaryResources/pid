@@ -1,0 +1,144 @@
+<div class="row" style="margin-top:10px;">
+    <label class="pri-table-header cursor-pointer" onclick="toggle_bookmarks('anomaly_bookmarks');">
+        ANOMALIES ({{bookmarks.anomaly|length}})
+        <i class="fa fa-caret-down fa-lg" aria-hidden="true" id="anomaly_bookmarks_toggle"></i>
+    </label><br>
+    <table class="table table-condensed table-hover pri-table" id="anomaly_bookmarks">
+        <tbody data-link="row" class="rowlink">
+            {% for bookmark in bookmarks.anomaly %}
+            <tr>
+                <td width="20%"><a href="{{bookmark.get_url()}}">{{bookmark.get_unique_identifier()}}</a></td>
+                <td width="70%">{{bookmark.get_name()}}</td>
+                <td width="10%">{{bookmark.get_state()}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <label class="pri-table-header cursor-pointer" onclick="toggle_bookmarks('asrun_bookmarks');">
+        AS-RUNS ({{bookmarks.asrun|length}})
+        <i class="fa fa-caret-down fa-lg" aria-hidden="true" id="asrun_bookmarks_toggle"></i>
+    </label><br>
+    <table class="table table-condensed table-hover pri-table" id="asrun_bookmarks">
+        <tbody data-link="row" class="rowlink">
+            {% for bookmark in bookmarks.asrun %}
+            <tr>
+                <td width="20%"><a href="{{bookmark.get_url()}}">{{bookmark.get_unique_identifier()}}</a></td>
+                <td width="70%">{{bookmark.get_name()}}</td>
+                <td width="10%">{{bookmark.get_state()}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <label class="pri-table-header cursor-pointer" onclick="toggle_bookmarks('design_bookmarks');">
+        DESIGNS ({{bookmarks.design|length}})
+        <i class="fa fa-caret-down fa-lg" aria-hidden="true" id="design_bookmarks_toggle"></i>
+    </label><br>
+    <table class="table table-condensed table-hover pri-table" id="design_bookmarks">
+        <tbody data-link="row" class="rowlink">
+            {% for bookmark in bookmarks.design %}
+            <tr>
+                <td width="20%"><a href="{{bookmark.get_url()}}">{{bookmark.get_unique_identifier()}}</a></td>
+                <td width="70%">{{bookmark.get_name()}}</td>
+                <td width="10%">{{bookmark.get_state()}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <label class="pri-table-header cursor-pointer" onclick="toggle_bookmarks('eco_bookmarks');">
+        ECOS ({{bookmarks.eco|length}})
+        <i class="fa fa-caret-down fa-lg" aria-hidden="true" id="eco_bookmarks_toggle"></i>
+    </label><br>
+    <table class="table table-condensed table-hover pri-table" id="eco_bookmarks">
+        <tbody data-link="row" class="rowlink">
+            {% for bookmark in bookmarks.eco %}
+            <tr>
+                <td width="20%"><a href="{{bookmark.get_url()}}">{{bookmark.get_unique_identifier()}}</a></td>
+                <td width="70%">{{bookmark.get_name()}}</td>
+                <td width="10%">{{bookmark.get_state()}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <label class="pri-table-header cursor-pointer" onclick="toggle_bookmarks('procedure_bookmarks');">
+        PROCEDURES ({{bookmarks.procedure|length}})
+        <i class="fa fa-caret-down fa-lg" aria-hidden="true" id="procedure_bookmarks_toggle"></i>
+    </label><br>
+    <table class="table table-condensed table-hover pri-table" id="procedure_bookmarks">
+        <tbody data-link="row" class="rowlink">
+            {% for bookmark in bookmarks.procedure %}
+            <tr>
+                <td width="20%"><a href="{{bookmark.get_url()}}">{{bookmark.get_unique_identifier()}}</a></td>
+                <td width="70%">{{bookmark.get_name()}}</td>
+                <td width="10%">{{bookmark.get_state()}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <label class="pri-table-header cursor-pointer" onclick="toggle_bookmarks('product_bookmarks');">
+        PRODUCTS ({{bookmarks.product|length}})
+        <i class="fa fa-caret-down fa-lg" aria-hidden="true" id="product_bookmarks_toggle"></i>
+    </label><br>
+    <table class="table table-condensed table-hover pri-table" id="product_bookmarks">
+        <tbody data-link="row" class="rowlink">
+            {% for bookmark in bookmarks.product %}
+            <tr>
+                <td width="20%"><a href="{{bookmark.get_url()}}">{{bookmark.get_unique_identifier()}}</a></td>
+                <td width="70%">{{bookmark.get_name()}}</td>
+                <td width="10%">{{bookmark.get_state()}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <label class="pri-table-header cursor-pointer" onclick="toggle_bookmarks('specification_bookmarks');">
+        SPECIFICATIONS ({{bookmarks.specification|length}})
+        <i class="fa fa-caret-down fa-lg" aria-hidden="true" id="specification_bookmarks_toggle"></i>
+    </label><br>
+    <table class="table table-condensed table-hover pri-table" id="specification_bookmarks">
+        <tbody data-link="row" class="rowlink">
+            {% for bookmark in bookmarks.specification %}
+            <tr>
+                <td width="20%"><a href="{{bookmark.get_url()}}">{{bookmark.get_unique_identifier()}}</a></td>
+                <td width="70%">{{bookmark.get_name()}}</td>
+                <td width="10%">{{bookmark.get_state()}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <label class="pri-table-header cursor-pointer" onclick="toggle_bookmarks('vendorpart_bookmarks');">
+        VENDOR PARTS ({{bookmarks.vendorpart|length}})
+        <i class="fa fa-caret-down fa-lg" aria-hidden="true" id="vendorpart_bookmarks_toggle"></i>
+    </label><br>
+    <table class="table table-condensed table-hover pri-table" id="vendorpart_bookmarks">
+        <tbody data-link="row" class="rowlink">
+            {% for bookmark in bookmarks.vendorpart %}
+            <tr>
+                <td width="20%"><a href="{{bookmark.get_url()}}">{{bookmark.get_unique_identifier()}}</a></td>
+                <td width="70%">{{bookmark.get_name()}}</td>
+                <td width="10%">{{bookmark.get_state()}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <label class="pri-table-header cursor-pointer" onclick="toggle_bookmarks('vendorproduct_bookmarks');">
+        VENDOR PRODUCTS ({{bookmarks.vendorproduct|length}})
+        <i class="fa fa-caret-down fa-lg" aria-hidden="true" id="vendorproduct_bookmarks_toggle"></i>
+    </label><br>
+    <table class="table table-condensed table-hover pri-table" id="vendorproduct_bookmarks">
+        <tbody data-link="row" class="rowlink">
+            {% for bookmark in bookmarks.vendorproduct %}
+            <tr>
+                <td width="20%"><a href="{{bookmark.get_url()}}">{{bookmark.get_unique_identifier()}}</a></td>
+                <td width="70%">{{bookmark.get_name()}}</td>
+                <td width="10%">{{bookmark.get_state()}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    function toggle_bookmarks(tablename) {
+        $('#'+tablename).toggle();
+        $('#'+tablename + '_toggle').toggleClass('fa-caret-down');
+        $('#'+tablename + '_toggle').toggleClass('fa-caret-up');
+    }
+</script>

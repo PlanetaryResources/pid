@@ -1,0 +1,30 @@
+<div>
+    <table class="table table-condensed table-hover pri-table">
+        <thead>
+            <tr>
+                <th>Build</th>
+                <th>S/N / LOT</th>
+                <th>Design Rev</th>
+                <th>Build Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    {{ build.build_identifier }}
+                </td>
+                <td>
+                    {% for product in build.products %}
+                    <a href="{{ product.get_url() }}">{{ product.serial_number }}</a>
+                    <br>
+                    {% endfor %}
+                </td>
+                <td>{{ build.part.design.revision }}</td>
+                <td>{{ build.notes|sn|safe }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-block btn-default pri-btn-secondary" onclick="view_build_modal.close(); createPartBuildModal({{ build.part_id }}, {{ build.id }});">
+        Create and Add New Product(s) to Build
+    </button>
+</div>

@@ -1,0 +1,69 @@
+{% macro as_built_list_component(component_list, quantity, indentLevel, arrange_product_components, arrange_extra_product_components, parentId) %}
+{% set padding = indentLevel * 20 %}
+{% set component = component_list[0] %}
+{% if component.part_id %}
+    {% set reference = component.get_product() %}
+    {% set reference_url = reference.get_url() if reference else None %}
+    {% set display_part_number = reference.part.part_number if reference else component.part.part_number %}
+    {% set serial_number = reference.serial_number if reference else None %}
+    {% set display_name = reference.part.design.name if reference else component.part.get_name() %}
+    {% set revision = reference.part.design.revision if reference else None %}
+    {% set revision_url = reference.part.get_url() if reference else None %}
+    {% set latest_revision = reference.part.design.find_latest_revision() if reference else None %}
+    {% set latest_revision_url = '/design/' + reference.part.design.design_number + '-' + latest_revision if reference else None %}
+    {% set state = reference.state if reference else None %}
+    {% set mass = reference.measured_mass if reference else None %}
+    {# Ensures components load references to part, design, and vendor_part #}
+    {% set children = arrange_product_components(reference) + arrange_extra_product_components(reference) if reference != None else [] %}
+{% elif component.vendor_part_id %}
+    {% set reference =component.get_product() %}
+    {% set reference_url = reference.get_url() if reference else None %}
+    {% set display_part_number = reference.vendor_part.part_number if reference else component.vendor_part.part_number %}
+    {% set serial_number = reference.serial_number if reference else None %}
+    {% set display_name = component.vendor_part.name %}
+    {% set mass = reference.measured_mass if reference else None %}
+    {% set state = reference.state if reference else None %}
+    {% set revision = None %}
+    {% set latest_revision = None %}
+    {% set children = [] %}
+{% endif %}
+<!-- Omit components without a selected serial number or lot -->
+    <tr data-tt-id="component-{{component.id}}" data-tt-parent-id="{{parentId}}" data-tt-branch="{{children|length > 0}}">
+        <td style="padding-left: {{padding}}px">{{display_name}}
+            {% if reference and reference.product_type != 'SN' %}
+            &nbsp;({{quantity}})
+            {% endif %}
+        </td>
+        <td>{{display_part_number|default('--', true)}}</td>
+        <td>
+            {% if reference %}
+            <a href="{{reference_url|default('#', true)}}">
+                {{serial_number}}
+            </a>
+            {% else %}
+                {{serial_number|default('--', true)}}
+            {% endif %}
+        </td>
+        <td>{{mass|default('--', true)}}</td>
+        <td>{{state|default('--', true)}}</td>
+        <td>
+            {% if revision != None %}
+            <a href="{{revision_url}}">{{revision}}</a>
+            {% else %}
+            {{revision|default('--', true)}}
+            {% endif %}
+        </td>
+        <td>
+            {% if latest_revision %}
+            <a href="{{latest_revision_url}}">{{latest_revision}}</a>
+            {% else %}
+            {{latest_revision|default('--', true)}}
+            {% endif %}
+        </td>
+    </tr>
+    {% if children | length > 0 %}
+        {% for child in children %}
+            {{as_built_list_component(child, child|length, indentLevel + 1, arrange_product_components, arrange_extra_product_components, 'component-' + component.id|string)}}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}

@@ -1,0 +1,153 @@
+
+{% macro render_ajax_select_field(field, parent_object) %}
+
+{% set field_name = kwargs.pop('field_name', '')                                    %}  {# Name of field, sent to server for update                 #}
+{% set label = kwargs.pop('label', field_name)|title                                %}  {# Label to display                                         #}
+{% set display_label = kwargs.pop('display_label', True)                            %}  {# Whether we should display label or not                   #}
+{% set invisible_label = kwargs.pop('invisible_label', False)                       %}  {# Whether we should have space for label                   #}
+{% set options = kwargs.pop('options', [])                                          %}  {# List of options for select list                          #}
+{% set option_id = kwargs.pop('option_id', '')                                      %}  {# ID of chosen option to send to server                    #}
+{% set option_name = kwargs.pop('option_name', '')                                  %}  {# Name to show for option                                  #}
+{% set api_url = kwargs.pop('api_url', '')                                          %}  {# URL to call for update                                   #}
+{% set populate_id = kwargs.pop('populate_id', '')                                  %}  {# HTML field ID to update after AJAX call                  #}
+{% set replace_id = kwargs.pop('replace_id', '')                                    %}  {# HTML field ID to replace after AJAX call                 #}
+{% set allow_blank = kwargs.pop('allow_blank', False)                               %}  {# Show a blank option                                      #}
+{% set blank_text = kwargs.pop('blank_text', 'Select option')                       %}  {# Text for blank option                                    #}
+{% set input_size = kwargs.pop('input_size', '')                                    %}  {# Set size of input                                        #}
+{% set text_size = kwargs.pop('text_size', '')                                      %}  {# Set size of text                                         #}
+{% set horizontal_labels = kwargs.pop('horizontal_labels', False)                   %}  {# Horizontal label or not                                  #}
+{% set label_container_class = kwargs.pop('label_container_class', 'col-xs-3')      %}  {# CSS class to add to label, usually a Bootstrap col size  #}
+{% set label_additional_css = kwargs.pop('label_additional_css', None)              %}  {# Additional CSS to apply to label                         #}
+{% set non_edit_additional_css = kwargs.pop('non_edit_additional_css', None)        %}  {# Additional CSS to apply when user can't edit             #}
+{% set non_edit_blank_text = kwargs.pop('non_edit_blank_text', 'Nothing selected')  %}  {# Text to use for blank option when user can't edit        #}
+{% set company_field = kwargs.pop('company_field', False)                           %}  {# If field is for Company object                           #}
+{% set ignore_permissions = kwargs.pop('ignore_permissions', False)                 %}  {# Ignore permissions for this field. Useful for relations  #}
+
+{% set primary_key = parent_object.id %}
+{% set parent_class = parent_object.get_class_name() %}
+
+{# Create a unique id which is unique on entire page for easier reference #}
+{% set uid = field_name + '-' + parent_class + '-' + primary_key|string + '-ajax' %}
+
+{% if horizontal_labels %}
+<div class="row">
+{% if display_label == True %}
+<div class="{{label_container_class}}" {% if label_additional_css %}style="{{label_additional_css}}"{% endif %}>
+  <label class="control-label pri-field-label {{text_size}}">{{label}}</label>
+</div>
+{% endif %}
+{% if parent_object.can_user_edit(field_name) or ignore_permissions %}
+<div class="{% if display_label %} col-xs-8 {% else %} col-xs-12 {% endif %}">
+  <div class="pri-select-wrapper">
+    <select class="form-control {{input_size}}" id="{{uid}}"{%if company_field%}data-company-select{%endif%}>
+        {% if allow_blank %}
+        <option value="None"{% if not field %} selected{% endif %}>{{ blank_text }}</option>
+        {% endif %}
+        {% for option in options %}
+        {% if company_field and loop.index0 == 2 %}
+        <option disabled>────────────────</option>
+        <option value="create-new-company">Create New Company</option>
+        <option disabled>────────────────</option>
+        {% endif %} {# end if company_field and loop.index #}
+        {% if option_id == 'id' %}
+        <option value="{{ option.id }}"{% if field == option %} selected{% endif %}>
+        {% else %} {# else if option_id #}
+        <option value="{{ option }}"{% if field == option %} selected{% endif %}>
+        {% endif %} {# end if option_id #}
+            {% if option_name == 'get_name()' %}
+            {{ option.get_name() }}
+            {% elif option_name != '' %}
+            {{ option[option_name] }}
+            {% else %}
+            {{ option }}
+            {% endif %}
+        </option>
+        {% endfor %}
+    </select>
+  </div>
+</div>
+{% else %}  {# else if parent_object.can_user_edit #}
+<div class="{% if display_label %} col-xs-8 {% else %} col-xs-12 {% endif %}">
+  <div class="{{input_size}}" {% if non_edit_additional_css %}style="{{non_edit_additional_css}}"{% endif %}>{{field|default(non_edit_blank_text, True)|safe}}</div>
+</div>
+{% endif %}  {# end if parent_object.can_user_edit #}
+</div>
+{% else %}  {# else if horizontal_labels #}
+{% if display_label == True %}
+<label class="control-label pri-field-label {{text_size}}">{{label}}</label>
+{% endif %}
+{% if invisible_label == True %}
+<label class="control-label pri-field-label {{text_size}} invisible">{{label}}</label>
+{% endif %}
+{% if parent_object.can_user_edit(field_name) or ignore_permissions %}
+<div class="pri-select-wrapper">
+<select class="form-control {{input_size}}" id="{{uid}}"{%if company_field%}data-company-select{%endif%}>
+    {% if allow_blank %}
+    <option value="None"{% if not field %} selected{% endif %}>{{ blank_text }}</option>
+    {% endif %}
+    {% for option in options %}
+    {% if company_field and loop.index0 == 2 %}
+    <option disabled>────────────────</option>
+    <option value="create-new-company">Create New Company</option>
+    <option disabled>────────────────</option>
+    {% endif %} {# end if company_field and loop.index #}
+    {% if option_id == 'id' %}
+    <option value="{{ option.id }}"{% if field == option %} selected{% endif %}>
+    {% else %}
+    <option value="{{ option }}"{% if field == option %} selected{% endif %}>
+    {% endif %}
+        {% if option_name == 'get_name()' %}
+        {{ option.get_name() }}
+        {% elif option_name != '' %}
+        {{ option[option_name] }}
+        {% else %}
+        {{ option }}
+        {% endif %}
+    </option>
+    {% endfor %}
+</select>
+</div>
+{% else %}  {# else if parent_object.can_user_edit #}
+<div class="{{input_size}}" {% if non_edit_additional_css %}style="{{non_edit_additional_css}}"{% endif %}>{{field|default(non_edit_blank_text, True)|safe}}</div>
+{% endif %}  {# end if parent_object.can_user_edit #}
+{% endif %}  {# end if horizontal_labels #}
+{% if parent_object.can_user_edit(field_name) or ignore_permissions %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#{{uid}}").change(function() {
+            if ($(this).val() === 'create-new-company') {
+                createCompanyModal();
+            }
+            else {
+                $.ajax({
+                    url: '{{api_url}}',
+                    type: 'POST',
+                    data: {
+                        pk: '{{ primary_key }}',
+                        name: '{{field_name}}',
+                        value: $(this).val()
+                    },
+                    success: function(data) {
+                        highlight($("#{{uid}}"));
+                        $.notify('<strong>{{label}}</strong> updated');
+                        {% if populate_id != '' %}
+                        $('#{{populate_id}}').html(data);
+                        {% endif %}
+                        {% if replace_id != '' %}
+                        $('#{{replace_id}}').replaceWith(data);
+                        {% endif %}
+                        {% if field_name == 'state' %} {# reload page if state changes, as permission change on many fields #}
+                        location.reload();
+                        {% endif %}
+                    },
+                    error: function() {
+                        $.notify('<strong>{{label}}</strong> could not be updated', { type: 'danger' });
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endif %}  {# end if parent_object.can_user_edit or ignore_permissions #}
+
+{% endmacro %}

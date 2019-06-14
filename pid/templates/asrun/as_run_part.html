@@ -1,0 +1,90 @@
+{% if part.design_id %}
+    {% set part_description = part.get_name() %}
+    {% set part_number = 'design-' + part.id|string %}
+    {% set part_type = 'design' %}
+    {% set revision = part.design.revision %}
+{% else %}
+    {% set part_description = part.get_name() %}
+    {% set part_number = 'vendorpart-' + part.id|string %}
+    {% set part_type = 'vendor' %}
+{% endif %}
+<table class="table table-condensed table-hover pri-table" style="overflow: auto;">
+    <tbody>
+        <tr>
+            <td width="10%"><span class="pri-field-label small">P/N</span></td>
+            <td width="20%">
+                <span><a href="{{ part.get_url() }}">{{ part.get_unique_identifier() }}</a></span>
+                {% if as_run %}
+                <span style="padding-left: 10px">{{revision|default('N/A', true)}}</span>
+                {% endif %}
+            </td>
+            <td width="70%">{{ part.get_name() }}</td>
+        </tr>
+        <tr>
+            <td width="10%"><span class="pri-field-label small">S/Ns / LOTs</span></td>
+            <td style="position: relative;">
+                {% if as_run and as_run.can_user_edit('products')%}
+                <button id="dLabel" class="btn pri-btn-secondary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add S/N</button>
+                <ul class="dropdown-menu pri-dropdown">
+                    <li><a href="#">--</a></li>
+                    {% for product in part.get_products_for_part() %}
+                    <li>
+                        <a href="#" onClick='addProductToAsRun("#as-run-part-{{part_number}}", "{{product.id}}", "{{product.serial_number}}", "{{part_type}}")'>
+                            {{part_description}} - {{product.serial_number}}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <button id="dLabel" class="btn pri-btn-secondary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add S/N</button>
+                <ul class="dropdown-menu pri-dropdown">
+                    <li><a href="#">--</a></li>
+                    {% for product in part.get_products_for_part() %}
+                    <li>
+                        <a href="#" onClick='addProductToAsRun("#as-run-part-{{part_number}}", "{{product.id}}", "{{product.serial_number}}", "{{part_type}}")'>
+                            {{part_description}} - {{product.serial_number}}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </td>
+            <td id="as-run-part-{{part_number}}">
+                {% if as_run %}
+                {% for product in as_run.products %}
+                    {% if part.id == product.part_id %}
+                    {% include 'asrun/as_run_product.html' %}
+                    {% endif %}
+                {% endfor %}
+                {% for product in as_run.vendor_products %}
+                    {% if part.id == product.vendor_part_id %}
+                    {% include 'asrun/as_run_product.html' %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table><br>
+<script type="text/javascript">
+    $(document).ready(function(){
+        var $productListField = $("#createAsRunForm [name='products']");
+        var $vendorProductListField = $("#createAsRunForm [name='vendor_products']");
+        createAsRunRemoveProduct = function (event) {
+            var $el = $(event.currentTarget).parents('.list-row');
+            var partData = $el.data();
+            if (partData.partType === 'designs') {
+                var currentProductList = $productListField.val().split(",");
+                var productIndex = currentProductList.indexOf(partData.partId);
+                currentProductList = currentProductList.splice(productIndex, 1);
+                $productListField.val(currentProductList.join(","));
+            } else {
+                var currentProductList = $vendorProductListField.val().split(",");
+                var productIndex = currentProductList.indexOf(partData.partId);
+                currentProductList = currentProductList.splice(productIndex, 1);
+                $vendorProductListField.val(currentProductList.join(","));
+            }
+            $el.remove();
+        };
+    });
+</script>

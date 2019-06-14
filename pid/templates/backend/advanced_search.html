@@ -1,0 +1,147 @@
+{% extends "layout.html" %}
+{% set active_page = "advanced_search" %}
+{% from "backend/create_advanced_search_results.html" import create_advanced_search_results %}
+{% block page_title %}{{ get_text('backend.search.title') }}{% endblock %}
+{% block content %}
+<div class="row advanced-search-container">
+    <div class="col-xs-12">
+        <div class="row search-forms">
+            <div class="col-xs-12">
+                <div class="row" style="padding-top:15px;">
+                    <div class="col-xs-2">
+                        <h4>Search By Type</h4>
+                        <div class="form-type-wrapper">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="searchFormType" {% if record_type == 'design' %} checked {% endif %} value="design" />
+                                    Design
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="searchFormType" value="vendor-part" {% if record_type == 'vendor-part' %} checked {% endif %}/>
+                                    Vendor Part
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="searchFormType" value="product" {% if record_type == 'product' %} checked {% endif %}/>
+                                    Product
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="searchFormType" value="vendor-product" {% if record_type == 'vendor-product' %} checked {% endif %}/>
+                                    Vendor Product
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="searchFormType" value="procedure" {% if record_type == 'procedure' %} checked {% endif %}/>
+                                    Procedure
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="searchFormType" value="anomaly" {% if record_type == 'anomaly' %} checked {% endif %}/>
+                                    Anomaly
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="searchFormType" value="eco" {% if record_type == 'eco' %} checked {% endif %} />
+                                    ECO
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="searchFormType" value="specification" {% if record_type == 'specification' %} checked {% endif %} />
+                                    Specification
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-10">
+                        {% include 'backend/advanced_design_search.html' %}
+                        {% include 'backend/advanced_vendor_part_search.html' %}
+                        {% include 'backend/advanced_product_search.html' %}
+                        {% include 'backend/advanced_vendor_product_search.html' %}
+                        {% include 'backend/advanced_procedure_search.html' %}
+                        {% include 'backend/advanced_anomaly_search.html' %}
+                        {% include 'backend/advanced_eco_search.html' %}
+                        {% include 'backend/advanced_specification_search.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <hr />
+            </div>
+        </div>
+        <div id="advanced_search_results">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h4>Results</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ create_advanced_search_results('design-search-results', column_names['design'], record_type == 'design') }}
+                    {{ create_advanced_search_results('vendor-part-search-results', column_names['vendor_part'], record_type == 'vendor-part') }}
+                    {{ create_advanced_search_results('product-search-results', column_names['product'], record_type == 'product') }}
+                    {{ create_advanced_search_results('vendor-product-search-results', column_names['vendor_product'], record_type == 'vendor-product') }}
+                    {{ create_advanced_search_results('procedure-search-results', column_names['procedure'], record_type == 'procedure') }}
+                    {{ create_advanced_search_results('specification-search-results', column_names['spec'], record_type == 'specification') }}
+                    {{ create_advanced_search_results('anomaly-search-results', column_names['anomaly'], record_type == 'anomaly') }}
+                    {{ create_advanced_search_results('eco-search-results', column_names['eco'], record_type == 'eco') }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <input id="advanced-search-clipboard" type="text" style="position:absolute;left:-2000px;" />
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var currentSearchFormType = '{{record_type}}';
+
+        // Handle search type changes
+        $('input[name=searchFormType]').on('change', function (e) {
+            var newSearchFormType = $(this).val();
+            var previousDomPrefix = '#' + currentSearchFormType;
+            var newDomPrefix = '#' + newSearchFormType;
+
+            // Hide previously visible form and it's search results
+            $(previousDomPrefix + '-search-form').addClass("hidden");
+            $(previousDomPrefix + '-search-results-wrapper').addClass("hidden");
+
+            // Show new form and it's search results
+            $(newDomPrefix + '-search-form').removeClass("hidden");
+            $(newDomPrefix + '-search-results-wrapper').removeClass("hidden");
+            currentSearchFormType = newSearchFormType;
+        });
+
+        // Clears state dropdowns when user selects "Open"
+        $('.clear-selections').on('click', function(e) {
+            e.preventDefault();
+            $(e.currentTarget).parents('.advanced-search-form').resetForm();
+        });
+
+        // Clear state dropdown when "Open" checkbox is selected
+        $('.advanced-search-form [name=in_open_state]').on('change', function (e) {
+            var value = $(e.currentTarget).is(':checked');
+            if (value === true ) {
+                $(e.currentTarget).parents('.advanced-search-form').find('[name=state]').val('');
+            }
+        });
+
+        // Clear "Open" checkbox when actual state is selected
+        $('.advanced-search-form [name=state]').on('change', function (e) {
+            var value = $(e.currentTarget).val();
+            if (value != "" ) {
+                $(e.currentTarget).parents('.advanced-search-form').find('[name=in_open_state]').prop('checked', false);
+            }
+        });
+    });
+</script>
+{% endblock %}

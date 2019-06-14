@@ -1,0 +1,118 @@
+<div id="create_design_modal" style="width: 500px;">
+    <form id="create_design_modal_form" class="form-horizontal" method="POST" action="/design/create" role="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {{ form.hidden_tag() }}
+        <div class="form-group{% if form.amount.errors %} has-error{% endif %}">
+            <label for="amount" class="col-xs-4 control-label">{{ form.amount.label }}</label>
+            <div class="col-xs-8">
+                {{ form.amount(class_="form-control") }}
+                {% if form.amount.errors %}
+                <span class="help-block">{{ form.amount.errors|join('<br>')|safe }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group{% if form.design_number_type.errors or form.design_number.errors %} has-error{% endif %}">
+            <label class="control-label col-xs-4">{{ form.design_number_type.label }}</label>
+            <div class="col-xs-offset-1 col-xs-5">
+                {% for subfield in form.design_number_type %}
+                <div class="radio">
+                    {{ subfield }}
+                    {{ subfield.label }}
+                </div>
+                {% endfor %}
+                {% if form.design_number.errors %}
+                {{ form.design_number(class_="form-control") }}
+                <span class="help-block">{{ form.design_number.errors|join('<br>')|safe }}</span>
+                {% else %}
+                {{ form.design_number(class_="form-control", placeholder="e.g. 1234567", disabled=True) }}
+                {% endif %}
+                {% if form.design_number_type.errors %}
+                <span class="help-block">{{ form.design_number_type.errors|join('<br>')|safe }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group{% if form.name.errors %} has-error{% endif %}">
+            <label for="amount" class="col-xs-4 control-label">{{ form.name.label }}</label>
+            <div class="col-xs-8">
+                {{ form.name(class_="form-control", placeholder="Descriptive name of component(s)") }}
+                {% if form.name.errors %}
+                <span class="help-block">{{ form.name.errors|join('<br>')|safe }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group{% if form.project.errors %} has-error{% endif %}">
+            <label for="amount" class="col-xs-4 control-label">{{ form.project.label }}</label>
+            <div class="col-xs-8">
+                {{ form.project(class_="form-control") }}
+                {% if form.project.errors %}
+                <span class="help-block">{{ form.project.errors|join('<br>')|safe }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group{% if form.revision.errors %} has-error{% endif %}">
+            <label for="amount" class="col-xs-4 control-label">{{ form.revision.label }}</label>
+            <div class="col-xs-8">
+                {{ form.revision(class_="form-control") }}
+                {% if form.revision.errors %}
+                <span class="help-block">{{ form.revision.errors|join('<br>')|safe }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="amount" class="col-xs-4 control-label">{{ form.owner.label }}</label>
+            <div class="col-xs-8">
+                {{ form.owner(class_="form-control") }}
+            </div>
+        </div>
+        <hr>
+        <div class="form-group">
+            <div class="col-xs-12">
+                <button type="submit" class="btn pri-btn-primary">Create Design</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        initial_focus('#name');
+        $("input[name='design_number_type']").change(radioValueChanged);
+        function radioValueChanged() {
+            radioValue = $(this).val();
+            let designNumberInput = $('#create_design_modal').find("input[name='design_number']");
+            if (radioValue === 'range') {
+                designNumberInput.removeAttr('disabled');
+                designNumberInput.focus();
+            }
+            else {
+                designNumberInput.attr('disabled', 'disabled');
+                designNumberInput.val('');
+            }
+        }
+        $('#create_design_modal_form').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#create_design_modal', create_design_modal);
+                return true;
+            },
+            error: function(responseText, statusText, xhr, $form) {
+                enableModal('#create_design_modal', create_design_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#create_design_modal').replaceWith(responseText.responseText);
+            },
+            success: function(responseText, statusText, xhr, $form) {
+                const amount = parseInt($form[0].amount.value);
+                if (amount === 1) {
+                    // Redirect to show the newly created design
+                    const design = responseText.designs[0];
+                    window.location = design.url;
+                }
+                else if (amount > 1) {
+                    // Close and show modal with all newly created designs
+                    enableModal('#create_design_modal', create_design_modal);
+                    create_design_modal.close();
+                    multipleDesignsCreatedModal(responseText.designs);
+                }
+            }
+        });
+    });
+</script>

@@ -1,0 +1,40 @@
+<div id="workflow_comment_modal">
+    <form class="form-horizontal" method="POST" action="/{{ parent_class }}/update_state" id="workflow_comment_modal_form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="parent_id" value="{{ parent_id }}"/>
+        <input type="hidden" name="state" value="{{ state }}"/>
+        <input type="hidden" name="transition" value="{{ transition }}"/>
+        <div class="form-group">
+            <label for="comment" class="col-xs-2 control-label">Comment</label>
+            <div class="col-xs-10">
+                <textarea class="form-control" id="workflow_comment" name="comment"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-12">
+                <button type="submit" class="btn pri-btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        initial_focus('#workflow_comment');
+        $('#workflow_comment_modal_form').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#workflow_comment_modal', workflow_comment_modal);
+                return true;
+            },
+            error: function(responseText, statusText, xhr, $form) {
+                enableModal('#workflow_comment_modal', workflow_comment_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#workflow_comment_modal').replaceWith(responseText.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                // Open page for new revision
+                location.reload();
+            }
+        });
+    });
+</script>

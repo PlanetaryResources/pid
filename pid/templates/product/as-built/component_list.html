@@ -1,0 +1,83 @@
+
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        <label class="pri-table-header">COMPONENTS</label><br/>
+        {% if product.components %}
+        <table class="table table-condensed table-hover pri-table">
+            <thead>
+                <tr>
+                    <th width="20%">Part Number</th>
+                    <th width="15%">S/N / LOT</th>
+                    <th width="50%">Description</th>
+                    <th width="15%">H/W State</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for components in components_array %}
+                    {% if components|length > 1 %}
+                        {% set product_component = components[0] %}
+                        {% if product_component.product or product_component.vendor_product %}
+                            {% include "product/as-built/multiple_assigned_components.html" %}
+                        {% else %}
+                            {% include "product/as-built/multiple_unassigned_components.html" %}
+                        {% endif %}
+                    {% else %}
+                        {% set product_component = components[0] %}
+                        {% include "product/as-built/single_component_row.html" %}
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <i class="small">There are no components for this product.</i><br><br>
+        {% endif %}
+    </div>
+</div>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        <label class="pri-table-header">EXTRA COMPONENTS</label><br/>
+        <table class="table table-condensed table-hover pri-table">
+            {% if product.extra_components %}
+            <thead>
+                <tr>
+                    <th width="20%">Part Number</th>
+                    <th width="15%">S/N / LOT</th>
+                    <th width="50%">Description</th>
+                    <th width="10%">H/W State</th>
+                    <th width="5%"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for components in extra_components_array %}
+                    {% if components|length > 1 %}
+                        {% set product_component = components[0] %}
+                        {% if product_component.product or product_component.vendor_product %}
+                            {% include "product/as-built/multiple_assigned_extra_components.html" %}
+                        {% else %}
+                            {% include "product/as-built/multiple_unassigned_extra_components.html" %}
+                        {% endif %}
+                    {% else %}
+                        {% set product_component = components[0] %}
+                        {% include "product/as-built/single_extra_component_row.html" %}
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+            {% else %}
+            <tbody>
+                <tr class="no-extra-components">
+                    <td colspan="5"><i>There are no extra components for this product.</i></td>
+                </tr>
+            </tbody>
+            {% endif %}
+            {% if product.can_user_edit('components') %}
+            <tfoot>
+                <tr onclick="addProductComponentModal({{product.id}});">
+                    <td colspan="5">
+                        <span><i class="pri-app-icon sm pri-icons-add"></i>ADD COMPONENT NOT INCLUDED IN DESIGN</span>
+                    </td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>

@@ -1,0 +1,3 @@
+{% macro view_changelog_button(parent_object) %}
+<i class="pri-app-icon edit pri-icons-view_changelog" data-change-log-class="{{parent_object.get_class_name()}}" data-change-log-id="{{parent_object.id}}" onclick="viewChangeLogModal(this);" data-toggle="tooltip" title="View Change Log"></i>
+{% endmacro %}

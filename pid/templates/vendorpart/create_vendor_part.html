@@ -1,0 +1,78 @@
+
+<div id="create_vendor_part_modal">
+    <div class="row">
+        <form id="createVendorPartForm" class="form-horizontal" method="POST" action="/vendorpart/create" role="form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group {% if form.part_number.errors %} has-error{% endif %}">
+                <label class="col-xs-4 control-label" for="part_number">Part Number</label>
+                <div class="col-xs-7">
+                    {{ form.part_number(placeholder="e.g. NHD-3.5-320240-ATXL#-1", class_="form-control") }}
+                    {% if form.part_number.errors %}
+                    <span class="help-block">{{ form.part_number.errors|join(', ') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-group {% if form.name.errors %} has-error{% endif %}">
+                <label class="col-xs-4 control-label" for="name">Name / Description</label>
+                <div class="col-xs-7">
+                    {{ form.name(placeholder="Descriptive name of component", class_="form-control") }}
+                    {% if form.name.errors %}
+                    <span class="help-block">{{ form.name.errors|join(', ') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-group {% if form.vendor.errors %} has-error{% endif %}">
+                <label class="col-xs-4 control-label" for="vendor">Vendor</label>
+                <div class="col-xs-7">
+                    {{ form.vendor(class_="form-control") }}
+                    {% if form.vendor.errors %}
+                    <span class="help-block">{{ form.vendor.errors|join(', ') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-group {% if form.project.errors %} has-error{% endif %}">
+                <label class="col-xs-4 control-label" for="project">Project</label>
+                <div class="col-xs-7">
+                    {{ form.project(class_="form-control") }}
+                    {% if form.project.errors %}
+                    <span class="help-block">{{ form.project.errors|join(', ') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-group {% if form.owner.errors %} has-error{% endif %}">
+                <label class="col-xs-4 control-label" for="owner">Owner</label>
+                <div class="col-xs-7">
+                    {{ form.owner(class_="form-control") }}
+                    {% if form.owner.errors %}
+                    <span class="help-block">{{ form.name.errors|join(', ') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
+            <div class="form-group">
+                <div class="col-xs-offset-1 col-xs-10">
+                    <button type="submit" class="btn pri-btn-primary">Create Vendor Part</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        initial_focus('#part_number');
+        $('#createVendorPartForm').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#create_vendor_part_modal', create_vendor_part_modal);
+                return true;
+            },
+            error: function(response, statusText, xhr, $form) {
+                enableModal('#create_vendor_part_modal', create_vendor_part_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#create_vendor_part_modal').replaceWith(response.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                window.location = response.url;
+            }
+        });
+    });
+</script>

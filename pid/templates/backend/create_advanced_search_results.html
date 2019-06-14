@@ -1,0 +1,17 @@
+{% macro create_advanced_search_results(id, column_names, visible=False) %}
+<div class="row {% if visible == False %} hidden {% endif %}" id="{{id}}-wrapper">
+    <div class="col-xs-12">
+        <table class="table table-condensed table-striped table-hover advanced-search-results-table" id="{{id}}">
+            <thead>
+                <tr>
+                    {% for name in column_names %}
+                        <th>{{name}}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody data-link="row" class="pri-list rowlink">
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endmacro %}

@@ -1,0 +1,11 @@
+{% if product.vendor_part %}
+    {% set part_type = 'vendor' %}
+{% else %}
+    {% set part_type = 'design' %}
+{% endif %}
+<div data-product-id="{{product.id}}" data-part-type="{{part_type}}" class="as-run-product">
+    {% if as_run and as_run.can_user_edit('products')%}
+    <span class="glyphicon glyphicon-trash action-icon delete-product" onclick="viewAsRunRemoveProduct(event)" aria-hidden="true"></span>
+    {% endif %}
+    <a href="{{ product.get_url() }}">{{ product.serial_number }}</a>
+</div>

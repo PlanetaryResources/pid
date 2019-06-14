@@ -1,0 +1,143 @@
+{% extends "layout.html" %}
+
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+{% from "shared/bookmark.html" import bookmark %}
+{% from "shared/creation_fields.html" import creation_fields %}
+{% from 'shared/thumbnail.html' import thumbnail %}
+{% from "shared/view_changelog_button.html" import view_changelog_button %}
+{% from "shared/view_revisionlog_button.html" import view_revisionlog_button %}
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+{% from 'shared/workflow.html' import workflow with context %}
+
+{% block page_title %}{{ design.design_number }}-{{ design.revision }} - {{ design.name }}{% endblock %}
+
+{% block content %}
+<div id="view_design">
+    <div class="row sticky-header-row">
+        <div class="col-xs-1">
+            <div class="pri-record-icon-wrapper">
+              <i class="pri-record-icon pri-icons-record-design" aria-hidden="true"></i>
+            </div>
+        </div>
+        <div class="col-xs-11">
+            <div class="row">
+                <div class="col-xs-3">
+                    <span class="pri-header">{{ design.design_number }} - </span>
+                    <div class="pri-header-select revision">
+                        <select class="form-control input-sm" onchange="window.location.href='/design/{{design.design_number}}-'+this.value+window.location.hash">
+                            {% for revision in revisions %}
+                            <option value="{{ revision.revision }}"{% if revision.revision == design.revision %} selected{% endif %}>
+                                {{ revision.revision }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-xs-7">
+                    {{ render_xeditable_text_field(field=design.name, parent_object=design, api_url="/design/update", non_edit_additional_css="margin-top: 20px;",
+                    field_name='name', label='NAME / DESCRIPTION', input_class="pri-subheader", display_label=False) }}
+                </div>
+                <div class="col-xs-2">
+                    <div id="workflow_container">
+                        {{ workflow(record=design) }}
+                    </div>
+                    {{ bookmark(parent_object=design, current_user=current_user) }}
+                </div>
+            </div>
+        </div>
+    </div>  {# End row, sticky-header #}
+    <div class="row header-info">
+        <div class="col-xs-2" id="thumbnail_parent">
+            {{ thumbnail(record=design) }}
+        </div>
+        <div class="col-xs-10">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ render_xeditable_text_field(field=design.summary, parent_object=design, api_url="/design/update", non_edit_additional_css="margin-top: 10px;",
+                    field_name='summary', horizontal_labels=True, label='SUMMARY', placeholder='Additional descriptive text; "hex recess | high-temp version of… | can be made from…"') }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    {{ render_ajax_select_field(field=design.project, parent_object=design, api_url="/design/update", non_edit_additional_css="margin-top: 6px; margin-left: -15px;",
+                                      field_name='project', label='PROJECT', options=projects, label_container_class='col-xs-2', label_additional_css="margin-right: 10px;",
+                                      option_id='id', horizontal_labels=True, option_name='name', input_size='input-sm') }}
+                </div>
+                <div class="col-xs-6 minus-one-column">
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <label class="control-label pri-field-label">CREATE</label>
+                        </div>
+                        <div class="col-xs-10">
+                            {% if design.can_user_edit('revision') %}
+                            <i class="pri-app-icon create pri-icons-reports-add-log" onclick="reviseDesignModal({{design.id}});" data-toggle="tooltip" title="Create New Revision"></i>
+                            {% else %}
+                            <i class="pri-app-icon create pri-icons-reports-add-log disabled" data-toggle="tooltip" title="Can only revise after design is released"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    {{ render_ajax_select_field(field=design.owner, parent_object=design, api_url="/design/update", non_edit_additional_css="margin-top: 6px; margin-left: -15px;",
+                                    field_name='owner', label='OWNER', options=users, horizontal_labels=True, label_container_class='col-xs-2', label_additional_css="margin-right: 10px;",
+                                    option_id='id', option_name='get_name()', input_size='input-sm') }}
+                </div>
+                <div class="col-xs-6 minus-one-column">
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <label class="control-label pri-field-label ">VIEW</label>
+                        </div>
+                        <div class="col-xs-10">
+                            {{ view_revisionlog_button(parent_object=design) }}
+                            {{ view_changelog_button(parent_object=design) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>  {# End col-xs-10 #}
+    </div>  {# End row , design information #}
+    <div class="row" style="padding-top: 15px;">
+        <div class="panel">
+            <ul class="nav nav-tabs nav-justified">
+                <li class="active"><a data-toggle="tab" href="#design">DESIGN</a></li>
+                <li><a data-toggle="tab" href="#parts">PARTS</a></li>
+                <li><a data-toggle="tab" href="#links">LINKS</a></li>
+                <li><a data-toggle="tab" href="#approvals">APPROVALS</a></li>
+                <li><a data-toggle="tab" href="#images">IMAGES</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="design" class="tab-pane active">
+                    {% include "design/tab_design.html" %}
+                </div>
+                <div id="parts" class="tab-pane">
+                    {% include "design/tab_parts.html" %}
+                </div>
+                <div id="links" class="tab-pane">
+                    {% include "design/tab_links.html" %}
+                </div>
+                <div id="approvals" class="tab-pane">
+                    {% include "design/tab_approvals.html" %}
+                </div>
+                <div id="images" class="tab-pane">
+                    {% include "design/tab_images.html" %}
+                </div>
+            </div>  {# End tab-content #}
+        </div>  {# End panel #}
+    </div>  {# End row, tabs #}
+    <div class="row">
+        <div class="col-xs-12">
+            {{ creation_fields(parent_object=design, moment=moment) }}
+        </div>
+    </div>  {# End row, creation information #}
+</div>  {# End container #}
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.sticky-header-row').sticky({topSpacing: $('.navbar').height(), zIndex: 4, getWidthFrom: '#view_design .panel'});
+    });
+</script>
+{% endblock %}

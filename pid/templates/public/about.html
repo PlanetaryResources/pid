@@ -1,0 +1,37 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="body-content">
+	<div class="row">
+		<div class="col-md-6">
+			<h2>{{ get_text('public.about.title') }}</h2>
+			<p>This app uses the following frameworks:</p>
+			<ul>
+				<li>
+					<a href="http://flask.pocoo.org/" target="new">Flask 0.11.1</a>, with the following (major) extensions:
+					<ul>
+						<li><a href="http://flask-sqlalchemy.pocoo.org/2.1/" target="new">Flask-SQLAlchemy 2.1</a></li>
+						<li><a href="https://flask-wtf.readthedocs.io/en/latest/" target="new">Flask-WTF 0.12</a></li>
+						<li><a href="https://flask-assets.readthedocs.io/en/latest/" target="new">Flask-Assets 0.12</a></li>
+						<li><a href="https://flask-login.readthedocs.io/en/latest/" target="new">Flask-Login 0.3.2</a></li>
+						<li><a href="https://pythonhosted.org/Flask-Caching/" target="new">Flask-Caching 1.0.1</a></li>
+						<li><a href="https://flask-admin.readthedocs.io/en/latest/" target="new">Flask-Admin 1.4.2</a></li>
+						<li><a href="https://flask-restful-cn.readthedocs.io/en/0.3.5/" target="new">Flask-RESTful 0.3.5</a></li>
+						<li><a href="https://flask-ldap3-login.readthedocs.io/en/latest/" target="new">Flask-LDAP3-Login 0.9.10</a></li>
+					</ul>
+				</li>
+				<li>
+					<a href="http://bootstrapdocs.com/v3.3.0/docs/getting-started/" target="new">Bootstrap 3.3.0</a>
+					extended by <a href="https://bootflat.github.io/documentation.html" target="new">Bootflat 2.0.4</a></li>
+				<li><a href="http://fontawesome.io/" target="new">Font Awesome 4.6.3</a></li>
+				<li><a href="https://jquery.com/" target="new">jQuery 3.1.0</a></li>
+			</ul>
+		</div>
+		<div class="col-md-6">
+			<img src="{{ url_for('static', filename = 'images/A112x600.png') }}" width="400" style="margin-top:50px"/>
+		</div>
+	</div>
+</div>
+{% endblock %}
+

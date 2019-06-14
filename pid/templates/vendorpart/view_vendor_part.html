@@ -1,0 +1,229 @@
+{% extends "layout.html" %}
+
+{% from "shared/ajax_input_float_field.html" import render_ajax_input_float_field %}
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+{% from "shared/bookmark.html" import bookmark %}
+{% from "shared/creation_fields.html" import creation_fields %}
+{% from 'shared/thumbnail.html' import thumbnail %}
+{% from "shared/view_changelog_button.html" import view_changelog_button %}
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+{% from 'shared/workflow.html' import workflow with context %}
+
+{% block page_title %}{{ vendor_part.part_number }} - {{ vendor_part.name }}{% endblock %}
+
+{% block content %}
+<div id="view_vendor_part">
+    <div class="row sticky-header-row">
+        <div class="col-xs-1">
+            <div class="pri-record-icon-wrapper">
+                <i class="pri-record-icon pri-icons-record-vendor-part" aria-hidden="true"></i>
+            </div>
+        </div>
+        <div class="col-xs-11">
+            <div class="row">
+                <div class="col-xs-3">
+                    <span class="pri-header">{{ vendor_part.part_number }}</span>
+                </div>
+                <div class="col-xs-7">
+                    {{ render_xeditable_text_field(field=vendor_part.name, parent_object=vendor_part, api_url="/vendorpart/update",
+                    field_name='name', display_label=False, input_class="pri-subheader", non_edit_additional_css="margin-top: 20px;") }}
+                </div>
+                <div class="col-xs-2">
+                    <div id="workflow_container">
+                        {{ workflow(record=vendor_part) }}
+                    </div>
+                    {{ bookmark(parent_object=vendor_part, current_user=current_user) }}
+                </div>
+            </div>
+        </div>
+    </div><!-- End row, sticky-header -->
+    <div class="row header-info">
+        <div class="col-xs-2" id="thumbnail_parent">
+            {{ thumbnail(record=vendor_part) }}
+        </div>
+        <div class="col-xs-10">
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ render_xeditable_text_field(field=vendor_part.summary, parent_object=vendor_part, api_url="/vendorpart/update", non_edit_additional_css="margin-top: 10px; margin-left: 8px;",
+                    field_name='summary', label='SUMMARY', horizontal_labels=True, placeholder='Additional descriptive text; "ESD Sensitive! | titanium nitride coated | use w/ Primer 9929 A/B"') }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    {{ render_ajax_select_field(field=vendor_part.vendor, parent_object=vendor_part, api_url="/vendorpart/update",
+                    label_container_class='col-xs-2', label_additional_css='margin-right: 10px;', non_edit_additional_css='margin-top: 6px; margin-left: -7px;',
+                    field_name='vendor', label='VENDOR', options=vendors, horizontal_labels=True, company_field=True, input_size='input-sm',
+                    option_id='id', option_name='name') }}
+                </div>
+                <div class="col-xs-6 minus-one-column">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <label class="pri-field-label">MASS</label>
+                        </div>
+                        <div class="col-xs-9" style="padding:0px; white-space: nowrap;">
+                            <div id="mass_fields_{{vendor_part.id}}" class="mass-fields">
+                                {{ render_ajax_input_float_field(field=vendor_part.current_best_estimate, parent_object=vendor_part,
+                                                         api_url="/vendorpart/update", field_name='current_best_estimate', label='Current Best Estimate',
+                                                         display_label=False, digits=2, populate_id="mass_fields_"+vendor_part.id|string) }}
+                                <label class="pri-field-label normal">(g)&nbsp;&nbsp;&nbsp;+&nbsp;</label>
+                                {{ render_ajax_input_float_field(field=vendor_part.uncertainty, parent_object=vendor_part, digits=1,
+                                                         api_url="/vendorpart/update", field_name='uncertainty', label='Uncertainty',
+                                                         display_label=False, populate_id="mass_fields_"+vendor_part.id|string) }}
+                                <label class="control-label pri-field-label">% = </label>
+                                <span>{{'%0.2f'| format(vendor_part.predicted_best_estimate|float)}}</span>
+                                <label class="pri-field-label normal">(g)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- end row -->
+            <div class="row">
+                <div class="col-xs-6">
+                    {{ render_ajax_select_field(field=vendor_part.owner, parent_object=vendor_part, api_url="/vendorpart/update",
+                        label_container_class='col-xs-2', label_additional_css='margin-right: 10px;', non_edit_additional_css='margin-top: 6px; margin-left: -7px;',
+                        field_name='owner', label='OWNER', options=users, horizontal_labels=True, input_size='input-sm',
+                        option_id='id', option_name='get_name()') }}
+                </div>
+                <div class="col-xs-6 minus-one-column" id="material_fields_{{vendor_part.id}}">
+                    {# Display dropdown for selecting material, if there are any. Otherwise show disabled dropdown #}
+                    {{ render_ajax_select_field(
+                        field=vendor_part.material, parent_object=vendor_part, api_url="/vendorpart/update", field_name='material', text_size='small',
+                        label='MATERIAL', options=materials, option_id='id', option_name='name', input_size='input-sm', horizontal_labels=True, blank_text='--- Select Material ---',
+                        populate_id='ajax_material_specification_'+vendor_part.id|string, allow_blank=True,
+                        non_edit_blank_text='<i>No Material Selected</i>', non_edit_additional_css='margin-top: 6px; margin-left: -15px;') }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    {{ render_ajax_select_field(field=vendor_part.project, parent_object=vendor_part, api_url="/vendorpart/update",
+                        label_container_class='col-xs-2', label_additional_css='margin-right: 10px;', non_edit_additional_css='margin-top: 6px; margin-left: -7px;',
+                        field_name='project', label='PROJECT', options=projects, horizontal_labels=True, input_size='input-sm',
+                        option_id='id', option_name='name') }}
+                </div>
+                <div class="col-xs-6 minus-one-column" id="ajax_material_specification_{{vendor_part.id}}">
+                    {# Display dropdown for selecting material specification, if there is a material and if there are #}
+                    {# material specifications to show. Otherwise show disabled dropdown #}
+                    {% if vendor_part.can_user_edit('material_specification') %}
+                    {% if vendor_part.material %}
+                    {% if vendor_part.material.specifications %}
+                    {{ render_ajax_select_field(
+                        field=vendor_part.material_specification, parent_object=vendor_part, api_url="/vendorpart/update", text_size='small',
+                        field_name='material_specification', label='MTRL SPEC', input_size='input-sm', blank_text='--- Select Specification ---',
+                        options=vendor_part.material.specifications, horizontal_labels=True, option_id='id', option_name='name', allow_blank=True) }}
+                    {% else %}
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <label class="control-label pri-field-label small">MTRL SPEC</label>
+                        </div>
+                        <div class="col-xs-8">
+                            <div class="pri-select-wrapper">
+                                <select class="form-control input-sm" disabled>
+                                    <option selected>No Specifications</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %} {# end if vendor_part.material.specifications #}
+                    {% else %}
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <label class="control-label pri-field-label small">MTRL SPEC</label>
+                        </div>
+                        <div class="col-xs-8">
+                            <div class="pri-select-wrapper">
+                                <select class="form-control input-sm" disabled>
+                                    <option selected>Please Select Material</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %} {# end if vendor_part.material #}
+                    {% else %} {# else if part.can_user_edit #}
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <label class="control-label pri-field-label small">MTRL SPEC</label>
+                        </div>
+                        <div class="col-xs-8">
+                            <div class="input-sm" style="margin-top: 5px; margin-left: -15px;"><i>No Specification Selected</i></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="row"> <!-- Extra row to bring labels in line -->
+                        <div class="col-xs-3">
+                            <label class="control-label pri-field-label ">VIEW</label>
+                        </div>
+                        <div class="col-xs-8">
+                            {% if vendor_part.get_vendor_builds_for_vendor_part() %}
+                            <i class="pri-app-icon edit pri-icons-reports-view-build" onclick="viewVendorPartBuildsModal({{vendor_part.id}}, this);" data-toggle="tooltip" title="View Builds"></i>
+                            {% else %}
+                            <i class="pri-app-icon edit pri-icons-reports-view-build disabled" data-toggle="tooltip" title="No builds to view"></i>
+                            {% endif %}
+                            {% if vendor_part.get_nlas_for_vendor_part() %}
+                            <i class="pri-app-icon edit pri-icons-reports-view-list-up" onclick="viewVendorPartNLAModal({{vendor_part.id}}, this);" data-toggle="tooltip" title="View Next Level Assemblies"></i>
+                            {% else %}
+                            <i class="pri-app-icon edit pri-icons-reports-view-list-up disabled" data-toggle="tooltip" title="No NLAs to view"></i>
+                            {% endif %}
+                            {{ view_changelog_button(parent_object=vendor_part) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 minus-one-column">
+                    <div class="row"> <!-- Extra row to bring labels in line -->
+                        <div class="col-xs-3">
+                            <label class="control-label pri-field-label ">CREATE</label>
+                        </div>
+                        <div class="col-xs-8">
+                            {% if vendor_part.can_user_edit('builds') %}
+                            <i class="pri-app-icon create pri-icons-reports-add-build" data-toggle="tooltip" title="Create Build" onclick="createVendorPartBuildModal({{vendor_part.id}}, null);"></i>
+                            {% else %}
+                            <i class="pri-app-icon create pri-icons-reports-add-build disabled" data-toggle="tooltip" title="Can only create build after part is released"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- end row -->
+        </div> <!-- end col-xs-10 -->
+    </div> <!-- end row top section -->
+    <div class="row" style="padding-top: 15px;">
+        <div class="panel">
+            <ul class="nav nav-tabs nav-justified">
+                <li class="active"><a data-toggle="tab" href="#part">PART</a></li>
+                <li><a data-toggle="tab" href="#links">LINKS</a></li>
+                <li><a data-toggle="tab" href="#approvals">APPROVALS</a></li>
+                <li><a data-toggle="tab" href="#images">IMAGES</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="part" class="tab-pane active">
+                    {% include "vendorpart/tab_info.html" %}
+                </div>
+                <div id="links" class="tab-pane">
+                    {% include "vendorpart/tab_links.html" %}
+                </div>
+                <div id="approvals" class="tab-pane">
+                    {% include "vendorpart/tab_approvals.html" %}
+                </div>
+                <div id="images" class="tab-pane">
+                    {% include "vendorpart/tab_images.html" %}
+                </div>
+            </div>  {# End tab-content #}
+        </div>  {# End panel #}
+    </div>  {# End row #}
+    <div class="row">
+        <div class="col-xs-12">
+            {{ creation_fields(parent_object=vendor_part, moment=moment) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.sticky-header-row').sticky({topSpacing: $('.navbar').height(), zIndex: 4, getWidthFrom: '#view_vendor_part .panel'});
+    });
+</script>
+{% endblock %}

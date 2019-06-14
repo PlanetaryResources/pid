@@ -1,0 +1,18 @@
+<div>
+    <table class="table table-condensed table-hover pri-table">
+        <thead>
+            <tr>
+                <th>Part Number</th>
+                <th>Name / Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for parent in parents %}
+            <tr>
+                <td><a href="{{ parent.design.get_url() }}#parts">{{ parent.part_number }}</a></td>
+                <td>{{ parent.design.name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

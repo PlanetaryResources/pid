@@ -1,0 +1,12 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/pr/pid
+ExecStart=/opt/pr/pid/venv/bin/gunicorn --workers 4 --bind unix:/opt/pr/pid/pid.sock -e PLAID_ENV=prod manage:app
+
+[Install]
+WantedBy=multi-user.target

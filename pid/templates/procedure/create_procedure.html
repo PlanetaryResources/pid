@@ -1,0 +1,244 @@
+<div id="create_procedure_modal">
+    <form id="createProcedureForm" class="form-horizontal" method="POST" action="/procedure/create" role="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="parts" value="{{current_part_ids}}"/>
+        <input type="hidden" name="vendor_parts" value="{{current_vendor_part_ids}}"/>
+
+        <div class="form-group {% if form.name.errors %} has-error{% endif %}">
+            <label class="col-xs-3 control-label" for="name">Procedure Title</label>
+            <div class="col-xs-9">
+                {{ form.name(placeholder="One line procedure title", class_="form-control") }}
+                {% if form.name.errors %}
+                <span class="help-block">{{ form.name.errors|join(', ') }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row" style="position:relative;">
+            <label class="col-xs-3 control-label" for="parts">Part Number(s)</label>
+            <i style="left:24%;top:7px;z-index:2;width:20px;" class="pri-app-icon pri-icons-question-circle tooltip-icon" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="bottom"></i>
+            <div class="col-xs-9">
+                <div class="pri-list" id="create-procedure-part-list" style="margin-top: 0px">
+                    <div class="row header-row">
+                        <div class="col-xs-5">
+                            <label class="control-label pri-field-label">PART NUMBER(s)</label>
+                        </div>
+                        <div class="col-xs-5">
+                            <label class="control-label pri-field-label">NAME / DESCRIPTION</label>
+                        </div>
+                        <div class="col-xs-2">
+                            <label class="control-label pri-field-label"></label>
+                        </div>
+                    </div>
+                    {% for part in vendor_parts + parts %}
+                        <div class="row list-row pri-text" id="procedure-part-{{part.id}}" data-part-id="{{part}}.id" data-part-type="{{part.__table__.name}}" >
+                        <div class="col-xs-5 ellipsis-text">
+                            <span>{{part.part_number}}</span>
+                            </div>
+                        <div class="col-xs-5">
+                           <span>{{part.get_name()}}</span>
+                            </div>
+                        <div class="col-xs-2">
+                            <span class="glyphicon glyphicon-trash pull-right action-icon" aria-hidden="true" onclick="createProcRemovePart(event)"></span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" id="parts-add-btn" class="btn pri-btn-secondary" style="margin-top:5px;margin-bottom: 15px;" >Add Part Number</button>
+            </div>
+        </div>
+        <div class="form-group hidden {% if form.name.errors %} has-error{% endif %}" id="procedure-parts-typeahead">
+            <div class="row">
+                <label class="control-label col-xs-3">&nbsp;</label><br/>
+                <div class="col-xs-8 typeahead__container pri-typeahead create-procedure-typeahead" style="margin-top: -15px; margin-bottom:15px;margin-left:10px;">
+                    <div class="typeahead__field">
+                          <span class="typeahead__query">
+                              <input id="create-procedure-typeahead-input" class="js-typeahead-components" name="design" value="" type="search" placeholder="Search" autocomplete="off" />
+                          </span>
+                    </div>
+                    {% if form.name.errors %}
+                    <span class="help-block">{{ form.name.errors|join(', ') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="form-group {% if form.project.errors %} has-error{% endif %}">
+            <label class="col-xs-3 control-label" for="project">Project</label>
+            <div class="col-xs-9">
+                {{ form.project(class_="form-control") }}
+                {% if form.project.errors %}
+                <span class="help-block">{{ form.project.errors|join(', ') }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group {% if form.owner.errors %} has-error{% endif %}">
+            <label class="col-xs-3 control-label" for="owner_id">Owner</label>
+            <div class="col-xs-9">
+                {{ form.owner(class_="form-control") }}
+                {% if form.owner.errors %}
+                <span class="help-block">{{ form.owner.errors|join(', ') }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <hr>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-offset-1 col-xs-10">
+                    <button type="submit" class="btn pri-btn-primary">Create Procedure</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div data-jbox-content="create-procedure" style="display:none;">
+        <ul>
+            <li>Specify which Part Number(s) this Procedure will be used to create / test / alter or otherwise affect.</li>
+            <li>Add P/Ns for anything that will have its pedigree or unique history affected by this work.</li>
+            <li>If this Procedure describes the build of an assembly, add the assembly P/N.</li>
+            <li>If this Procedure describes a test that applies to two different P/N variants, e.g. -1 & -2, add both P/Ns</li>
+            <li>Use your judgement:</li>
+            <ul>
+                <li>If this Procedure describes a random launch vibration test of a spacecraft: Add the spacecraft P/N</li>
+                <li>Add any components which you need to point to this test as pedigree proof that they meet their own requirements.<br>A Star Tracker? Maybe, if it wasn't qualified before delivery. A bolt? Probably not.</li>
+            </ul>
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        initial_focus('#name');
+        var $partListField = $("#createProcedureForm [name='parts']");
+        var $vendorPartListField = $("#createProcedureForm [name='vendor_parts']");
+        createProcRemovePart = function (event) {
+            var $el = $(event.currentTarget).parents('.list-row');
+            var partData = $el.data();
+            if (partData.partType === 'designs') {
+                var currentPartList = $partListField.val().split(",");
+                currentPartList = currentPartList.filter(function (value) {
+                    return value != partData.partId;
+                });
+                $partListField.val(currentPartList.join(","));
+            } else {
+                var currentPartList = $vendorPartListField.val().split(",");
+                currentPartList = currentPartList.filter(function (value) {
+                    return value != partData.partId;
+                });
+                $vendorPartListField.val(currentPartList.join(","));
+            }
+            $el.remove();
+        };
+
+        $('#parts-add-btn').click(function () {
+            $('#procedure-parts-typeahead').removeClass('hidden');
+            $('.jBox-container').height('auto');
+            setTimeout(function() { $('#create-procedure-typeahead-input').focus() }, 0);  // Focus on search field when open
+        });
+
+        $('#createProcedureForm').ajaxForm({
+            beforeSubmit: function(formData, jqForm, options) {
+                disableModal('#create_procedure_modal', create_procedure_modal);
+                return true;
+            },
+            error: function(response, statusText, xhr, $form) {
+                enableModal('#create_procedure_modal', create_procedure_modal);
+                // Just refresh the entire modal with the responsetext, will contain WTForm errors if any
+                $('#create_procedure_modal').replaceWith(response.responseText);
+            },
+            success: function(response, statusText, xhr, $form) {
+                window.location = response.url;
+            }
+        });
+
+        $.typeahead({
+            input: '#create-procedure-typeahead-input',
+            minLength: 3,
+            maxItem: 10,
+            order: 'asc',
+            hint: true,  // Shows a hint while user is typing
+            dynamic: true,  // Queries backend for each input rather than just once
+            searchOnFocus: true,
+            addClass: "part-search-modal",
+            display: ['number', 'name'],
+            correlativeTemplate: ['number', 'name'],
+            template: function (query, item) {
+                let template = '<span class="typeahead-group">{[icon]}</span>';
+                template += '<span class="typeahead-number" title="{[number|raw]}">{[number]}</span>';
+                template += '<span class="typeahead-name" title="{[name|raw]}">{[name]}</span>';
+                if (typeof item.thumb_url !== 'undefined' && item.thumb_url !== null) {
+                    template += '<span class="typeahead-logo"><img class="img-rounded" src="{[thumb_url]}"></span>';
+                }
+                return template;
+            },
+            matcher: function (item, displayKey) {
+                let includedPartIds = $partListField.val().split(",");
+                let includedVendorPartIds = $vendorPartListField.val().split(",");
+                // Exclude already included parts
+                if (includedPartIds.indexOf(item.id.toString()) > -1 && item.table === 'designs') {
+                    return false;
+                } else if (includedVendorPartIds.indexOf(item.id.toString()) > -1 && item.table === 'vendor_parts') {
+                    return false
+                }
+                return true;
+            },
+            source: {
+                'Part': {
+                    ajax: {
+                        url: '/part/typeahead_search_parts',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}",
+                            search_type: 'procedure'
+                        },
+                        path: 'parts'
+                    }
+                },
+                'Vendor Part': {
+                    ajax: {
+                        url: '/vendorpart/typeahead_search_vendor_parts',
+                        type: 'GET',
+                        data: {
+                            query: "{[query]}"
+                        },
+                        path: 'vendor_parts'
+                    }
+                }
+            },
+            callback: {
+                onClickAfter: function (node, a, item, event) {
+                    event.preventDefault();
+                    let domId = "procedure-part-" + item.id;
+                    let currentPartList;
+                    if (item.table === 'designs') {
+                        currentPartList = $partListField.val() === "" ? [] : $partListField.val().split(",");
+                        currentPartList.push(item.id);
+                        $partListField.val(currentPartList.join(","));
+                    } else {
+                        currentPartList = $vendorPartListField.val() === "" ? [] : $vendorPartListField.val().split(",");
+                        currentPartList.push(item.id);
+                        $vendorPartListField.val(currentPartList.join(","));
+                    }
+
+                    // TODO: update list of parts
+                    let tpl = '<div class="row list-row pri-text" id="' + domId + '" data-part-id="' + item.id + '" data-part-type="' + item.table + '" >' +
+                        '<div class="col-xs-5 ellipsis-text">' +
+                        '<span>' + item.number + '</span>' +
+                        '</div>' +
+                        '<div class="col-xs-5">' +
+                        '<span>' + item.name + '</span>' +
+                        '</div>' +
+                        '<div class="col-xs-2">' +
+                        '<span class="glyphicon glyphicon-trash pull-right action-icon" aria-hidden="true" onclick="createProcRemovePart(event)"></span>' +
+                        '</div>' +
+                        '</div>';
+
+                    $('#create-procedure-part-list').append(tpl);
+                    $('#create-procedure-typeahead-input').val('');
+                    $('#procedure-parts-typeahead').addClass('hidden');
+                    $('.jBox-container').height('auto');
+                }
+            } // end typeahead callback
+        }); // end typeahead
+
+        let tooltip_settings = { content: $('[data-jbox-content="create-procedure"]') };
+        create_procedure_part_numbers_tooltip = new jBox('Tooltip', $.extend({}, global_jbox_tooltip_options, tooltip_settings));
+    });
+</script>

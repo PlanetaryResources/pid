@@ -1,0 +1,138 @@
+<!doctype html>
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <title>{% block page_title %} {{ get_text('layout.title') }} {% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{% endblock %}">
+    <meta name="author" content="{% block meta_author %}{% endblock %}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Mobile viewport optimized: h5bp.com/viewport -->
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/font-awesome-4.7.0/css/font-awesome.min.css') }}">
+    {% if config['ENV'] == 'prod' or config['ENV'] == 'staging'%}
+    {% assets "css_all" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
+    {% else %}
+    {% assets "css_dev" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
+    {% endif %}
+    {% block css %}{% endblock %}
+    {{ moment.include_jquery(local_js=url_for('static', filename='libs/jquery-3.2.1/jquery.min.js')) }}
+    {{ moment.include_moment(local_js=url_for('static', filename='libs/moment-2.18.1/moment-with-locales.min.js')) }}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    {% block body %} {% with form=form %} {% include "nav.html" %} {% endwith %}
+    {% set active_page = active_page %}
+    {% set active_sub_page = active_sub_page %}
+    <header>{% block header %}{% endblock %}</header>
+    <div id="loading-mask"></div>
+    <div class="{% block content_class %}container{% endblock content_class %}" id="parent-container">
+        <div role="main">
+            {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
+            <div class="row">
+                <div class="col-md-12">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <a class="close" title="Close" data-dismiss="alert">&times;</a> {{message}}
+                    </div>
+                    <!-- end .alert -->
+                    {% endfor %}
+                </div>
+                <!-- end col-md -->
+            </div>
+            <!-- end row -->
+            {% endif %} {% endwith %} {% block content %}{% endblock %}
+        </div>
+    </div>
+    <!-- end container -->
+    {% include "footer.html" %}
+    <!-- JavaScript at the bottom for fast page loading -->
+    <script type="text/javascript">
+        // Debug messages in prod only, or when user sets debug flag to true in console.
+        // See: http://stackoverflow.com/a/32928812
+        isDebug = true;
+        if ("{{config['ENV']}}" === 'prod' || "{{config['ENV']}}" === 'staging') isDebug = false;
+        if (isDebug) var debug = console.log.bind(window.console);
+        else var debug = function(){};
+        if (!isDebug) console.log = function(){};
+        $(document).ready(function() {
+            var csrf_token = "{{ csrf_token() }}";
+            // Set csrf token for all subsequent AJAX requests
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+            // Make sure select lists show the selection option on back/forward in browser
+            $("select").each(function () {
+                var selectedValue = $(this).find('option[selected]').val();
+                if (selectedValue) {
+                    $(this).val(selectedValue);
+                }
+            });
+            // Change to tab when clicked. From https://stackoverflow.com/a/25377673
+            $("ul.nav-tabs > li > a").click(function (e) {
+                $(this).tab('show');
+                history.pushState(null, null, $(e.target).attr("href"));
+            });
+            // Allow back/forward with tabs. From http://www.redotheweb.com/2012/05/17/enable-back-button-handling-with-twitter-bootstrap-tabs-plugin.html
+            window.addEventListener("popstate", function(e) {
+                var activeTab = $('[href="' + location.hash + '"]');
+                if (activeTab.length) {
+                    activeTab.tab('show');
+                } else {
+                    $('.nav-tabs a:first').tab('show');
+                }
+            });
+            // on load of the page: switch to the currently selected tab
+            $('ul.nav-tabs a[href="' + window.location.hash + '"]').tab('show');
+            // Show tooltips
+            $('body').tooltip({
+                selector: '[data-toggle="tooltip"]',
+                html: true
+            });
+            $('.workflow-info-icon').tooltip({
+                placement: "bottom",
+                html: true
+            });
+            $('.tooltip-icon').tooltip({
+                placement: "bottom",
+                html: true
+            });
+            // Make entire tablerows clickable
+            $('tbody.rowlink').rowlink();
+            // Show loader till all JS is ready, then hide it
+            document.getElementById("loading-mask").style.display = "none";
+            var what_is_this_who_knows = new Konami(function() {
+                $('body').css('font-family', "'Press Start 2P', cursive");
+            });
+            // Display banner in staging
+            if ("{{config['ENV']}}" === 'staging') {
+                flash('This is PLAIDs staging server. Data entered here might be deleted at any time. Feel free to play around!', 'info')
+            }
+        });
+    </script>
+    {% if config['ENV'] == 'prod' or config['ENV'] == 'staging' %}
+    {% assets "js_all" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {% else %}
+    {% assets "js_dev" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {% endif %}
+    {% block js %}{% endblock %}
+    <!-- end scripts -->
+    {% endblock %}
+</body>
+</html>

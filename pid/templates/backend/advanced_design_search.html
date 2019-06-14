@@ -1,0 +1,224 @@
+<form id="design-search-form" class="form-horizontal advanced-search-form {% if record_type != 'design' %} hidden {% endif %}">
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="g1">Design Number</label>
+        <div class="col-xs-10" id="g1">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <select class="form-control input-sm" name="design_number_query_type">
+                                <option value="includes" selected>
+                                    Includes
+                                </option>
+                                <option value="starts-with">
+                                    Starts w/
+                                </option>
+                                <option value="ends-with">
+                                    Ends w/
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-xs-3">
+                            <input type="text" class="form-control" name="design_number_query" id="design-number" />
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="row">
+                                <label class="col-xs-3 control-label" for="g2">State</label>
+                                <div class="col-xs-6" id="g2">
+                                    <select class="form-control input-sm" name="state" id="design-state">
+                                        <option value="">-- any --</option>
+                                        {% for state in Design.workflow.states %}
+                                            <option value="{{state}}">{{state}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-xs-2">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" value="true" name="in_open_state" />
+                                            Open
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>  <!-- End div row -->
+                        </div>  <!-- End div col-xs-6 -->
+                    </div>  <!-- End div row -->
+                </div>  <!-- End div col-xs-12 -->
+            </div>  <!-- End div row -->
+        </div>  <!-- End div col-xs-10 -->
+    </div>  <!-- End form-group -->
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="g3">Text Fields</label>
+        <div class="col-xs-10" id="g3">
+            <input type="text" class="form-control" name="text_fields_query" placeholder="Searches name, description, summary, and notes"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="g4">Project</label>
+        <div class="col-xs-10 split-col" id="g4">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <select class="form-control input-sm" name="project_id">
+                                <option value="">-- any --</option>
+                                {% for project in projects %}
+                                <option value="{{ project.id }}">
+                                    {{ project.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="row">
+                        <label class="col-xs-3 control-label" for="g5">Owner</label>
+                        <div class="col-xs-9" id="g5">
+                            <select class="form-control input-sm" name="owner_id" id="design-owner">
+                                <option value="">-- any --</option>
+                                {% for owner in users %}
+                                <option value="{{ owner.id }}">
+                                    {{ owner.get_name() }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>  <!-- End div row -->
+        </div>  <!-- End div col-xs-10 -->
+    </div>  <!-- End form-group -->
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="g6">Has</label>
+        <div class="col-xs-10" id="g6">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="row" style="padding-bottom: 5px;">
+                        <div class="col-xs-12">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="true" name="open_anomalies" />
+                                    Open Anomalies
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="true" name="open_ecos" />
+                                    Open ECOs
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="row">
+                        <label class="col-xs-3 control-label" for="design-material">Material</label>
+                        <div class="col-xs-9" id="design-material">
+                            <select class="form-control input-sm" name="material_id" id="design-material">
+                                <option value="">-- any --</option>
+                                {% for material in materials %}
+                                <option value="{{ material.id }}">
+                                    {{ material.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>  <!-- End div row -->
+        </div>  <!-- End div col-xs-10 -->
+    </div>  <!-- End form-group -->
+    <div class="form-group">
+        <label class="col-xs-2 control-label" for="g7">Created By/On</label>
+        <div class="col-xs-10" id="g7">
+            <div class="row">
+                <div class="col-xs-4">
+                    <select class="form-control input-sm" name="created_by_id">
+                        <option value="">-- any --</option>
+                        {% for owner in users %}
+                        <option value="{{ owner.id }}">
+                            {{ owner.get_name() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-xs-8">
+                    <div class="input-group input-daterange">
+                        <input type="text" class="form-control input-sm" name="created_on_start" id="design_created_on_start">
+                            <div class="input-group-addon" style="color: black;">to</div>
+                        <input type="text" class="form-control input-sm" name="created_on_end" id="design_created_on_end">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-4">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" value="true" name="exclude_obsolete" checked/>
+                    Exclude Obsolete
+                </label>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <a href="#" class="clear-selections pull-right">Clear Selections</a>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-12">
+            <button class="btn btn-default pri-btn-primary" id="search-design-btn">Search</button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var designSearchResultsTable = $('#design-search-results').DataTable({
+            dom: '<"pull-left"r<"#design-action-btns">><"pull-right"B>t<"pull-left"i><"pull-right"p>',
+            columnDefs: [
+                {targets: [0], render: renderUrlColumn, width: '15%'},
+                {targets: [1], width: '10%'},
+                {targets: [3], render: renderStateIcon },
+                {targets: [9], render: renderDateColumn}
+            ],
+            columns: [
+                {data: 'design_number', name: 'design_number', defaultContent: ''},
+                {data: 'revision', name: 'revision', defaultContent: ''},
+                {data: 'name', name: 'name', defaultContent: ''},
+                {data: 'state', name: 'state', defaultContent: ''},
+                {data: 'summary', name: 'summary', defaultContent: '', visible: false},
+                {data: 'notes', name: 'notes', defaultContent: '', visible: false},
+                {data: 'project', name: 'project', defaultContent: '', visible: false},
+                {data: 'owner', name: 'owner', defaultContent: '', visible: false},
+                {data: 'created_by', name: 'created_by', defaultContent: '', visible: false},
+                {data: 'created_at', name: 'created_at', defaultContent: '', visible: false},
+                {data: 'anomalies', name: 'anomalies', defaultContent: '', visible: false},
+                {data: 'ecos', name: 'ecos', defaultContent: '', visible: false}
+            ],
+            buttons: [
+                {extend: 'colvis', text: 'Show Columns', columns: ':gt(0)', className: 'pri-btn-secondary'}
+            ]
+        });
+
+        // Catch submission of forms and load data through datatables
+        $('#search-design-btn').on('click', function (e) {
+            start_search();
+            e.preventDefault();
+            var queryParams = $('#design-search-form').formSerialize();
+            designSearchResultsTable.ajax.url('/design/advanced_search?' + queryParams).load(search_complete, true);
+        });
+
+        addSaveAndCopyToDataTable(designSearchResultsTable, '#design-action-btns');
+
+        $('#design_created_on_start').datepicker().on('changeDate', function(e) {
+            $('#design_created_on_end').datepicker('show');
+        });
+        $('#design_created_on_end').datepicker();
+
+        if ('{{record_type}}' === 'design') {
+            refreshSearchParams('{{record_type}}', designSearchResultsTable);
+        }
+    });
+</script>

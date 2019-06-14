@@ -1,0 +1,77 @@
+{% macro document_list(parent_object) %}
+
+{% set documents = parent_object.documents %}
+{% set parent_object_id = parent_object.id %}
+{% set api_url = url_for('api.generic_documents', record_id=parent_object_id, record_class=parent_object.get_class_name()) %}
+{% set uid = parent_object.get_class_name() + '_' + parent_object_id|string + '_documents' %}
+
+<div class="document-list">
+    <div id="document-dropzone-{{uid}}" class="pri-dropzone">
+        <label class="pri-table-header">Documents</label>
+        <div class="dropzone-previews hidden"></div>
+        <table class="table table-condensed table-hover pri-table">
+            <tbody class="pri-list">
+                {% if documents %}
+                {% for document in documents %}
+                {% include "shared/document_row.html" %}
+                {% endfor %}
+                {% else %}
+                <tr class="no-documents-added">
+                    <td colspan="3"><i>No documents added yet.</i></td>
+                </tr>
+                {% endif %}
+            </tbody>
+            {% if parent_object.can_user_edit('documents') %}
+            <tfoot>
+                <tr class="fileinput-button">
+                    <td colspan="3">
+                        <span><i class="pri-app-icon sm pri-icons-simple-procedure"></i>Select files, or drag and drop here</span>
+                    </td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+{% if parent_object.can_user_edit('documents') %}
+<script type="text/javascript">
+    $( document ).ready(function() {
+        var $documentDropzone_{{uid}} = $("#document-dropzone-{{uid}}");
+        new Dropzone($documentDropzone_{{uid}}.get(0), {
+            url: "{{api_url}}",
+            parallelUploads: 20,
+            clickable: $documentDropzone_{{uid}}.find(".fileinput-button")[0],
+            previewsContainer: $documentDropzone_{{uid}}.find(".dropzone-previews")[0],
+            init: function() {
+                this.on("dragover", function(file) {
+                    $documentDropzone_{{uid}}.addClass("dragover");
+                });
+                this.on("dragleave", function(file) {
+                    $documentDropzone_{{uid}}.removeClass("dragover");
+                });
+                this.on("drop", function(file) {
+                    $documentDropzone_{{uid}}.removeClass("dragover");
+                });
+            },
+            sending: function (arg1, xhr, formData) {
+                xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token() }}');
+            },
+            success: function (file, response) {
+                $($documentDropzone_{{uid}}).find(".no-documents-added").remove();
+                $($documentDropzone_{{uid}}).find(".pri-list").append(response);
+                highlight($('.document-list .pri-list tr:last'));
+                $.notify('Document uploaded')
+            },
+            complete: function (file) {
+                this.removeFile(file);
+            },
+            error: function (file, response) {
+              $.notify(response, { type: 'danger' });
+            }
+        });
+    });
+</script>
+{% endif %}
+
+{% endmacro %}

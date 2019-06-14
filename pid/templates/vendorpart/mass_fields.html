@@ -1,0 +1,13 @@
+
+{% from "shared/ajax_input_float_field.html" import render_ajax_input_float_field %}
+
+{{ render_ajax_input_float_field(field=vendor_part.current_best_estimate, parent_object=vendor_part,
+                         api_url="/vendorpart/update", field_name='current_best_estimate', label='Current Best Estimate',
+                         display_label=False, digits=2, populate_id="mass_fields_"+vendor_part.id|string) }}
+<label class="pri-field-label">(g)&nbsp;&nbsp;&nbsp;+&nbsp;</label>
+{{ render_ajax_input_float_field(field=vendor_part.uncertainty, parent_object=vendor_part, digits=1,
+                         api_url="/vendorpart/update", field_name='uncertainty', label='Uncertainty',
+                         display_label=False, populate_id="mass_fields_"+vendor_part.id|string) }}
+<label class="control-label pri-field-label">% = </label>
+<span>{{'%0.2f'| format(vendor_part.predicted_best_estimate|float)}}</span>
+<label class="pri-field-label">(g)</label>

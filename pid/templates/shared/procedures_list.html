@@ -1,0 +1,37 @@
+{% macro procedures_list(parent_object, prepopulate_id) %}
+
+<label class="pri-table-header">Procedures</label>
+<table class="table table-condensed table-hover pri-table">
+    <tbody class="pri-list rowlink" data-link="row">
+        {% set procedures = parent_object.get_procedures() %}
+        {% if procedures %}
+        {% for procedure in procedures %}
+        <tr>
+            <td width="150px"><a href="{{ procedure.get_url() }}">{{ procedure.procedure_number }}</a></td>
+            <td>{{ procedure.name|sn }}</td>
+            <td width="100px">{{ procedure.state|sn }}</td>
+            <td width="100px" data-toggle="tooltip" title="Created At">{{ moment(procedure.created_at).format('YYYY-MM-DD') }}</td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr class="no-procedures-added">
+            <td colspan="4"><i>No procedures for this {{ parent_object.descriptor|lower }}.</i></td>
+        </tr>
+        {% endif %}
+    </tbody>
+    <tfoot>
+        <tr onclick="createProcedureModal('{{ parent_object.__table__.name }}', {{ prepopulate_id }});">
+            <td colspan="4">
+                <span><i class="pri-app-icon sm pri-icons-simple-procedure"></i>Create Procedure</span>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        flask_moment_render_all();  // For rendering timestamp
+    });
+</script>
+
+{% endmacro %}

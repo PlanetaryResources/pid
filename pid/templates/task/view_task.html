@@ -1,0 +1,183 @@
+{% extends "layout.html" %}
+
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+{% from 'shared/thumbnail.html' import thumbnail %}
+{% from "shared/view_changelog_button.html" import view_changelog_button %}
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+
+{% set workflow_img = url_for('static', filename='images/workflows/task_workflow.png') %}
+
+{% block page_title %}{{ task.task_number }} - {{ task.title }}{% endblock %}
+
+{% block content %}
+<div id="view_task">
+    <div class="row">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row sticky-header-row">
+                    <div class="col-xs-1">
+                        <div class="pri-record-icon-wrapper">
+                            <i class="pri-record-icon pri-icons-checklist-box" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                    <div class="col-xs-11">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <span class="pri-header">{{ task.task_number }}</span>
+                            </div>
+                            <div class="col-xs-7">
+                            {{ render_xeditable_text_field(field=task.title, parent_object=task, api_url="/task/update",
+                            field_name='title', display_label=False, input_class="pri-subheader", non_edit_additional_css="margin-top: 20px;") }}
+                        </div>
+                            <div class="col-xs-2">
+                                {{ render_ajax_select_field(field=task.state, parent_object=task, api_url="/task/update",
+                            field_name='state', display_label=False, options=task.allowed_states, input_size='input-sm') }}
+                                <i class="pri-app-icon pri-icons-question-circle tooltip-icon"
+                                   aria-hidden="true"
+                                   data-title="<img src='{{ workflow_img }}' style='width: 150px' />"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row header-info">
+                    <div class="col-xs-2" id="thumbnail_parent">
+                    {{ thumbnail(record=task) }}
+                </div>
+                    <div class="col-xs-10">
+                        <div class="row" style="padding-top: 10px;">
+                            <div class="col-xs-6">
+                            {{ render_ajax_select_field(field=task.assigned_to, parent_object=task, api_url="/task/update",
+                            field_name='assigned_to', label='ASSIGNED TO', options=users, horizontal_labels=True, input_size='input-sm',
+                            option_id='id', option_name='get_name()', non_edit_additional_css="margin-top: 6px; margin-left: -15px;") }}
+                        </div>
+                            <div class="col-xs-6 minus-one-column">
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        <label class="control-label pri-field-label">REQUESTED BY</label>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        <span class='pri-text'>{{ task.requested_by.get_name() }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <i style="left: 100px; top: 8px; position: absolute; font-size: 20px;"
+                                   class="pri-icons-critical-{{ criticalities[task.urgency|lower] }}"
+                                   aria-hidden="true" id="task-urgency-icon"></i>
+                                {{ render_ajax_select_field(field=task.urgency, parent_object=task, api_url="/task/update", non_edit_additional_css="margin-top: 6px; margin-left: -15px;",
+                            field_name='urgency', label='CRITICALITY', options=task.urgency_states, horizontal_labels=True, input_size='input-sm') }}
+                            </div>
+                            <div class="col-xs-6 minus-one-column">
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        <label class="control-label pri-field-label">REQUESTED ON</label>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        <span class='pri-text'>{{ moment(task.requested_on).format('YYYY-MM-DD') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <label class="control-label pri-field-label">NEED DATE</label>
+                                    </div>
+                                    <div class="col-xs-7">
+                                        <div class='input-group' style="margin-top: 5px;">
+                                            <input type='text' class="form-control input-sm" name="need_date"
+                                                   id="need_date" placeholder="Select date"
+                                                   value="{{ task.need_date.strftime('%Y-%m-%d') }}"/>
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar" aria-hidden="true"
+                                                   style="color: #323D4C;"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-1"></div>
+                                </div>
+                            </div>
+                            <div class="col-xs-6 minus-one-column">
+                                <div class="row">
+                                    <div class="col-xs-4">
+                                        <label class="control-label pri-field-label">VIEW</label>
+                                    </div>
+                                    <div class="col-xs-8">
+                              {{ view_changelog_button(parent_object=task) }}
+                            </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- end col-xs-10 -->
+                </div>
+            </div>
+        </div>
+        <div class="row" style="padding-top: 15px;">
+            <div class="col-xs-12">
+                <div class="panel">
+                    <ul class="nav nav-tabs nav-justified">
+                        <li class="active"><a data-toggle="tab" href="#info">INFO</a></li>
+                        <li><a data-toggle="tab" href="#images">IMAGES</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="info" class="tab-pane active">
+                            {% include "task/tab_info.html" %}
+                        </div>
+                        <div id="images" class="tab-pane">
+                            {% include "task/tab_images.html" %}
+                        </div>
+                    </div>
+                    {# End tab-content #}
+                </div>
+                {# End panel #}
+            </div>
+        </div>
+        {# End row #}
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.sticky-header-row').sticky({
+            topSpacing: $('.navbar').height(),
+            zIndex: 4,
+            getWidthFrom: '#view_task .panel'
+        });
+        $('#need_date').datepicker().on('changeDate', function (e) {
+            $.ajax({
+                url: '/task/update',
+                type: 'POST',
+                data: {
+                    pk: '{{ task.id }}',
+                    name: 'need_date',
+                    value: e.format('yyyy-mm-dd')
+                },
+                success: function (data) {
+                    highlight($("#need_date"));
+                    $.notify('<strong>Need Date</strong> updated');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $.notify('<strong>Need Date</strong> could not be updated: ' + jqXHR.responseText, {type: 'danger'});
+                }
+            });
+        });
+        $('#urgency-task-{{ task.id }}-ajax').change(function () {
+            // For updating criticality icon when dropdown is changed
+            var criticality = $('#urgency-task-{{ task.id }}-ajax option:selected').text().trim().toLowerCase();
+            var stateIconClasses = {
+                'at your leisure': 'odd',
+                'important': 'worrisome',
+                'urgent': 'serious',
+                'sof': 'sof'
+            };
+            $('#task-urgency-icon').removeClass();
+            $('#task-urgency-icon').addClass('pri-icons-critical-' + stateIconClasses[criticality]);
+        });
+    });
+</script>
+{% endblock %}

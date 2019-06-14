@@ -1,0 +1,35 @@
+{% macro as_runs_list(parent_object) %}
+
+<label class="pri-table-header">AS RUNS</label>
+{% if parent_object.as_runs %}
+<table class="table table-condensed table-hover pri-table">
+    <thead>
+        <tr>
+            <th width="20%">Number</th>
+            <th width="60%">Description</th>
+            <th width="10%">State</th>
+            <th width="10%">Created At</th>
+        </tr>
+    </thead>
+    <tbody class="pri-list rowlink" data-link="row">
+        {% for as_run in parent_object.as_runs %}
+            <tr>
+                <td><a href="{{ as_run.get_url() }}">{{ as_run.identifier }}</a></td>
+                <td>{{ as_run.name }}</td>
+                <td>{{ as_run.state }}</td>
+                <td>{{ moment(as_run.created_at).format('YYYY-MM-DD') }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<br><i class="small">There are no as-runs for this {{ parent_object.descriptor|lower }}.</i><br><br>
+{% endif %}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        flask_moment_render_all();  // For rendering timestamp
+    });
+</script>
+
+{% endmacro %}

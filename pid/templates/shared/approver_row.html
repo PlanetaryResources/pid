@@ -1,0 +1,45 @@
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+
+<tr class="action-icons-row list-row" id="approver-row-{{approver.id}}">
+    <td>
+        <div class="inline-approver-input" style="display: none;">
+            <select class="form-control input-sm" id="approver-approver-{{ approver.id }}">
+                <option value="None">---</option>
+                {% for user in users %}
+                {% if user != current_user %}
+                <option value="{{ user.id }}" {% if approver.approver.id ==user.id %}selected{% endif %}>{{ user.get_name() }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <span class="inline-approver-display">{{ approver.approver.get_name() }}</span>
+        <input type="hidden" id="current-approver-approver-{{ approver.id }}" value="{{ approver.approver.id }}">
+    </td>
+    <td>
+        <input type="text" class="inline-approver-input form-control input-sm" style="display: none;" id="capacity-approver-{{ approver.id }}" value="{{ approver.capacity|sn }}">
+        <span class="inline-approver-display">{{ approver.capacity|sn }}</span>
+        <input type="hidden" id="current-approver-capacity-{{ approver.id }}" value="{{ approver.capacity|sn }}">
+    </td>
+    <td>
+        <span class="inline-approver-display">
+            {% if approver.approved_at %}
+            <i class="fa fa-check" aria-hidden="true" style="color: green;" data-toggle="tooltip" title="Approved on {{ approver.approved_at.strftime('%Y.%m.%d') }}"></i>
+            {% endif %}
+        </span>
+    </td>
+    <td>
+        <div class="save-icon text-right" style="display: none;">
+            <div class="editable-buttons">
+                <button type="submit" class="btn btn-primary btn-sm editable-submit" onclick="saveApprover({{approver.id}}, {{parent_object.id}}, '{{parent_object.get_class_name()}}');"><i class="glyphicon glyphicon-ok"></i></button>
+                <button type="button" class="btn btn-default btn-sm editable-cancel" onclick="cancelApprover({{approver.id}});""><i class="glyphicon glyphicon-remove"></i></button>
+            </div>
+        </div>
+        <div class="action-icons text-right">
+            {% if parent_object.can_user_edit('approvers') and not approver.approved_at and not (current_user.padawan and approver.capacity == 'Supervisor') %}
+            <span class="cursor-pointer" onclick="editApprover({{ approver.id }}, {{parent_object.id}}, '{{parent_object.get_class_name()}}');"><i class="fa fa-lg fa-pencil" aria-hidden="true" style="padding-right:5px;"></i></span>
+            <span class="cursor-pointer" onclick="deleteApprover(event, {{ approver.id }}, {{parent_object.id}}, '{{parent_object.get_class_name()}}')"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></span>
+            {% endif %}
+        </div>
+    </td>
+</tr>

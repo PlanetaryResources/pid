@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+{% set active_page = "dashboard" %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div id="dashboard" style="margin-top: 20px;">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="panel">
+                <ul class="nav nav-tabs nav-justified">
+                    <li class="active"><a data-toggle="tab" href="#my-records">MY RECORDS</a></li>
+                    <li><a data-toggle="tab" href="#tasks">TASKS</a></li>
+                    <li><a data-toggle="tab" href="#bookmarks">BOOKMARKS</a></li>
+                    <li><a data-toggle="tab" href="#search-filters">SEARCH FILTERS</a></li>
+                    <li><a data-toggle="tab" href="#announcements">ANNOUNCEMENTS</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="my-records" class="tab-pane active">
+                        {% include "backend/tab_my_records.html" %}
+                    </div>
+                    <div id="tasks" class="tab-pane">
+                        {% include "backend/tab_tasks.html" %}
+                    </div>
+                    <div id="bookmarks" class="tab-pane">
+                        {% include "backend/tab_bookmarks.html" %}
+                    </div>
+                    <div id="search-filters" class="tab-pane">
+                        {% include "backend/tab_search_filters.html" %}
+                    </div>
+                    <div id="announcements" class="tab-pane">
+                        {% include "backend/tab_announcements.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#approvals').DataTable();
+        $('#records_awaiting_approvals').DataTable();
+        $('#designs').DataTable();
+        $('#vendor_parts').DataTable();
+        $('#procedures').DataTable({"bSort": false});
+        $('#products').DataTable();
+        $('#vendor_products').DataTable();
+        $('#anomalies').DataTable();
+        $('#ecos').DataTable();
+        $('#specifications').DataTable();
+        taskTable = $('#tasks-table').DataTable({
+            dom: 'lrtip',
+            ordering: true,
+            autoWidth: false, // To prevent table from resizing when window opens with different tab
+            columnDefs: [
+                {searchable: true, targets: [1, 2, 3, 4, 5]},
+                {
+                    targets: [0], render: function (task_number) {
+                        return '<a href="/task/' + task_number + '">' + task_number + '</a>';
+                    }
+                },
+                {
+                    targets: [2], render: function (need_date) {
+                        return moment(need_date).format('YYYY.MM.DD')
+                    }
+                },
+                {targets: [5], render: renderCriticalityIconForTasks},
+            ],
+            ajax: {
+                url: '/task/get_tasks_for_user/{{current_user.username}}/assigned',
+                type: 'POST'
+            },
+            columns: [
+                {data: 'task_number', name: 'task_number'},
+                {data: 'title', name: 'title'},
+                {data: 'need_date', name: 'need_date'},
+                {data: 'requested_by.get_name', name: 'requested_by'},
+                {data: 'assigned_to.get_name', name: 'assigned_to'},
+                {data: 'urgency', name: 'urgency'},
+                {data: 'state', name: 'state'},
+                {data: 'requested_by.id', name: 'requested_by_id', visible: false},
+                {data: 'assigned_to.id', name: 'assigned_to_id', visible: false}
+            ]
+        });
+
+        $("input[type=radio][name=taskType]").on('change', function (e) {
+            var type = $(e.currentTarget).val();
+            var currentUrl = taskTable.ajax.url().split('assigned')[0].split('requested')[0];
+            taskTable.ajax.url(currentUrl + type).load();
+        });
+        $('.dashboard-user-select').change(function (e) {
+            var type = $("input[type=radio][name=taskType]:checked").val();
+            var username = $(e.currentTarget).val();
+            taskTable.ajax.url('/task/get_tasks_for_user/' + username + '/' + type).load();
+        });
+        $("#user-me-btn").on('click', function (e) {
+            var type = $("input[type=radio][name=taskType]:checked").val();
+            $('.dashboard-user-select').val('{{current_user.username}}');
+            taskTable.ajax.url('/task/get_tasks_for_user/{{current_user.username}}/' + type).load();
+        });
+        $("#user-mfab-btn").on('click', function (e) {
+            var type = $("input[type=radio][name=taskType]:checked").val();
+            $('.dashboard-user-select').val('{{settings.mfab_user.username}}');
+            taskTable.ajax.url('/task/get_tasks_for_user/mfab/' + type).load();
+        });
+        $("#user-efab-btn").on('click', function (e) {
+            var type = $("input[type=radio][name=taskType]:checked").val();
+            $('.dashboard-user-select').val('{{settings.efab_user.username}}');
+            taskTable.ajax.url('/task/get_tasks_for_user/efab/' + type).load();
+        });
+        $("#user-admin-btn").on('click', function (e) {
+            var type = $("input[type=radio][name=taskType]:checked").val();
+            $('.dashboard-user-select').val('{{settings.plaid_admin.username}}');
+            taskTable.ajax.url('/task/get_tasks_for_user/plaid_admin/' + type).load();
+        });
+        $("#hide-complete-tasks").on('change', function (e) {
+            if ($(this).is(':checked')) {
+                taskTable.columns('state:name').search('Requested|Acknowledged|In Work|Rejected|IGNORED', true, false, true).draw();
+            } else {
+                taskTable.columns('state:name').search('.', true, false, true).draw();
+            }
+        });
+        $("#hide-rejected-tasks").on('change', function (e) {
+            if ($(this).is(':checked')) {
+                taskTable.columns('state:name').search('Requested|Acknowledged|In Work|Complete|IGNORED', true, false, true).draw();
+            } else {
+                taskTable.columns('state:name').search('.', true, false, true).draw();
+            }
+        });
+    });
+</script>
+{% endblock %}

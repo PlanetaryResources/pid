@@ -1,0 +1,27 @@
+
+{% from 'product/discrepancy_list.html' import discrepancy_list with context %}
+{% from 'shared/document_list.html' import document_list with context %}
+{% from 'shared/link_list.html' import link_list with context %}
+{% from "shared/trumbowyg.html" import trumbowyg %}
+
+<div class="row">
+    <div class="col-xs-12">
+        {{ trumbowyg(field=vendor_product.notes, parent=vendor_product, api_url="/vendorproduct/update",
+                                       field_name='notes', label='NOTES', placeholder='Additional information relevant to this Product; "Stored in cabinet B2 | turned into an engraved gift for visiting royalty"') }}
+    </div>
+</div>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        {{ discrepancy_list(parent_object=vendor_product) }}
+    </div>
+</div>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        {{ document_list(parent_object=vendor_product) }}
+    </div>
+</div>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-xs-12">
+        {{ link_list(parent_object=vendor_product) }}
+    </div>
+</div>

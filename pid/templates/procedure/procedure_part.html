@@ -1,0 +1,37 @@
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+{% set part_revision_url = '/procedure/{procedure_id}/update_part_revision/{part_id}'.format(procedure_id=proc.id,part_id=part.id) %}
+{% if part.design_id %}
+    {% set part_type = 'designs' %}
+{% else %}
+    {% set part_type = 'vendor_parts' %}
+{% endif %}
+{% set dom_id = 'procedure-part-{part_type}-{part_id}'.format(part_type=part_type, part_id=part.id) %}
+<tr class="action-icons-row" id="{{dom_id}}">
+    <td>
+        {% if part.design_id %}
+        <a href="{{ part.design.get_url() }}">{{part.part_number}}</a>
+        {% else %}
+        <a href="{{ part.get_url() }}">{{part.part_number}}</a>
+        {% endif %}
+    </td>
+    <td>
+        {% if part.design_id %}
+        {% if proc.can_user_edit('parts') %}
+        {{ render_ajax_select_field(field=part, parent_object=part, api_url=part_revision_url, ignore_permissions=True,
+            field_name='revision', display_label=False, replace_id=dom_id, option_id='id', options=part.get_parts_for_design_revisions(), option_name='revision') }}
+        {% else %}
+        {{ part.design.revision }}
+        {% endif %}
+        {% else %}
+        N/A
+        {% endif %}
+    </td>
+    <td>{{part.get_name()}}</td>
+    <td>
+        {% if proc.can_user_edit('parts') %}
+        <div class="action-icons text-right">
+            <span class="cursor-pointer" onclick="deleteProcedurePart(event, '{{proc.id}}', '{{part.id}}', '{{part_type}}')"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></span>
+        </div>
+        {% endif %}
+    </td>
+</tr>

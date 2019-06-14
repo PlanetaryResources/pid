@@ -1,0 +1,32 @@
+{% extends 'admin/model/list.html' %}
+
+{% block list_header %}
+    {{ super() }}
+    <th>Reorder</th>
+{% endblock %}
+
+{% block list_row %}
+    {{ super() }}
+    <td>
+        <a href="/common/reorder_{{ admin_view.model.__tablename__ }}/superuser/{{ get_pk_value(row) }}/up"><span class="glyphicon glyphicon-arrow-up"></span></a>
+        <a href="/common/reorder_{{ admin_view.model.__tablename__ }}/superuser/{{ get_pk_value(row) }}/down"><span class="glyphicon glyphicon-arrow-down"></span></a>
+    </td>
+{% endblock %}
+
+{% block tail_js %}
+    {{ super() }}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $.fn.editable.defaults.mode = 'inline';
+            var csrf_token = "{{ csrf_token() }}";
+            // Set csrf token for all subsequent AJAX requests
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

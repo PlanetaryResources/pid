@@ -1,0 +1,52 @@
+{% from "shared/xeditable_text_field.html" import render_xeditable_text_field %}
+{% from "shared/ajax_select_field.html" import render_ajax_select_field %}
+
+<tr class="action-icons-row list-row" id="discrepancy-row-{{discrepancy.id}}">
+    <td>{{discrepancy.discrepancy_number}}</td>
+    <td>
+        <input type="text" class="inline-discrepancy-input form-control input-sm" style="display: none;" id="description-discrepancy-{{discrepancy.id}}" value="{{discrepancy.description|sn}}">
+        <span class="inline-discrepancy-display">{{discrepancy.description|sn}}</span>
+        <input type="hidden" id="current-discrepancy-description-{{discrepancy.id}}" value="{{discrepancy.description|sn}}">
+    </td>
+    <td>
+        <div class="inline-discrepancy-input" style="display: none;">
+            <select class="form-control input-sm" id="disposition-discrepancy-{{discrepancy.id}}">
+                <option value="None">---</option>
+                {% for disposition in dispositions%}
+                <option value="{{disposition.id}}" {%if discrepancy.disposition.id == disposition.id%}selected{%endif%}>{{disposition.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <span class="inline-discrepancy-display">{{discrepancy.disposition|default('---', True)}}</span>
+        <input type="hidden" id="current-discrepancy-disposition-{{discrepancy.id}}" value="{{discrepancy.disposition.id}}">
+    </td>
+    <td>
+        <input type="text" class="inline-discrepancy-input form-control input-sm" style="display: none;" id="justification-discrepancy-{{discrepancy.id}}" value="{{discrepancy.justification|sn}}">
+        <span class="inline-discrepancy-display">{{discrepancy.justification|sn}}</span>
+        <input type="hidden" id="current-discrepancy-justification-{{discrepancy.id}}" value="{{discrepancy.justification|sn}}">
+    </td>
+    <td>
+        <div class="inline-discrepancy-input" style="display: none;">
+            <select class="form-control input-sm" id="state-discrepancy-{{discrepancy.id}}">
+                {% for state in discrepancy.allowed_states %}
+                <option value="{{state}}" {%if discrepancy.state == state%}selected{%endif%}>{{state}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <span class="inline-discrepancy-display">{{discrepancy.state|sn}}</span>
+        <input type="hidden" id="current-discrepancy-state-{{discrepancy.id}}" value="{{discrepancy.state}}">
+    </td>
+    <td>
+        <div class="save-icon text-right" style="display: none;">
+            <div class="editable-buttons">
+                <button type="submit" class="btn btn-primary btn-sm editable-submit" onclick="saveDiscrepancy({{discrepancy.id}}, {{parent_object.id}}, '{{parent_object.get_class_name()}}');"><i class="glyphicon glyphicon-ok"></i></button>
+                <button type="button" class="btn btn-default btn-sm editable-cancel" onclick="cancelDiscrepancy({{discrepancy.id}});""><i class="glyphicon glyphicon-remove"></i></button>
+            </div>
+        </div>
+        <div class="action-icons text-right">
+            {% if parent_object.can_user_edit('discrepancies') %}
+            <span class="cursor-pointer" onclick="editDiscrepancy({{discrepancy.id}}, {{parent_object.id}}, '{{parent_object.get_class_name()}}');"><i class="fa fa-lg fa-pencil" aria-hidden="true" style="padding-right:5px;"></i></span>
+            {% endif %}
+        </div>
+    </td>
+</tr>

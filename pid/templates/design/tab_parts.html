@@ -1,0 +1,35 @@
+
+<div id="design_parts" style="padding-top: 20px">
+{% for part in design.parts %}
+    {% if not part.inseparable_component %}
+    {% include "part/view_part.html" %}
+    {% endif %}
+{% endfor %}
+</div>
+<div id="design_inseparable_parts" style="padding-top: 20px">
+{% for part in design.parts %}
+    {% if part.inseparable_component %}
+    {% include "part/view_part.html" %}
+    {% endif %}
+{% endfor %}
+</div>
+
+<div class="row" style="padding-bottom:10px;">
+    {% if design.can_user_edit('parts') %}
+    <div class="col-xs-1">
+        <button type="button" class="btn pri-btn-primary" onclick="addPartModal('separable', {{design.id}});">Add Part</button>
+    </div>
+    <div class="col-xs-4">
+        <button type="button" class="btn pri-btn-primary" onclick="addPartModal('inseparable', {{design.id}});">Add Inseparable Component</button>
+    </div>
+    {% else %}
+    <div class="col-xs-1">
+        <button type="button" class="btn pri-btn-primary" disabled>Add Part</button>
+    </div>
+    <div class="col-xs-4">
+        <button type="button" class="btn pri-btn-primary" disabled>Add Inseparable Component</button>
+    </div>
+    {% endif %}
+    <div class="col-xs-7">
+    </div>
+</div>

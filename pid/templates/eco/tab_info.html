@@ -1,0 +1,33 @@
+
+{% from 'shared/document_list.html' import document_list with context %}
+{% from 'shared/link_list.html' import link_list with context %}
+{% from "shared/trumbowyg.html" import trumbowyg %}
+
+<div class="row" style="padding-top: 10px;">
+    <div class="col-xs-12">
+        {{ trumbowyg(field=eco.summary, parent=eco,
+        api_url="/eco/update", field_name='summary', label='SUMMARY', placeholder='Summary of updates to the Design') }}
+    </div>
+</div>
+<div class="row" style="padding-top: 10px;">
+    <div class="col-xs-12">
+        {{ trumbowyg(field=eco.analysis, parent=eco,
+        api_url="/eco/update", field_name='analysis', label='ANALYSIS', placeholder='Explanation / Justification / Analysis of how the update fixes the design issue') }}
+    </div>
+</div>
+<div class="row" style="padding-top: 10px;">
+    <div class="col-xs-12">
+        {{ trumbowyg(field=eco.corrective_action, parent=eco,
+        api_url="/eco/update", field_name='corrective_action', label='CORRECTIVE ACTION', placeholder='What has to be done to address this ECO -- what design documents need to be updated and how | What DOC needs to be performed on the hardware | Basic steps for bringing hardware into compliance') }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {{ document_list(parent_object=eco) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {{ link_list(parent_object=eco) }}
+    </div>
+</div>

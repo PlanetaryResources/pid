@@ -1,0 +1,83 @@
+
+{% macro render_ajax_input_float_field(field, parent_object) %}
+
+{% set field_name = kwargs.pop('field_name', '')                                %}  {# Name of field, sent to server for update     #}
+{% set label = kwargs.pop('label', '')|title                                    %}  {# Label to display                             #}
+{% set display_label = kwargs.pop('display_label', True)                        %}  {# Whether we should display label or not       #}
+{% set api_url = kwargs.pop('api_url', '')                                      %}  {# URL to call for update                       #}
+{% set input_size = kwargs.pop('input_size', '')                                %}  {# Set size of input                            #}
+{% set text_size = kwargs.pop('text_size', '')                                  %}  {# Set size of text                             #}
+{% set update_parents_id = kwargs.pop('update_parents_id', '')                  %}  {# Update mass fields of parents on change      #}
+{% set digits = kwargs.pop('digits', 2)                                         %}  {# Num of digits to show after comma            #}
+{% set populate_id = kwargs.pop('populate_id', '')                              %}  {# HTML field ID to update after AJAX call      #}
+{% set horizontal_labels = kwargs.pop('horizontal_labels', False)               %}
+{% set non_edit_additional_css = kwargs.pop('non_edit_additional_css', None)    %}  {# Additional CSS to apply when user can't edit #}
+
+{% set primary_key = parent_object.id %}
+{% set parent_class = parent_object.get_class_name() %}
+
+{# Create a composite id which is unique on entire page for easier reference #}
+{% set uid = field_name + '-' + parent_class + '-' + primary_key|string + '-ajax' %}
+
+{% if horizontal_labels %}
+<div class="row">
+    {% if display_label == True %}
+    <div class="col-xs-3">
+        <label class="control-label pri-field-label {{text_size}}">{{label}}</label>
+    </div>
+    {% endif %}
+    <div class="col-xs-8">
+        {% if parent_object.can_user_edit(field_name) %}
+        <input type="input" class="form-control {{input_size}} text-right" value="{{('%0.'+digits|string+'f')|format(field|float)}}" id="{{uid}}"/>
+        {% else %}
+        <div class="{{input_size}}" {% if non_edit_additional_css %}style="{{non_edit_additional_css}}"{% endif %}>{{('%0.'+digits|string+'f')|format(field|float)}}</div>
+        {% endif %}
+    </div>
+</div>
+{% else %} {# else if horizontal_labels #}
+{% if display_label == True %}
+<label class="control-label pri-field-label {{text_size}}">{{label}}</label><br/>
+{% endif %}
+{% if parent_object.can_user_edit(field_name) %}
+<input type="input" class="form-control {{input_size}} text-right" value="{{('%0.'+digits|string+'f')|format(field|float)}}" id="{{uid}}"/>
+{% else %}
+<span class="{{input_size}}" {% if non_edit_additional_css %}style="{{non_edit_additional_css}}"{% endif %}>{{('%0.'+digits|string+'f')|format(field|float)}}</span>
+{% endif %}
+{% endif %} {# end if horizontal_labels #}
+
+{% if parent_object.can_user_edit(field_name) %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#{{uid}}").change(function() {
+            var floatvalue = $(this).val() || 0;
+            floatvalue = parseFloat(floatvalue).toFixed({{digits}});
+            $.ajax({
+                url: '{{api_url}}',
+                type: 'POST',
+                data: {
+                    pk: '{{ primary_key }}',
+                    name: '{{field_name}}',
+                    value: floatvalue
+                },
+                success: function(data) {
+                    $('#{{uid}}').val(floatvalue);
+                    highlight($("#{{uid}}"));
+                    $.notify('<strong>{{label}}</strong> updated');
+                    {% if update_parents_id != '' %}
+                    update_parent_mass_fields("{{update_parents_id}}")
+                    {% endif %}
+                    {% if populate_id != '' %}
+                    // Populate field with template coming in response
+                    $('#{{populate_id}}').html(data);
+                    {% endif %}
+                },
+                error: function() {
+                    $.notify('<strong>{{label}}</strong> could not be updated', { type: 'danger' });
+                }
+            });
+        });
+    });
+</script>
+{% endif %}
+
+{% endmacro %}
