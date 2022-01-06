@@ -27,7 +27,7 @@ WTForms==2.1
 
 # Deployment
 gunicorn==19.7.1
-celery==4.1.0
+celery==5.2.2
 
 # Assets
 Flask-Assets==0.12
